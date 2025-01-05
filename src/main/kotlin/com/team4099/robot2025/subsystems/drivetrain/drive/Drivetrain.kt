@@ -8,6 +8,7 @@ import com.team4099.lib.vision.TimestampedTrigVisionUpdate
 import com.team4099.lib.vision.TimestampedVisionUpdate
 import com.team4099.robot2023.config.constants.Constants
 import com.team4099.robot2023.config.constants.DrivetrainConstants
+import com.team4099.robot2023.config.constants.VisionConstants
 import com.team4099.robot2023.subsystems.drivetrain.gyro.GyroIO
 import com.team4099.robot2023.subsystems.superstructure.Request
 import com.team4099.robot2023.util.Alert
@@ -256,7 +257,7 @@ class Drivetrain(val gyroIO: GyroIO, swerveModuleIOs: DrivetrainIO) : SubsystemB
         )
     }
     val chassisState: ChassisSpeeds =
-      ChassisSpeeds(swerveDriveKinematics.toChassisSpeeds(*measuredStates))
+      ChassisSpeeds(swerveDriveKinematics.toChassisSpeeds(measuredStates))
     val fieldVelCalculated =
       Translation2d(
         chassisState.vx.inMetersPerSecond.meters, chassisState.vy.inMetersPerSecond.meters

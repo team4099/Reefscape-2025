@@ -12,6 +12,8 @@ package com.team4099.utils.threads;// Copyright 2021-2023 FRC 6328
 // GNU General Public License for more details.
 
 
+import edu.wpi.first.units.measure.Angle;
+
 /**
  * Provides an interface for asynchronously reading high-frequency measurements to a set of queues.
  *
@@ -42,7 +44,7 @@ public class PhoenixOdometryThread extends Thread {
         start();
     }
 
-    public java.util.Queue<Double> registerSignal(com.ctre.phoenix6.hardware.ParentDevice device, com.ctre.phoenix6.StatusSignal<Double> signal) {
+    public java.util.Queue<Double> registerSignal(com.ctre.phoenix6.hardware.ParentDevice device, com.ctre.phoenix6.StatusSignal<Angle> signal) {
         isCANFD = device.getNetwork().equals(com.team4099.robot2023.config.constants.Constants.Universal.CANIVORE_NAME);
         java.util.Queue<Double> queue = new java.util.concurrent.ArrayBlockingQueue<>(100);
         signalsLock.lock();

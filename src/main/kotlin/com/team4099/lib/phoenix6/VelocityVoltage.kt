@@ -2,6 +2,7 @@ package com.team4099.lib.phoenix6
 
 import org.team4099.lib.units.AngularAcceleration
 import org.team4099.lib.units.AngularVelocity
+import org.team4099.lib.units.Velocity
 import org.team4099.lib.units.derived.ElectricalPotential
 import org.team4099.lib.units.derived.degrees
 import org.team4099.lib.units.derived.inVolts
@@ -25,14 +26,14 @@ class VelocityVoltage(
   val velocityVoltagePhoenix6 =
     VelocityVoltagePhoenix6(
       velocity.inRotationsPerSecond,
-      acceleration.inRotationsPerSecondPerSecond,
-      enableFOC,
-      feedforward.inVolts,
-      slot,
-      overrideBrakeDurNeutral,
-      limitForwardMotion,
-      limitReverseMotion
     )
+      .withAcceleration(acceleration.inRotationsPerSecondPerSecond)
+      .withEnableFOC(enableFOC)
+      .withFeedForward(feedforward.inVolts)
+      .withSlot(slot)
+      .withOverrideBrakeDurNeutral(overrideBrakeDurNeutral)
+      .withLimitForwardMotion(limitForwardMotion)
+      .withLimitReverseMotion(limitReverseMotion)
 
   fun setVelocity(new_velocity: AngularVelocity) {
     velocity = new_velocity

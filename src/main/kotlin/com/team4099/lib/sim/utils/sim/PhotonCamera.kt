@@ -32,7 +32,6 @@ import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.Timer
 import org.photonvision.PhotonVersion
 import org.photonvision.common.dataflow.structures.Packet
-import org.photonvision.common.dataflow.structures.PacketSerde
 import org.photonvision.targeting.PNPResult.APacketSerde
 import org.photonvision.targeting.PhotonTrackedTarget
 

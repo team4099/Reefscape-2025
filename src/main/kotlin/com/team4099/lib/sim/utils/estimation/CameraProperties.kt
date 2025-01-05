@@ -158,6 +158,8 @@ class CameraProperties {
             areaPercent,
             Math.toDegrees(boundingCenterRot.x),
             target.fiducialId,
+            target.detectedObjectClassID,
+            target.objDetectConf,
             target.bestCameraToTarget,
             target.alternateCameraToTarget,
             target.poseAmbiguity,

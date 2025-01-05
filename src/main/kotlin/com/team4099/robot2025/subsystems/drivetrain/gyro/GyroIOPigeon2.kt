@@ -5,6 +5,7 @@ import com.ctre.phoenix6.configs.Pigeon2Configuration
 import com.ctre.phoenix6.hardware.Pigeon2
 import com.team4099.robot2023.config.constants.Constants
 import com.team4099.robot2023.config.constants.DrivetrainConstants
+import com.team4099.robot2023.config.constants.GyroConstants
 import com.team4099.utils.threads.PhoenixOdometryThread
 import com.team4099.utils.threads.SparkMaxOdometryThread
 import org.littletonrobotics.junction.Logger
@@ -31,7 +32,7 @@ object GyroIOPigeon2 : GyroIO {
 
   private val isConnected: Boolean
     get() {
-      return upTimeSignal.value > 0.0
+      return upTimeSignal.valueAsDouble > 0.0
     }
 
   var gyroYawOffset: Angle = 0.0.degrees
@@ -46,7 +47,7 @@ object GyroIOPigeon2 : GyroIO {
   val gyroYaw: Angle
     get() {
       if (isConnected) {
-        var rawYaw = yawSignal.value + gyroYawOffset.inDegrees
+        var rawYaw = yawSignal.valueAsDouble + gyroYawOffset.inDegrees
         rawYaw += DrivetrainConstants.GYRO_RATE_COEFFICIENT * gyroYawRate.inDegreesPerSecond
         return rawYaw.IEEErem(360.0).degrees
       } else {
@@ -57,7 +58,7 @@ object GyroIOPigeon2 : GyroIO {
   val gyroPitch: Angle
     get() {
       if (isConnected) {
-        val rawPitch = pitchSignal.value + gyroPitchOffset.inDegrees
+        val rawPitch = pitchSignal.valueAsDouble + gyroPitchOffset.inDegrees
         return rawPitch.IEEErem(360.0).degrees
       } else {
         return (-1.337).degrees
@@ -67,7 +68,7 @@ object GyroIOPigeon2 : GyroIO {
   val gyroRoll: Angle
     get() {
       if (isConnected) {
-        val rawRoll = rollSignal.value + gyroRollOffset.inDegrees
+        val rawRoll = rollSignal.valueAsDouble + gyroRollOffset.inDegrees
         return rawRoll.IEEErem(360.0).degrees
       } else {
         return -1.337.degrees
@@ -77,7 +78,7 @@ object GyroIOPigeon2 : GyroIO {
   val gyroYawRate: AngularVelocity
     get() {
       if (isConnected) {
-        return yawVelSignal.value.degrees.perSecond
+        return yawVelSignal.valueAsDouble.degrees.perSecond
       } else {
         return -1.337.degrees.perSecond
       }
@@ -86,7 +87,7 @@ object GyroIOPigeon2 : GyroIO {
   val gyroPitchRate: AngularVelocity
     get() {
       if (isConnected) {
-        return pitchVelSignal.value.degrees.perSecond
+        return pitchVelSignal.valueAsDouble.degrees.perSecond
       } else {
         return -1.337.degrees.perSecond
       }
@@ -95,7 +96,7 @@ object GyroIOPigeon2 : GyroIO {
   val gyroRollRate: AngularVelocity
     get() {
       if (isConnected) {
-        return rollVelSignal.value.degrees.perSecond
+        return rollVelSignal.valueAsDouble.degrees.perSecond
       } else {
         return -1.337.degrees.perSecond
       }
@@ -113,7 +114,7 @@ object GyroIOPigeon2 : GyroIO {
       ) {
         PhoenixOdometryThread.getInstance().registerSignal(pigeon2, pigeon2.yaw)
       } else {
-        SparkMaxOdometryThread.getInstance().registerSignal { pigeon2.yaw.getValueAsDouble() }
+        SparkMaxOdometryThread.getInstance().registerSignal { pigeon2.yaw.valueAsDouble }
       }
 
     // TODO look into more pigeon configuration stuff
@@ -130,7 +131,7 @@ object GyroIOPigeon2 : GyroIO {
       pitchVelSignal,
       rollVelSignal
     )
-    inputs.rawGyroYaw = yawSignal.value.degrees
+    inputs.rawGyroYaw = yawSignal.valueAsDouble.degrees
 
     inputs.gyroConnected = isConnected
 
@@ -151,14 +152,14 @@ object GyroIOPigeon2 : GyroIO {
   }
 
   override fun zeroGyroYaw(toAngle: Angle) {
-    gyroYawOffset = toAngle - pigeon2.yaw.value.IEEErem(360.0).degrees
+    gyroYawOffset = toAngle - pigeon2.yaw.valueAsDouble.IEEErem(360.0).degrees
   }
 
   override fun zeroGyroPitch(toAngle: Angle) {
-    gyroPitchOffset = toAngle - pigeon2.pitch.value.IEEErem(360.0).degrees
+    gyroPitchOffset = toAngle - pigeon2.pitch.valueAsDouble.IEEErem(360.0).degrees
   }
 
   override fun zeroGyroRoll(toAngle: Angle) {
-    gyroRollOffset = toAngle - pigeon2.roll.value.IEEErem(360.0).degrees
+    gyroRollOffset = toAngle - pigeon2.roll.valueAsDouble.IEEErem(360.0).degrees
   }
 }

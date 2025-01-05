@@ -20,7 +20,6 @@ import org.opencv.core.MatOfPoint
 import org.opencv.core.MatOfInt
 import com.team4099.lib.sim.utils.estimation.VisionEstimation.PNPResults
 import edu.wpi.first.math.numbers.N1
-import edu.wpi.first.cscore.CameraServerCvJNI
 import edu.wpi.first.math.Matrix
 import edu.wpi.first.math.Vector
 import edu.wpi.first.math.geometry.CoordinateSystem
@@ -521,13 +520,5 @@ object OpenCVHelp {
     knownPts.release()
     outputMat.release()
     return trf
-  }
-
-  init {
-    try {
-      CameraServerCvJNI.forceLoad()
-    } catch (e: Exception) {
-      throw RuntimeException("Failed to load native libraries!", e)
-    }
   }
 }

@@ -1,6 +1,5 @@
 package com.team4099.lib.pathfollow
 
-import com.pathplanner.lib.path.PathPlannerTrajectory
 import edu.wpi.first.math.trajectory.TrajectoryParameterizer
 import org.team4099.lib.geometry.Pose2d
 import org.team4099.lib.geometry.Translation2d
@@ -8,7 +7,6 @@ import org.team4099.lib.units.LinearVelocity
 import org.team4099.lib.units.base.meters
 import org.team4099.lib.units.base.seconds
 import org.team4099.lib.units.derived.angle
-import org.team4099.lib.units.derived.radians
 import org.team4099.lib.units.inMetersPerSecond
 import org.team4099.lib.units.inMetersPerSecondPerSecond
 import org.team4099.lib.units.perSecond
@@ -70,20 +68,4 @@ fun trajectoryFromPath(
     }
 
   return Trajectory(states)
-}
-
-fun trajectoryFromPathPlanner(pathPlannerTrajectory: PathPlannerTrajectory): Trajectory {
-  return Trajectory(
-    pathPlannerTrajectory.states.map { state ->
-      state as PathPlannerTrajectory.State
-      TrajectoryState(
-        state.timeSeconds.seconds,
-        Pose2d(Translation2d(state.positionMeters), state.targetHolonomicRotation.angle),
-        state.targetHolonomicPose.rotation.angle,
-        state.velocityMps.meters.perSecond,
-        state.accelerationMpsSq.meters.perSecond.perSecond,
-        angularVelocity = state.holonomicAngularVelocityRps.get().radians.perSecond
-      )
-    }
-  )
 }

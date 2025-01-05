@@ -20,20 +20,19 @@ class PositionVoltage(
   private var overrideBrakeDurNeutral: Boolean = false,
   private var limitForwardMotion: Boolean = false,
   private var limitReverseMotion: Boolean = false,
-  private var velocity: AngularVelocity = 0.0.degrees.perSecond
+  private val velocity: AngularVelocity = 0.0.degrees.perSecond
 ) {
 
   val positionVoltagePhoenix6 =
     PositionVoltagePhoenix6(
       position.inRotations,
-      velocity.inRotationsPerSecond,
-      enableFOC,
-      feedforward.inVolts,
-      slot,
-      overrideBrakeDurNeutral,
-      limitForwardMotion,
-      limitReverseMotion
     )
+      .withVelocity(velocity.inRotationsPerSecond)
+      .withEnableFOC(enableFOC)
+      .withFeedForward(feedforward.inVolts)
+      .withOverrideBrakeDurNeutral(overrideBrakeDurNeutral)
+      .withLimitForwardMotion(limitForwardMotion)
+      .withLimitReverseMotion(limitReverseMotion)
 
   fun setPosition(new_position: Angle) {
     position = new_position
