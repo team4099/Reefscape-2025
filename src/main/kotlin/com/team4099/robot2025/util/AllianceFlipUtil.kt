@@ -5,7 +5,6 @@ import com.team4099.lib.trajectory.FieldWaypoint
 import com.team4099.lib.trajectory.OdometryWaypoint
 import com.team4099.lib.trajectory.RotationSequence
 import com.team4099.lib.trajectory.Waypoint
-import com.team4099.robot2023.config.constants.FieldConstants
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.trajectory.Trajectory
 import edu.wpi.first.wpilibj.DriverStation

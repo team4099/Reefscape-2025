@@ -5,7 +5,6 @@ import com.ctre.phoenix6.configs.Pigeon2Configuration
 import com.ctre.phoenix6.hardware.Pigeon2
 import com.team4099.robot2023.config.constants.Constants
 import com.team4099.robot2023.config.constants.DrivetrainConstants
-import com.team4099.robot2023.config.constants.GyroConstants
 import com.team4099.utils.threads.PhoenixOdometryThread
 import com.team4099.utils.threads.SparkMaxOdometryThread
 import org.littletonrobotics.junction.Logger
@@ -18,7 +17,6 @@ import org.team4099.lib.units.inDegreesPerSecond
 import org.team4099.lib.units.perSecond
 import java.util.Queue
 import kotlin.math.IEEErem
-import kotlin.streams.toList
 
 object GyroIOPigeon2 : GyroIO {
   private var pigeon2 = Pigeon2(Constants.Gyro.PIGEON_2_ID, Constants.Universal.CANIVORE_NAME)

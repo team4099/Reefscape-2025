@@ -99,7 +99,7 @@ class Path constructor(val startingPose: Pose2d, val endingPose: Pose2d) {
     splinePoints = mutableListOf()
 
     // Add the first point to the vector.
-    splinePoints.add(splines[0].getPoint(0.0))
+    splinePoints.add(splines[0].getPoint(0.0).get())
 
     // Iterate through the vector and parameterize each spline, adding the
     // parameterized points to the final vector.
