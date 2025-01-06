@@ -1,8 +1,8 @@
-package com.team4099.robot2023.auto
+package com.team4099.robot2025.auto
 
-import com.team4099.robot2023.auto.mode.ExamplePathAuto
-import com.team4099.robot2023.subsystems.drivetrain.drive.Drivetrain
-import com.team4099.robot2023.util.AllianceFlipUtil
+import com.team4099.robot2025.auto.mode.ExamplePathAuto
+import com.team4099.robot2025.subsystems.drivetrain.drive.Drivetrain
+import com.team4099.robot2025.util.AllianceFlipUtil
 import edu.wpi.first.networktables.GenericEntry
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard

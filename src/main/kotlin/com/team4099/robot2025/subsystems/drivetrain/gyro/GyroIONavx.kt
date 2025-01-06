@@ -1,7 +1,7 @@
-package com.team4099.robot2023.subsystems.drivetrain.gyro
+package com.team4099.robot2025.subsystems.drivetrain.gyro
 
 import com.kauailabs.navx.frc.AHRS
-import com.team4099.robot2023.config.constants.DrivetrainConstants
+import com.team4099.robot2025.config.constants.DrivetrainConstants
 import edu.wpi.first.wpilibj.SerialPort
 import org.team4099.lib.units.AngularVelocity
 import org.team4099.lib.units.derived.Angle

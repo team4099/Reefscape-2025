@@ -1,7 +1,7 @@
-package com.team4099.robot2023.config
+package com.team4099.robot2025.config
 
-import com.team4099.robot2023.config.constants.Constants
-import com.team4099.robot2023.config.constants.DrivetrainConstants
+import com.team4099.robot2025.config.constants.Constants
+import com.team4099.robot2025.config.constants.DrivetrainConstants
 import edu.wpi.first.wpilibj.GenericHID
 import edu.wpi.first.wpilibj2.command.button.Trigger
 import org.team4099.lib.joystick.XboxOneGamepad

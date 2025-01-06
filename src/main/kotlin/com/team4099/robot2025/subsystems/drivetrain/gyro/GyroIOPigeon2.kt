@@ -1,11 +1,11 @@
-package com.team4099.robot2023.subsystems.drivetrain.gyro
+package com.team4099.robot2025.subsystems.drivetrain.gyro
 
 import com.ctre.phoenix6.BaseStatusSignal
 import com.ctre.phoenix6.configs.Pigeon2Configuration
 import com.ctre.phoenix6.hardware.Pigeon2
-import com.team4099.robot2023.config.constants.Constants
-import com.team4099.robot2023.config.constants.DrivetrainConstants
-import com.team4099.robot2023.config.constants.GyroConstants
+import com.team4099.robot2025.config.constants.Constants
+import com.team4099.robot2025.config.constants.DrivetrainConstants
+import com.team4099.robot2025.config.constants.GyroConstants
 import com.team4099.utils.threads.PhoenixOdometryThread
 import com.team4099.utils.threads.SparkMaxOdometryThread
 import org.littletonrobotics.junction.Logger

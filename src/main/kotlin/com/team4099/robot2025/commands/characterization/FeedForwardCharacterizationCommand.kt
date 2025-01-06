@@ -1,6 +1,6 @@
-package com.team4099.robot2023.commands.characterization
+package com.team4099.robot2025.commands.characterization
 
-import com.team4099.robot2023.subsystems.drivetrain.drive.Drivetrain
+import com.team4099.robot2025.subsystems.drivetrain.drive.Drivetrain
 import com.team4099.utils.PolynomialRegression
 import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj2.command.Command

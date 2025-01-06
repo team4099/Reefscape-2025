@@ -1,6 +1,6 @@
 package com.team4099.lib.vision
 
-import com.team4099.robot2023.subsystems.limelight.CoordinatePair
+import com.team4099.robot2025.subsystems.limelight.CoordinatePair
 import org.photonvision.targeting.TargetCorner
 
 data class TargetCorner(val x: Double, val y: Double) {

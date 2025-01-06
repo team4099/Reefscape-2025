@@ -1,8 +1,8 @@
-package com.team4099.robot2023.auto.mode
+package com.team4099.robot2025.auto.mode
 
 import com.team4099.lib.trajectory.FieldWaypoint
-import com.team4099.robot2023.commands.drivetrain.DrivePathCommand
-import com.team4099.robot2023.subsystems.drivetrain.drive.Drivetrain
+import com.team4099.robot2025.commands.drivetrain.DrivePathCommand
+import com.team4099.robot2025.subsystems.drivetrain.drive.Drivetrain
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import org.team4099.lib.geometry.Pose2d
 import org.team4099.lib.geometry.Translation2d

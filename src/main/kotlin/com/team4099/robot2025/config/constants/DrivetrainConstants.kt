@@ -1,4 +1,4 @@
-package com.team4099.robot2023.config.constants
+package com.team4099.robot2025.config.constants
 
 import edu.wpi.first.wpilibj.RobotBase
 import org.team4099.lib.units.Velocity

@@ -1,4 +1,4 @@
-package com.team4099.robot2023.commands.drivetrain
+package com.team4099.robot2025.commands.drivetrain
 
 import com.team4099.lib.logging.LoggedTunableValue
 import com.team4099.lib.math.asPose2d
@@ -8,12 +8,12 @@ import com.team4099.lib.trajectory.CustomTrajectoryGenerator
 import com.team4099.lib.trajectory.FieldWaypoint
 import com.team4099.lib.trajectory.OdometryWaypoint
 import com.team4099.lib.trajectory.Waypoint
-import com.team4099.robot2023.config.constants.DrivetrainConstants
-import com.team4099.robot2023.subsystems.drivetrain.drive.Drivetrain
-import com.team4099.robot2023.util.AllianceFlipUtil
-import com.team4099.robot2023.util.CustomLogger
-import com.team4099.robot2023.util.FrameType
-import com.team4099.robot2023.util.Velocity2d
+import com.team4099.robot2025.config.constants.DrivetrainConstants
+import com.team4099.robot2025.subsystems.drivetrain.drive.Drivetrain
+import com.team4099.robot2025.util.AllianceFlipUtil
+import com.team4099.robot2025.util.CustomLogger
+import com.team4099.robot2025.util.FrameType
+import com.team4099.robot2025.util.Velocity2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics
 import edu.wpi.first.math.trajectory.TrajectoryParameterizer.TrajectoryGenerationException
@@ -62,7 +62,7 @@ import org.team4099.lib.units.inRadiansPerSecondPerSecond
 import org.team4099.lib.units.perSecond
 import java.util.function.Supplier
 import kotlin.math.PI
-import com.team4099.robot2023.subsystems.superstructure.Request.DrivetrainRequest as DrivetrainRequest
+import com.team4099.robot2025.subsystems.superstructure.Request.DrivetrainRequest as DrivetrainRequest
 
 class DrivePathCommand<T : Waypoint>
 private constructor(

@@ -45,7 +45,7 @@ public class PhoenixOdometryThread extends Thread {
     }
 
     public java.util.Queue<Double> registerSignal(com.ctre.phoenix6.hardware.ParentDevice device, com.ctre.phoenix6.StatusSignal<Angle> signal) {
-        isCANFD = device.getNetwork().equals(com.team4099.robot2023.config.constants.Constants.Universal.CANIVORE_NAME);
+        isCANFD = device.getNetwork().equals(com.team4099.robot2025.config.constants.Constants.Universal.CANIVORE_NAME);
         java.util.Queue<Double> queue = new java.util.concurrent.ArrayBlockingQueue<>(100);
         signalsLock.lock();
         try {
@@ -68,13 +68,13 @@ public class PhoenixOdometryThread extends Thread {
             signalsLock.lock();
             try {
                 if (isCANFD && signals.length > 0) {
-                    com.ctre.phoenix6.BaseStatusSignal.waitForAll(2.0 / com.team4099.robot2023.config.constants.DrivetrainConstants.OMOMETRY_UPDATE_FREQUENCY, signals);
+                    com.ctre.phoenix6.BaseStatusSignal.waitForAll(2.0 / com.team4099.robot2025.config.constants.DrivetrainConstants.OMOMETRY_UPDATE_FREQUENCY, signals);
                 } else {
                     // "waitForAll" does not support blocking on multiple
                     // signals with a bus that is not CAN FD, regardless
                     // of Pro licensing. No reasoning for this behavior
                     // is provided by the documentation.
-                    Thread.sleep((long) (1000.0 / com.team4099.robot2023.config.constants.DrivetrainConstants.OMOMETRY_UPDATE_FREQUENCY));
+                    Thread.sleep((long) (1000.0 / com.team4099.robot2025.config.constants.DrivetrainConstants.OMOMETRY_UPDATE_FREQUENCY));
                     com.ctre.phoenix6.BaseStatusSignal.refreshAll(signals);
                 }
             } catch (InterruptedException e) {
@@ -84,13 +84,13 @@ public class PhoenixOdometryThread extends Thread {
             }
 
             // Save new data to queues
-            com.team4099.robot2023.subsystems.drivetrain.drive.Drivetrain.Companion.setOdometryLock(true);
+            com.team4099.robot2025.subsystems.drivetrain.drive.Drivetrain.Companion.setOdometryLock(true);
             try {
                 for (int i = 0; i < signals.length; i++) {
                     queues.get(i).offer(signals[i].getValueAsDouble());
                 }
             } finally {
-                com.team4099.robot2023.subsystems.drivetrain.drive.Drivetrain.Companion.setOdometryLock(false);
+                com.team4099.robot2025.subsystems.drivetrain.drive.Drivetrain.Companion.setOdometryLock(false);
             }
         }
     }
