@@ -48,7 +48,7 @@ interface GyroIO {
       table?.get("gyroRollRateDegreesPerSecond", gyroRollRate.inDegreesPerSecond)?.let {
         gyroRollRate = it.degrees.perSecond
       }
-      table?.getBoolean("gyroConnected", gyroConnected)?.let { gyroConnected = it }
+      table?.get("gyroConnected", gyroConnected)?.let { gyroConnected = it }
     }
   }
   fun updateInputs(inputs: GyroIOInputs) {}

@@ -4,7 +4,6 @@ import com.team4099.robot2025.config.constants.Constants
 import edu.wpi.first.util.WPISerializable
 import edu.wpi.first.util.struct.Struct
 import edu.wpi.first.util.struct.StructSerializable
-import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d
 import org.littletonrobotics.junction.Logger
 import org.littletonrobotics.junction.inputs.LoggableInputs
 
@@ -28,10 +27,6 @@ class CustomLogger {
 
     inline fun <T : StructSerializable> recordOutput(key: String, vararg value: T) {
       Logger.recordOutput(key, *value)
-    }
-
-    inline fun recordOutput(key: String, value: Mechanism2d) {
-      Logger.recordOutput(key, value)
     }
 
     inline fun recordOutput(key: String, value: Array<String>) {
@@ -107,12 +102,6 @@ class CustomLogger {
     inline fun <T : StructSerializable> recordDebugOutput(key: String, vararg value: T) {
       if (Constants.Tuning.DEBUGING_MODE) {
         Logger.recordOutput(key, *value)
-      }
-    }
-
-    inline fun recordDebugOutput(key: String, value: Mechanism2d) {
-      if (Constants.Tuning.DEBUGING_MODE) {
-        Logger.recordOutput(key, value)
       }
     }
 

@@ -4,7 +4,6 @@ import com.team4099.robot2025.config.constants.Constants
 import edu.wpi.first.util.WPISerializable
 import edu.wpi.first.util.struct.Struct
 import edu.wpi.first.util.struct.StructSerializable
-import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d
 import org.littletonrobotics.junction.Logger
 
 inline fun <E : Enum<E>> Logger.recordDebugOutput(key: String, value: E) {
@@ -28,12 +27,6 @@ inline fun <T> Logger.recordDebugOutput(key: String, value: Struct<T>) {
 inline fun <T : StructSerializable> Logger.recordDebugOutput(key: String, vararg value: T) {
   if (Constants.Tuning.DEBUGING_MODE) {
     Logger.recordOutput(key, *value)
-  }
-}
-
-inline fun Logger.recordDebugOutput(key: String, value: Mechanism2d) {
-  if (Constants.Tuning.DEBUGING_MODE) {
-    Logger.recordOutput(key, value)
   }
 }
 
