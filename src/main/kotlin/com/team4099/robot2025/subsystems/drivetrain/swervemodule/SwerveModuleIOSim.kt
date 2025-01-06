@@ -3,11 +3,9 @@ package com.team4099.robot2025.subsystems.drivetrain.swervemodule
 import com.team4099.lib.math.clamp
 import com.team4099.robot2025.config.constants.Constants
 import com.team4099.robot2025.config.constants.DrivetrainConstants
-import com.team4099.robot2025.subsystems.falconspin.MotorChecker
-import com.team4099.robot2025.subsystems.falconspin.MotorCollection
-import com.team4099.robot2025.subsystems.falconspin.SimulatedMotor
 import edu.wpi.first.math.MathUtil
 import edu.wpi.first.math.system.plant.DCMotor
+import edu.wpi.first.math.system.plant.LinearSystemId
 import edu.wpi.first.wpilibj.simulation.BatterySim
 import edu.wpi.first.wpilibj.simulation.FlywheelSim
 import edu.wpi.first.wpilibj.simulation.RoboRioSim
@@ -52,16 +50,22 @@ class SwerveModuleIOSim(override val label: String) : SwerveModuleIO {
   // Use inverses of gear ratios because our standard is <1 is reduction
   val driveMotorSim: FlywheelSim =
     FlywheelSim(
-      DCMotor.getNEO(1),
-      1 / DrivetrainConstants.DRIVE_SENSOR_GEAR_RATIO,
-      DrivetrainConstants.DRIVE_WHEEL_INERTIA.inKilogramsMeterSquared
+      LinearSystemId.createFlywheelSystem(
+        DCMotor.getKrakenX60(1),
+        DrivetrainConstants.DRIVE_WHEEL_INERTIA.inKilogramsMeterSquared,
+        1 / DrivetrainConstants.DRIVE_SENSOR_GEAR_RATIO
+      ),
+      DCMotor.getKrakenX60(1)
     )
 
   val steerMotorSim =
     FlywheelSim(
-      DCMotor.getNEO(1),
-      1 / DrivetrainConstants.STEERING_SENSOR_GEAR_RATIO,
-      DrivetrainConstants.STEERING_WHEEL_INERTIA.inKilogramsMeterSquared
+      LinearSystemId.createFlywheelSystem(
+        DCMotor.getFalcon500(1),
+        DrivetrainConstants.STEERING_WHEEL_INERTIA.inKilogramsMeterSquared,
+        1 / DrivetrainConstants.STEERING_SENSOR_GEAR_RATIO
+      ),
+      DCMotor.getFalcon500(1)
     )
 
   var turnRelativePosition = 0.0.radians
@@ -95,30 +99,6 @@ class SwerveModuleIOSim(override val label: String) : SwerveModuleIO {
   init {
     steeringFeedback.enableContinuousInput(-Math.PI.radians, Math.PI.radians)
     steeringFeedback.errorTolerance = DrivetrainConstants.ALLOWED_STEERING_ANGLE_ERROR
-
-    MotorChecker.add(
-      "Drivetrain",
-      "Drive",
-      MotorCollection(
-        mutableListOf(SimulatedMotor(driveMotorSim, "$label Drive Motor")),
-        65.amps,
-        90.celsius,
-        45.amps,
-        100.celsius
-      )
-    )
-
-    MotorChecker.add(
-      "Drivetrain",
-      "Steering",
-      MotorCollection(
-        mutableListOf(SimulatedMotor(steerMotorSim, "$label Steering Motor")),
-        65.amps,
-        90.celsius,
-        45.amps,
-        100.celsius
-      )
-    )
   }
 
   var driveAppliedVolts = 0.0.volts

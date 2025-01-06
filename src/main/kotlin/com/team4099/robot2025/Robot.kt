@@ -3,9 +3,7 @@ package com.team4099.robot2025
 import com.team4099.lib.hal.Clock
 import com.team4099.robot2025.auto.AutonomousSelector
 import com.team4099.robot2025.auto.PathStore
-import com.team4099.robot2025.config.ControlBoard
 import com.team4099.robot2025.config.constants.Constants
-import com.team4099.robot2025.subsystems.falconspin.MotorChecker
 import com.team4099.robot2025.util.Alert
 import com.team4099.robot2025.util.Alert.AlertType
 import com.team4099.robot2025.util.CustomLogger
@@ -178,16 +176,7 @@ object Robot : LoggedRobot() {
     // checking for logging errors
     logReceiverQueueAlert.set(Logger.getReceiverQueueFault())
 
-    // motor checker stuff
-    val motorCheckerStartTime = Clock.realTimestamp
-    MotorChecker.periodic()
-    Logger.recordOutput(
-      "LoggedRobot/Subsystems/MotorCheckerLoopTimeMS",
-      (Clock.realTimestamp - motorCheckerStartTime).inMilliseconds
-    )
-
     val superstructureLoopTimeMS = Clock.realTimestamp
-    RobotContainer.superstructure.periodic()
     Logger.recordOutput(
       "LoggedRobot/Subsystems/SuperstructureLoopTimeMS",
       (Clock.realTimestamp - superstructureLoopTimeMS).inMilliseconds
@@ -200,8 +189,6 @@ object Robot : LoggedRobot() {
     CustomLogger.recordDebugOutput(
       "LoggedRobot/totalMS", (Clock.realTimestamp - startTime).inMilliseconds
     )
-
-    ControlBoard.rumbleConsumer.accept(RobotContainer.rumbleState)
 
     /*
     DebugLogger.recordDebugOutput("LoggedRobot/port0", port0.voltage)

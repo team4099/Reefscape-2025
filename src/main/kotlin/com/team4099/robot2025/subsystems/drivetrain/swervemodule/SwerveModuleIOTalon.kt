@@ -14,10 +14,9 @@ import com.ctre.phoenix6.signals.InvertedValue
 import com.ctre.phoenix6.signals.NeutralModeValue
 import com.team4099.robot2025.config.constants.Constants
 import com.team4099.robot2025.config.constants.DrivetrainConstants
-import com.team4099.robot2025.subsystems.falconspin.Falcon500
-import com.team4099.robot2025.subsystems.falconspin.MotorChecker
-import com.team4099.robot2025.subsystems.falconspin.MotorCollection
 import com.team4099.utils.threads.PhoenixOdometryThread
+import edu.wpi.first.units.measure.Current
+import edu.wpi.first.units.measure.Temperature
 import edu.wpi.first.wpilibj.AnalogInput
 import edu.wpi.first.wpilibj.RobotController
 import org.littletonrobotics.junction.Logger
@@ -50,7 +49,6 @@ import org.team4099.lib.units.derived.inVoltsPerMetersPerSecond
 import org.team4099.lib.units.derived.inVoltsPerMetersPerSecondPerSecond
 import org.team4099.lib.units.derived.radians
 import org.team4099.lib.units.derived.volts
-import org.team4099.lib.units.perSecond
 import java.lang.Math.PI
 import java.util.Queue
 
@@ -89,13 +87,13 @@ class SwerveModuleIOTalon(
       }
     }
 
-  val driveStatorCurrentSignal: StatusSignal<Double>
-  val driveSupplyCurrentSignal: StatusSignal<Double>
-  val steeringStatorCurrentSignal: StatusSignal<Double>
-  val steeringSupplyCurrentSignal: StatusSignal<Double>
-  val steeringPosition: StatusSignal<Double>
-  val driveTempSignal: StatusSignal<Double>
-  val steeringTempSignal: StatusSignal<Double>
+  val driveStatorCurrentSignal: StatusSignal<Current>
+  val driveSupplyCurrentSignal: StatusSignal<Current>
+  val steeringStatorCurrentSignal: StatusSignal<Current>
+  val steeringSupplyCurrentSignal: StatusSignal<Current>
+  val steeringPosition: StatusSignal<edu.wpi.first.units.measure.Angle>
+  val driveTempSignal: StatusSignal<Temperature>
+  val steeringTempSignal: StatusSignal<Temperature>
   val drivePositionQueue: Queue<Double>
   val steeringPositionQueue: Queue<Double>
 
@@ -144,9 +142,9 @@ class SwerveModuleIOTalon(
     //      driveSensor.velocityFeedforwardToRawUnits(DrivetrainConstants.PID.DRIVE_KFF)
     driveConfiguration.CurrentLimits.SupplyCurrentLimit =
       DrivetrainConstants.DRIVE_SUPPLY_CURRENT_LIMIT.inAmperes
-    driveConfiguration.CurrentLimits.SupplyCurrentThreshold =
+    driveConfiguration.CurrentLimits.SupplyCurrentLowerLimit =
       DrivetrainConstants.DRIVE_THRESHOLD_CURRENT_LIMIT.inAmperes
-    driveConfiguration.CurrentLimits.SupplyTimeThreshold =
+    driveConfiguration.CurrentLimits.SupplyCurrentLowerTime =
       DrivetrainConstants.DRIVE_TRIGGER_THRESHOLD_TIME.inSeconds
     driveConfiguration.CurrentLimits.SupplyCurrentLimitEnable = true
     driveConfiguration.CurrentLimits.StatorCurrentLimit =
@@ -170,30 +168,6 @@ class SwerveModuleIOTalon(
     steeringPositionQueue =
       PhoenixOdometryThread.getInstance()
         .registerSignal(steeringFalcon, steeringFalcon.getPosition())
-
-    MotorChecker.add(
-      "Drivetrain",
-      "Drive",
-      MotorCollection(
-        mutableListOf(Falcon500(driveFalcon, "$label Drive Motor")),
-        DrivetrainConstants.DRIVE_SUPPLY_CURRENT_LIMIT,
-        90.celsius,
-        DrivetrainConstants.DRIVE_SUPPLY_CURRENT_LIMIT - 30.amps,
-        110.celsius
-      )
-    )
-
-    MotorChecker.add(
-      "Drivetrain",
-      "Steering",
-      MotorCollection(
-        mutableListOf(Falcon500(steeringFalcon, "$label Steering Motor")),
-        DrivetrainConstants.STEERING_SUPPLY_CURRENT_LIMIT,
-        90.celsius,
-        DrivetrainConstants.STEERING_SUPPLY_CURRENT_LIMIT - 10.amps,
-        110.celsius
-      )
-    )
   }
 
   fun updateSignals() {
@@ -215,10 +189,10 @@ class SwerveModuleIOTalon(
     inputs.steeringAppliedVoltage =
       (steeringFalcon.get() * RobotController.getBatteryVoltage()).volts
 
-    inputs.driveStatorCurrent = driveStatorCurrentSignal.value.amps
-    inputs.driveSupplyCurrent = driveSupplyCurrentSignal.value.amps
-    inputs.steeringStatorCurrent = steeringStatorCurrentSignal.value.amps
-    inputs.steeringSupplyCurrent = steeringSupplyCurrentSignal.value.amps
+    inputs.driveStatorCurrent = driveStatorCurrentSignal.value.baseUnitMagnitude().amps
+    inputs.driveSupplyCurrent = driveSupplyCurrentSignal.value.baseUnitMagnitude().amps
+    inputs.steeringStatorCurrent = steeringStatorCurrentSignal.value.baseUnitMagnitude().amps
+    inputs.steeringSupplyCurrent = steeringSupplyCurrentSignal.value.baseUnitMagnitude().amps
 
     Logger.recordOutput(
       "$label/drivePosition",
@@ -239,8 +213,8 @@ class SwerveModuleIOTalon(
     inputs.steeringVelocity = steeringSensor.velocity
 
     // processor temp is also something we may want to log ?
-    inputs.driveTemp = driveTempSignal.value.celsius
-    inputs.steeringTemp = steeringTempSignal.value.celsius
+    inputs.driveTemp = driveTempSignal.value.baseUnitMagnitude().celsius
+    inputs.steeringTemp = steeringTempSignal.value.baseUnitMagnitude().celsius
 
     inputs.odometryDrivePositions = listOf(inputs.drivePosition)
     inputs.odometrySteeringPositions = listOf(inputs.steeringPosition)
@@ -281,18 +255,7 @@ class SwerveModuleIOTalon(
 
   override fun setSteeringSetpoint(angle: Angle) {
     Logger.recordOutput("$label/steeringSetpointDegrees", angle.inDegrees)
-    steeringFalcon.setControl(
-      PositionDutyCycle(
-        steeringSensor.positionToRawUnits(angle),
-        steeringSensor.velocityToRawUnits(0.0.radians.perSecond),
-        DrivetrainConstants.FOC_ENABLED,
-        0.0,
-        0,
-        false,
-        false,
-        false
-      )
-    )
+    steeringFalcon.setControl(PositionDutyCycle(steeringSensor.positionToRawUnits(angle)))
   }
 
   override fun setClosedLoop(
@@ -302,16 +265,9 @@ class SwerveModuleIOTalon(
   ) {
     val feedforward = DrivetrainConstants.PID.DRIVE_KS * speed.sign
     driveFalcon.setControl(
-      VelocityVoltage(
-        driveSensor.velocityToRawUnits(speed),
-        driveSensor.accelerationToRawUnits(acceleration),
-        DrivetrainConstants.FOC_ENABLED,
-        feedforward.inVolts,
-        0,
-        false,
-        false,
-        false
-      )
+      VelocityVoltage(driveSensor.velocityToRawUnits(speed))
+        .withAcceleration(driveSensor.accelerationToRawUnits(acceleration))
+        .withFeedForward(feedforward.inVolts)
     )
 
     setSteeringSetpoint(steering)
@@ -327,10 +283,6 @@ class SwerveModuleIOTalon(
     driveFalcon.setControl(
       DutyCycleOut(
         speed / DrivetrainConstants.DRIVE_SETPOINT_MAX,
-        DrivetrainConstants.FOC_ENABLED,
-        false,
-        false,
-        false
       )
     )
     setSteeringSetpoint(steering)

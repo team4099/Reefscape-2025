@@ -29,10 +29,7 @@ object AutonomousSelector {
     //    orientationChooser.addOption("Right", 270.degrees)
     //    autoTab.add("Starting Orientation", orientationChooser)
 
-    autonomousModeChooser.addOption(
-      "Example Path Auto",
-      AutonomousMode.EXAMPLE_PATH_AUTO
-    )
+    autonomousModeChooser.addOption("Example Path Auto", AutonomousMode.EXAMPLE_PATH_AUTO)
 
     autoTab.add("Mode", autonomousModeChooser.sendableChooser).withSize(4, 2).withPosition(2, 0)
 
@@ -58,7 +55,7 @@ object AutonomousSelector {
   val secondaryWaitTime: Time
     get() = secondaryWaitInAuto.getDouble(0.0).seconds
 
-  fun getCommand(drivetrain: Drivetrain, superstructure: Superstructure): Command {
+  fun getCommand(drivetrain: Drivetrain): Command {
     val mode = autonomousModeChooser.get()
 
     when (mode) {
@@ -71,7 +68,6 @@ object AutonomousSelector {
               AllianceFlipUtil.apply(ExamplePathAuto.startingPose)
             )
           })
-          .andThen(ExamplePathAuto(drivetrain, superstructure))
       else -> println("ERROR: unexpected auto mode: $mode")
     }
     return InstantCommand()

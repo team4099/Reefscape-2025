@@ -1,7 +1,6 @@
 package com.team4099.robot2025.util
 
 import com.team4099.robot2025.config.constants.Constants
-import edu.wpi.first.units.Measure
 import edu.wpi.first.util.WPISerializable
 import edu.wpi.first.util.struct.Struct
 import edu.wpi.first.util.struct.StructSerializable
@@ -20,10 +19,6 @@ class CustomLogger {
     }
 
     inline fun <T : WPISerializable> recordOutput(key: String, value: T) {
-      Logger.recordOutput(key, value)
-    }
-
-    inline fun <U : edu.wpi.first.units.Unit<U>> recordOutput(key: String, value: Measure<U>) {
       Logger.recordOutput(key, value)
     }
 
@@ -98,12 +93,6 @@ class CustomLogger {
     }
 
     inline fun <T : WPISerializable> recordDebugOutput(key: String, value: T) {
-      if (Constants.Tuning.DEBUGING_MODE) {
-        Logger.recordOutput(key, value)
-      }
-    }
-
-    inline fun <U : edu.wpi.first.units.Unit<U>> recordDebugOutput(key: String, value: Measure<U>) {
       if (Constants.Tuning.DEBUGING_MODE) {
         Logger.recordOutput(key, value)
       }
