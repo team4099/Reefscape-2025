@@ -37,6 +37,7 @@ sealed interface Request {
     class ClosedLoop(
       val position: Angle
     ) : ClimberRequest
-    class Zero() : ClimberRequest
+
+    class Home() : ClimberRequest
   }
 }
