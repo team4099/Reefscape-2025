@@ -1,9 +1,8 @@
 package com.team4099.robot2025.config.constants
 
 import org.team4099.lib.units.base.amps
-import org.team4099.lib.units.derived.radians
-import org.team4099.lib.units.derived.volts
 import org.team4099.lib.units.base.seconds
+import org.team4099.lib.units.derived.*
 import org.team4099.lib.units.perSecond
 
 object ClimberConstants {
@@ -18,11 +17,34 @@ object ClimberConstants {
     val HOMING_STALL_CURRENT = 0.0.amps
     val HOMING_STALL_TIME_THRESHOLD = 0.0.seconds
 
+    val VOLTAGE_COMPENSATION = 0.0.volts
+    val STATOR_CURRENT_LIMIT = 0.0.amps
+    val SUPPLY_CURRENT_LIMIT = 0.amps
+    val THRESHOLD_CURRENT_LIMIT = 0.0.amps
+    val TRIGGER_THRESHOLD_TIME = 0.0.seconds
+
+    val ABSOLUTE_ENCODER_OFFSET = 0.0.radians
+    val ABSOLUTE_ENCODER_TO_MECHANISM_GEAR_RATIO = 0.0
+    val MOTOR_TO_ABSOLUTE_ENCODER_GEAR_RATIO = 0.0
+
     // TODO: Tune the PID values
     object PID {
-        val KP_REAL = 0.0.volts / 1.0.radians
-        val KI_REAL = 0.0.volts / (1.0.radians * 1.0.seconds)
-        val KD_REAL = 0.0.volts / 1.0.radians.perSecond
+        val SLOT1_POS_SWITCH_THRESHOLD = 0.0.radians
+        val SLOT1_VEL_SWITCH_THRESHOLD = 0.0.radians.perSecond
+        val SLOT2_POS_SWITCH_THRESHOLD = 0.0.radians
+        val SLOT2_VEL_SWITCH_THRESHOLD = 0.0.radians.perSecond
+
+        val KP_REAL: ProportionalGain<Radian, Volt>  = 0.0.volts / 1.0.radians
+        val KI_REAL: IntegralGain<Radian, Volt>  = 0.0.volts / (1.0.radians * 1.0.seconds)
+        val KD_REAL: DerivativeGain<Radian, Volt> = 0.0.volts / 1.0.radians.perSecond
+
+        val KP_UNLATCH: ProportionalGain<Radian, Volt>  = 0.0.volts / 1.0.radians
+        val KI_UNLATCH: IntegralGain<Radian, Volt>  = 0.0.volts / (1.0.radians * 1.0.seconds)
+        val KD_UNLATCH: DerivativeGain<Radian, Volt> = 0.0.volts / 1.0.radians.perSecond
+
+        val KP_LATCH: ProportionalGain<Radian, Volt> = 0.0.volts / 1.0.radians
+        val KI_LATCH: IntegralGain<Radian, Volt> = 0.0.volts / (1.0.radians * 1.0.seconds)
+        val KD_LATCH: DerivativeGain<Radian, Volt> = 0.0.volts / 1.0.radians.perSecond
 
         val KP_SIM = 0.0.volts / 1.0.radians
         val KI_SIM = 0.0.volts / (1.0.radians * 1.0.seconds)

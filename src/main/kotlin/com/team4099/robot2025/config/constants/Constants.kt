@@ -28,23 +28,15 @@ object Constants {
     val POWER_DISTRIBUTION_HUB_ID = 1
 
     enum class GamePiece {
-      CUBE,
-      CONE,
       NONE
     }
 
     enum class NodeTier {
-      HYBRID,
-      MID,
-      HIGH,
       NONE
     }
 
     enum class Substation {
-      DOUBLE_SUBSTATION_LEFT,
-      DOUBLE_SUBSTATION_RIGHT,
-      SINGLE_SUBSTATION,
-      NONE,
+      NONE
     }
   }
 
@@ -111,6 +103,13 @@ object Constants {
   object Elevator {
     const val LEADER_MOTOR_ID = 42
     const val FOLLOWER_MOTOR_ID = 41
+  }
+
+  object Climber {
+    //TODO: Get the motor ids
+    const val CLIMBER_MOTOR_ID = 0
+    const val FRAME_PERIMETER_MOTOR_ID = 0
+    const val CANCODER_ID = 0
   }
 
   object Gyro {

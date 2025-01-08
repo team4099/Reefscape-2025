@@ -2,7 +2,10 @@ package com.team4099.robot2025.subsystems.climber
 
 import org.littletonrobotics.junction.LogTable
 import org.littletonrobotics.junction.inputs.LoggableInputs
-import org.team4099.lib.units.base.*
+import org.team4099.lib.units.base.amps
+import org.team4099.lib.units.base.celsius
+import org.team4099.lib.units.base.inAmperes
+import org.team4099.lib.units.base.inCelsius
 import org.team4099.lib.units.derived.*
 import org.team4099.lib.units.inRadiansPerSecond
 import org.team4099.lib.units.perSecond
@@ -39,13 +42,29 @@ interface ClimberIO {
 
     fun updateInputs(inputs: ClimberInputs) {}
 
-    fun setVoltage(voltage: ElectricalPotential) {}
+    fun setClimberVoltage(voltage: ElectricalPotential) {}
 
-    fun setPosition(position: Angle, feedForward: ElectricalPotential) {}
+    fun setFramePerimeterVoltage(voltage: ElectricalPotential) {}
+
+    fun setClimberPosition(position: Angle, feedForward: ElectricalPotential, latched: Boolean) {}
+
+    fun setFramePerimeterPosition(position: Angle, feedForward: ElectricalPotential, latched: Boolean) {}
 
     fun zeroEncoder() {}
 
     fun configPID (
+        kP: ProportionalGain<Radian, Volt>,
+        kI: IntegralGain<Radian, Volt>,
+        kD: DerivativeGain<Radian, Volt>
+    ) {}
+
+    fun configPIDSlot1 (
+        kP: ProportionalGain<Radian, Volt>,
+        kI: IntegralGain<Radian, Volt>,
+        kD: DerivativeGain<Radian, Volt>
+    ) {}
+
+    fun configPIDSlot2 (
         kP: ProportionalGain<Radian, Volt>,
         kI: IntegralGain<Radian, Volt>,
         kD: DerivativeGain<Radian, Volt>
