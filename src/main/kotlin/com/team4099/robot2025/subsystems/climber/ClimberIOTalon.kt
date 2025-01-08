@@ -148,7 +148,6 @@ object ClimberIOTalon : ClimberIO {
         framePerimeterConfiguration.Voltage.PeakForwardVoltage = 3.0
         framePerimeterConfiguration.Voltage.PeakReverseVoltage = -3.0
 
-        // TODO: Find replacements for SupplyCurrentThreshold
         climberConfiguration.CurrentLimits.SupplyCurrentLimit = ClimberConstants.SUPPLY_CURRENT_LIMIT.inAmperes
         climberConfiguration.CurrentLimits.SupplyCurrentLowerLimit = ClimberConstants.THRESHOLD_CURRENT_LIMIT.inAmperes
         climberConfiguration.CurrentLimits.SupplyCurrentLimitEnable = true
