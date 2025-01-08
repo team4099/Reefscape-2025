@@ -102,29 +102,45 @@ object ClimberIOTalon : ClimberIO {
         climberConfiguration.Feedback.RotorToSensorRatio = ClimberConstants.MOTOR_TO_ABSOLUTE_ENCODER_GEAR_RATIO
         framePerimeterConfiguration.Feedback.FeedbackRemoteSensorID = absoluteEncoder.deviceID
         framePerimeterConfiguration.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder
-        framePerimeterConfiguration.Feedback.SensorToMechanismRatio = ClimberConstants.ABSOLUTE_ENCODER_TO_MECHANISM_GEAR_RATIO
+        framePerimeterConfiguration.Feedback.SensorToMechanismRatio =
+            ClimberConstants.ABSOLUTE_ENCODER_TO_MECHANISM_GEAR_RATIO
         framePerimeterConfiguration.Feedback.RotorToSensorRatio = ClimberConstants.MOTOR_TO_ABSOLUTE_ENCODER_GEAR_RATIO
 
-        climberConfiguration.Slot0.kP = climberSensor.proportionalPositionGainToRawUnits(ClimberConstants.PID.KP_REAL)
-        climberConfiguration.Slot0.kI = climberSensor.integralPositionGainToRawUnits(ClimberConstants.PID.KI_REAL)
-        climberConfiguration.Slot0.kD = climberSensor.derivativePositionGainToRawUnits(ClimberConstants.PID.KD_REAL)
-        framePerimeterConfiguration.Slot0.kP = climberSensor.proportionalPositionGainToRawUnits(ClimberConstants.PID.KP_REAL)
-        framePerimeterConfiguration.Slot0.kI = climberSensor.integralPositionGainToRawUnits(ClimberConstants.PID.KI_REAL)
-        framePerimeterConfiguration.Slot0.kD = climberSensor.derivativePositionGainToRawUnits(ClimberConstants.PID.KD_REAL)
+        climberConfiguration.Slot0.kP =
+            climberSensor.proportionalPositionGainToRawUnits(ClimberConstants.PID.KP_REAL)
+        climberConfiguration.Slot0.kI =
+            climberSensor.integralPositionGainToRawUnits(ClimberConstants.PID.KI_REAL)
+        climberConfiguration.Slot0.kD =
+            climberSensor.derivativePositionGainToRawUnits(ClimberConstants.PID.KD_REAL)
+        framePerimeterConfiguration.Slot0.kP =
+            climberSensor.proportionalPositionGainToRawUnits(ClimberConstants.PID.KP_REAL)
+        framePerimeterConfiguration.Slot0.kI =
+            climberSensor.integralPositionGainToRawUnits(ClimberConstants.PID.KI_REAL)
+        framePerimeterConfiguration.Slot0.kD =
+            climberSensor.derivativePositionGainToRawUnits(ClimberConstants.PID.KD_REAL)
 
-        climberConfiguration.Slot1.kP = climberSensor.proportionalPositionGainToRawUnits(ClimberConstants.PID.KP_UNLATCH)
-        climberConfiguration.Slot1.kI = climberSensor.integralPositionGainToRawUnits(ClimberConstants.PID.KI_UNLATCH)
-        climberConfiguration.Slot1.kD = climberSensor.derivativePositionGainToRawUnits(ClimberConstants.PID.KD_UNLATCH)
-        framePerimeterConfiguration.Slot1.kP = climberSensor.proportionalPositionGainToRawUnits(ClimberConstants.PID.KP_UNLATCH)
-        framePerimeterConfiguration.Slot1.kI = climberSensor.integralPositionGainToRawUnits(ClimberConstants.PID.KI_UNLATCH)
-        framePerimeterConfiguration.Slot1.kD = climberSensor.derivativePositionGainToRawUnits(ClimberConstants.PID.KD_UNLATCH)
+        climberConfiguration.Slot1.kP =
+            climberSensor.proportionalPositionGainToRawUnits(ClimberConstants.PID.KP_UNLATCH)
+        climberConfiguration.Slot1.kI =
+            climberSensor.integralPositionGainToRawUnits(ClimberConstants.PID.KI_UNLATCH)
+        climberConfiguration.Slot1.kD =
+            climberSensor.derivativePositionGainToRawUnits(ClimberConstants.PID.KD_UNLATCH)
+        framePerimeterConfiguration.Slot1.kP =
+            climberSensor.proportionalPositionGainToRawUnits(ClimberConstants.PID.KP_UNLATCH)
+        framePerimeterConfiguration.Slot1.kI =
+            climberSensor.integralPositionGainToRawUnits(ClimberConstants.PID.KI_UNLATCH)
+        framePerimeterConfiguration.Slot1.kD =
+            climberSensor.derivativePositionGainToRawUnits(ClimberConstants.PID.KD_UNLATCH)
 
         climberConfiguration.Slot2.kP = climberSensor.proportionalPositionGainToRawUnits(ClimberConstants.PID.KP_LATCH)
         climberConfiguration.Slot2.kI = climberSensor.integralPositionGainToRawUnits(ClimberConstants.PID.KI_LATCH)
         climberConfiguration.Slot2.kD = climberSensor.derivativePositionGainToRawUnits(ClimberConstants.PID.KD_LATCH)
-        framePerimeterConfiguration.Slot2.kP = climberSensor.proportionalPositionGainToRawUnits(ClimberConstants.PID.KP_LATCH)
-        framePerimeterConfiguration.Slot2.kI = climberSensor.integralPositionGainToRawUnits(ClimberConstants.PID.KI_LATCH)
-        framePerimeterConfiguration.Slot2.kD = climberSensor.derivativePositionGainToRawUnits(ClimberConstants.PID.KD_LATCH)
+        framePerimeterConfiguration.Slot2.kP =
+            climberSensor.proportionalPositionGainToRawUnits(ClimberConstants.PID.KP_LATCH)
+        framePerimeterConfiguration.Slot2.kI =
+            climberSensor.integralPositionGainToRawUnits(ClimberConstants.PID.KI_LATCH)
+        framePerimeterConfiguration.Slot2.kD =
+            climberSensor.derivativePositionGainToRawUnits(ClimberConstants.PID.KD_LATCH)
 
         // TODO: Check if these are tunable values or not
         climberConfiguration.Voltage.PeakForwardVoltage = 3.0
@@ -134,13 +150,14 @@ object ClimberIOTalon : ClimberIO {
 
         // TODO: Find replacements for SupplyCurrentThreshold
         climberConfiguration.CurrentLimits.SupplyCurrentLimit = ClimberConstants.SUPPLY_CURRENT_LIMIT.inAmperes
-        // climberConfiguration.CurrentLimits.SupplyCurrentThreshold = ClimberConstants.THRESHOLD_CURRENT_LIMIT.inAmperes
+        climberConfiguration.CurrentLimits.SupplyCurrentLowerLimit = ClimberConstants.THRESHOLD_CURRENT_LIMIT.inAmperes
         climberConfiguration.CurrentLimits.SupplyCurrentLimitEnable = true
         climberConfiguration.CurrentLimits.StatorCurrentLimit = ClimberConstants.STATOR_CURRENT_LIMIT.inAmperes
         climberConfiguration.CurrentLimits.StatorCurrentLimitEnable = false
 
         framePerimeterConfiguration.CurrentLimits.SupplyCurrentLimit = ClimberConstants.SUPPLY_CURRENT_LIMIT.inAmperes
-        // framePerimeterConfiguration.CurrentLimits.SupplyCurrentThreshold = ClimberConstants.THRESHOLD_CURRENT_LIMIT.inAmperes
+        framePerimeterConfiguration.CurrentLimits.SupplyCurrentLowerLimit =
+            ClimberConstants.THRESHOLD_CURRENT_LIMIT.inAmperes
         framePerimeterConfiguration.CurrentLimits.SupplyCurrentLimitEnable = true
         framePerimeterConfiguration.CurrentLimits.StatorCurrentLimit = ClimberConstants.STATOR_CURRENT_LIMIT.inAmperes
         framePerimeterConfiguration.CurrentLimits.StatorCurrentLimitEnable = false
