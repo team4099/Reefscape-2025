@@ -7,14 +7,20 @@ import org.team4099.lib.units.base.seconds
 import org.team4099.lib.units.derived.ElectricalPotential
 import org.team4099.lib.units.derived.volts
 
-class Elevator (val io: ElevatorIO) {
+class Elevator(val io: ElevatorIO) {
     val inputs = ElevatorIO.ElevatorInputs()
 
     var currentState: ElevatorState = ElevatorState.UNINITIALIZED
 
     var targetVoltage: ElectricalPotential = 0.0.volts
 
-    var homingCurrentSpikeStartTime = 0.0.seconds
+    val upperLimitReached: Boolean
+        get() = inputs.elevatorPosition >= ElevatorConstants.UPWARDS_EXTENSION_LIMIT
+
+    val lowerLimitReached: Boolean
+        get() = inputs.elevatorPosition <= ElevatorConstants.DOWNWARDS_EXTENSION_LIMIT
+
+    var isHomed = false
 
     var isHomed = false
 
@@ -65,7 +71,11 @@ class Elevator (val io: ElevatorIO) {
     }
 
     fun setVoltage(targetVoltage: ElectricalPotential) {
-
+        if ((upperLimitReached && targetVoltage > 0.0.volts) || (lowerLimitReached && targetVoltage < 0.0.volts)) {
+            io.setVoltage(0.0.volts)
+        } else {
+            io.setVoltage(targetVoltage)
+        }
     }
 
 
