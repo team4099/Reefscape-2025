@@ -122,23 +122,13 @@ object Constants {
     const val FLYWHEEL_RIGHT_MOTOR_ID = 52
   }
 
-  object WRIST {
-    const val WRIST_MOTOR_ID = 41
+  object Arm {
+    const val ARM_MOTOR_ID = 41
     const val CANCODER_ID = 42
   }
 
   object Alert {
     val TABS = arrayOf("Pre-match", "In-match")
-  }
-
-  object Intake {
-    const val ROLLER_MOTOR_ID = 31
-    const val CENTER_MOTOR_ID = 32
-    const val REV_ENCODER_PORT = 7
-  }
-
-  object Feeder {
-    const val FEEDER_MOTOR_ID = 61
   }
 
   object LED {
