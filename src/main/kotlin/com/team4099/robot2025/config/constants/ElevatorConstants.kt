@@ -24,7 +24,7 @@ object ElevatorConstants {
 
   val ELEVATOR_PULLEY_TO_MOTOR = 0.0
   val SPOOL_DIAMETER = 0.0.inches
-  val VOLTAGE_COMPENSATION = 0.0.volts
+  val VOLTAGE_COMPENSATION = 12.0.volts
 
   val ELEVATOR_SAFE_THRESHOLD = 5.0.inches
 
