@@ -28,10 +28,6 @@ object ElevatorConstants {
 
   val ELEVATOR_SAFE_THRESHOLD = 5.0.inches
 
-  val MAX_VELOCITY = 2.0.meters.perSecond
-  val MAX_ACCELERATION = 4.0.meters.perSecond.perSecond
-  val SLAM_VELOCITY = 5.0.inches.perSecond
-
   val ELEVATOR_TOLERANCE = 0.5.inches
 
   val LEADER_STATOR_CURRENT_LIMIT = 0.0
