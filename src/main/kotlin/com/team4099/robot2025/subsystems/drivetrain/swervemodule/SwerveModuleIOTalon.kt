@@ -15,16 +15,20 @@ import com.ctre.phoenix6.signals.NeutralModeValue
 import com.team4099.robot2025.config.constants.Constants
 import com.team4099.robot2025.config.constants.DrivetrainConstants
 import com.team4099.utils.threads.PhoenixOdometryThread
+import edu.wpi.first.units.Units
 import edu.wpi.first.units.measure.Current
 import edu.wpi.first.units.measure.Temperature
 import edu.wpi.first.wpilibj.AnalogInput
 import edu.wpi.first.wpilibj.RobotController
 import org.littletonrobotics.junction.Logger
 import org.team4099.lib.units.AngularAcceleration
+import org.team4099.lib.units.AngularMechanismSensor
 import org.team4099.lib.units.AngularVelocity
 import org.team4099.lib.units.Fraction
 import org.team4099.lib.units.LinearAcceleration
+import org.team4099.lib.units.LinearMechanismSensor
 import org.team4099.lib.units.LinearVelocity
+import org.team4099.lib.units.Timescale
 import org.team4099.lib.units.Value
 import org.team4099.lib.units.Velocity
 import org.team4099.lib.units.base.Meter
@@ -121,12 +125,13 @@ class SwerveModuleIOTalon(
 
     steeringConfiguration.ClosedLoopGeneral.ContinuousWrap = true
     steeringConfiguration.CurrentLimits.SupplyCurrentLimitEnable = true
-    steeringConfiguration.Feedback.SensorToMechanismRatio =
-      1 / DrivetrainConstants.STEERING_SENSOR_GEAR_RATIO
 
     steeringConfiguration.MotorOutput.NeutralMode =
       NeutralModeValue.Brake // change back to coast maybe?
     steeringFalcon.inverted = true
+
+    steeringConfiguration.Feedback.SensorToMechanismRatio =
+      1 / DrivetrainConstants.STEERING_SENSOR_GEAR_RATIO
 
     steeringFalcon.configurator.apply(steeringConfiguration)
 
@@ -189,10 +194,10 @@ class SwerveModuleIOTalon(
     inputs.steeringAppliedVoltage =
       (steeringFalcon.get() * RobotController.getBatteryVoltage()).volts
 
-    inputs.driveStatorCurrent = driveStatorCurrentSignal.value.baseUnitMagnitude().amps
-    inputs.driveSupplyCurrent = driveSupplyCurrentSignal.value.baseUnitMagnitude().amps
-    inputs.steeringStatorCurrent = steeringStatorCurrentSignal.value.baseUnitMagnitude().amps
-    inputs.steeringSupplyCurrent = steeringSupplyCurrentSignal.value.baseUnitMagnitude().amps
+    inputs.driveStatorCurrent = driveStatorCurrentSignal.value.`in`(Units.Amps).amps
+    inputs.driveSupplyCurrent = driveSupplyCurrentSignal.value.`in`(Units.Amps).amps
+    inputs.steeringStatorCurrent = steeringStatorCurrentSignal.value.`in`(Units.Amps).amps
+    inputs.steeringSupplyCurrent = steeringSupplyCurrentSignal.value.`in`(Units.Amps).amps
 
     Logger.recordOutput(
       "$label/drivePosition",
@@ -213,8 +218,8 @@ class SwerveModuleIOTalon(
     inputs.steeringVelocity = steeringSensor.velocity
 
     // processor temp is also something we may want to log ?
-    inputs.driveTemp = driveTempSignal.value.baseUnitMagnitude().celsius
-    inputs.steeringTemp = steeringTempSignal.value.baseUnitMagnitude().celsius
+    inputs.driveTemp = driveTempSignal.value.`in`(Units.Celsius).celsius
+    inputs.steeringTemp = steeringTempSignal.value.`in`(Units.Celsius).celsius
 
     inputs.odometryDrivePositions = listOf(inputs.drivePosition)
     inputs.odometrySteeringPositions = listOf(inputs.steeringPosition)

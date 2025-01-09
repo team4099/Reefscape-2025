@@ -83,10 +83,10 @@ object DrivetrainConstants {
   val DRIVE_STATOR_THRESHOLD_CURRENT_LIMIT = 80.0.amps
   val DRIVE_STATOR_TRIGGER_THRESHOLD_TIME = 1.0.seconds
 
-  val FRONT_LEFT_MODULE_ZERO = 0.19.radians // good
-  val FRONT_RIGHT_MODULE_ZERO = 6.016.radians // good
-  val BACK_LEFT_MODULE_ZERO = 2.538.radians // good
-  val BACK_RIGHT_MODULE_ZERO = 1.25.radians // good
+  val FRONT_LEFT_MODULE_ZERO = 0.423.radians // good
+  val FRONT_RIGHT_MODULE_ZERO = 1.207.radians // good
+  val BACK_LEFT_MODULE_ZERO = 4.239.radians // good
+  val BACK_RIGHT_MODULE_ZERO = 1.509.radians // good
 
   val STEERING_COMPENSATION_VOLTAGE = 10.volts
   val DRIVE_COMPENSATION_VOLTAGE = 12.volts
@@ -121,7 +121,8 @@ object DrivetrainConstants {
       get() {
         if (RobotBase.isReal()) {
           return (0.6.meters.perSecond / (1.0.meters.perSecond))
-            .metersPerSecondPerMetersPerSecond // todo: 0.25
+            .metersPerSecondPerMetersPerSecond // todo: 0
+          // .25
         } else {
           return (0.0.meters.perSecond / (1.0.meters.perSecond)).metersPerSecondPerMetersPerSecond
         }
