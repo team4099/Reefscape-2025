@@ -55,6 +55,7 @@ object ArmIOTalonFX: ArmIO {
         armConfiguration.Slot0.kP = armMechanismSensor.proportionalPositionGainToRawUnits(ArmConstants.ARM_KP)
         armConfiguration.Slot0.kI = armMechanismSensor.integralPositionGainToRawUnits(ArmConstants.ARM_KI)
         armConfiguration.Slot0.kD = armMechanismSensor.derivativePositionGainToRawUnits(ArmConstants.ARM_KD)
+        armConfiguration.Slot0.GravityType = ArmConstants.GRAVITY_TYPE
 
         // Configure Gear Ratio and Cancoder Fusing
         armConfiguration.Feedback.FeedbackRemoteSensorID = Constants.Arm.CANCODER_ID
