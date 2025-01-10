@@ -70,15 +70,15 @@ class TargetAngleCommand(
 
     if (!(RobotBase.isSimulation())) {
 
-      thetakP.initDefault(DrivetrainConstants.PID.TELEOP_ALIGN_PID_KP)
-      thetakI.initDefault(DrivetrainConstants.PID.TELEOP_ALIGN_PID_KI)
-      thetakD.initDefault(DrivetrainConstants.PID.TELEOP_ALIGN_PID_KD)
+      thetakP.initDefault(DrivetrainConstants.PID.TELEOP_THETA_PID_KP)
+      thetakI.initDefault(DrivetrainConstants.PID.TELEOP_THETA_PID_KI)
+      thetakD.initDefault(DrivetrainConstants.PID.TELEOP_THETA_PID_KD)
 
       thetaPID =
         PIDController(
-          DrivetrainConstants.PID.TELEOP_ALIGN_PID_KP,
-          DrivetrainConstants.PID.TELEOP_ALIGN_PID_KI,
-          DrivetrainConstants.PID.TELEOP_ALIGN_PID_KD
+          DrivetrainConstants.PID.TELEOP_THETA_PID_KP,
+          DrivetrainConstants.PID.TELEOP_THETA_PID_KI,
+          DrivetrainConstants.PID.TELEOP_THETA_PID_KD
         )
     } else {
       thetakP.initDefault(DrivetrainConstants.PID.SIM_AUTO_THETA_PID_KP)
