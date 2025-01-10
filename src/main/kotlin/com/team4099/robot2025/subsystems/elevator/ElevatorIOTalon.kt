@@ -5,9 +5,11 @@ import com.ctre.phoenix6.StatusSignal
 import com.ctre.phoenix6.configs.Slot0Configs
 import com.ctre.phoenix6.configs.Slot1Configs
 import com.ctre.phoenix6.configs.TalonFXConfiguration
+import com.ctre.phoenix6.controls.Follower
 import com.ctre.phoenix6.controls.MotionMagicVoltage
 import com.ctre.phoenix6.controls.VoltageOut
 import com.ctre.phoenix6.hardware.TalonFX
+import com.ctre.phoenix6.signals.GravityTypeValue
 import com.team4099.robot2025.config.constants.Constants
 import com.team4099.robot2025.config.constants.ElevatorConstants
 import org.team4099.lib.units.base.Length
@@ -17,6 +19,7 @@ import org.team4099.lib.units.base.celsius
 import org.team4099.lib.units.base.inInches
 import org.team4099.lib.units.base.inches
 import org.team4099.lib.units.ctreLinearMechanismSensor
+import org.team4099.lib.units.derived.DegreesPerSecondPerDegreesPerSecond
 import org.team4099.lib.units.derived.DerivativeGain
 import org.team4099.lib.units.derived.ElectricalPotential
 import org.team4099.lib.units.derived.IntegralGain
@@ -36,6 +39,8 @@ object ElevatorIOTalon : ElevatorIO {
 
   private val leaderConfigs: TalonFXConfiguration = TalonFXConfiguration()
   private val followerConfigs: TalonFXConfiguration = TalonFXConfiguration()
+
+  private val leaderMotionMagicConfigs = leaderConfigs.MotionMagic
 
   val voltageControl: VoltageOut = VoltageOut(-1337.volts.inVolts)
 
@@ -88,13 +93,15 @@ object ElevatorIOTalon : ElevatorIO {
       leaderSensor.integralPositionGainToRawUnits(ElevatorConstants.PID.REAL_KI)
     leaderConfigs.Slot0.kD =
       leaderSensor.derivativePositionGainToRawUnits(ElevatorConstants.PID.REAL_KD)
+    leaderConfigs.Slot0.GravityType = GravityTypeValue.Elevator_Static
 
-    followerConfigs.Slot0.kP =
+    followerConfigs.Slot1.kP =
       followerSensor.proportionalPositionGainToRawUnits(ElevatorConstants.PID.REAL_KP)
-    followerConfigs.Slot0.kI =
+    followerConfigs.Slot1.kI =
       followerSensor.integralPositionGainToRawUnits(ElevatorConstants.PID.REAL_KI)
-    followerConfigs.Slot0.kD =
+    followerConfigs.Slot1.kD =
       followerSensor.derivativePositionGainToRawUnits(ElevatorConstants.PID.REAL_KD)
+    followerConfigs.Slot0.GravityType = GravityTypeValue.Elevator_Static
 
     leaderConfigs.CurrentLimits.SupplyCurrentLimit = ElevatorConstants.LEADER_SUPPLY_CURRENT_LIMIT
     leaderConfigs.CurrentLimits.SupplyCurrentLowerLimit =
@@ -104,6 +111,8 @@ object ElevatorIOTalon : ElevatorIO {
       ElevatorConstants.LEADER_SUPPLY_CURRENT_LIMIT
     leaderConfigs.CurrentLimits.StatorCurrentLimitEnable = true
     leaderConfigs.CurrentLimits.SupplyCurrentLimitEnable = true
+    leaderMotionMagicConfigs.MotionMagicCruiseVelocity = 80.0
+    leaderMotionMagicConfigs.MotionMagicAcceleration = 160.0
 
     followerConfigs.CurrentLimits.SupplyCurrentLimit =
       ElevatorConstants.FOLLOWER_SUPPLY_CURRENT_LIMIT
@@ -115,6 +124,7 @@ object ElevatorIOTalon : ElevatorIO {
       ElevatorConstants.FOLLOWER_SUPPLY_CURRENT_LIMIT
     followerConfigs.CurrentLimits.StatorCurrentLimitEnable = true
     followerConfigs.CurrentLimits.SupplyCurrentLimitEnable = true
+    followerTalon.setControl(Follower(Constants.Elevator.LEADER_MOTOR_ID, false))
 
     leaderPositionStatusSignal = leaderTalon.getPosition()
     leaderVelocityStatusSignal = leaderTalon.getVelocity()
