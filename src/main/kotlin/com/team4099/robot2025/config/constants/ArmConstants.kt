@@ -1,5 +1,6 @@
 package com.team4099.robot2025.config.constants
 
+import com.ctre.phoenix6.signals.GravityTypeValue
 import com.ctre.phoenix6.signals.InvertedValue
 import com.ctre.phoenix6.signals.NeutralModeValue
 import com.ctre.phoenix6.signals.SensorDirectionValue
@@ -34,4 +35,6 @@ object ArmConstants {
 
     val ENCODER_DIRECTION_VALUE: SensorDirectionValue = SensorDirectionValue.CounterClockwise_Positive
     val ENCODER_OFFSET = 0.0.degrees // TODO: Find correct units for this
+
+    val GRAVITY_TYPE: GravityTypeValue = GravityTypeValue.Arm_Cosine
 }
