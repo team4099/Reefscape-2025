@@ -1,5 +1,7 @@
 package com.team4099.robot2025.subsystems.arm
 
+import edu.wpi.first.math.geometry.Rotation2d
+import edu.wpi.first.units.measure.Voltage
 import org.littletonrobotics.junction.LogTable
 import org.littletonrobotics.junction.inputs.LoggableInputs
 import org.team4099.lib.units.*
@@ -67,6 +69,11 @@ interface ArmIO {
 
     fun setArmBrakeMode(brake: Boolean) {}
 
+    fun configurePID(
+        kP: ProportionalGain<Radian, Volt>,
+        kI: IntegralGain<Radian, Volt>,
+        kD: DerivativeGain<Radian, Volt>
+    ) {}
 
 
 

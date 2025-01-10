@@ -154,4 +154,17 @@ object ArmIOTalonFX: ArmIO {
 
         armTalon.configurator.apply(armConfiguration)
     }
+
+    override fun configurePID(
+        kP: ProportionalGain<Radian, Volt>,
+        kI: IntegralGain<Radian, Volt>,
+        kD: DerivativeGain<Radian, Volt>
+    ) {
+        val PIDConfig = armConfiguration.Slot0
+        PIDConfig.kP = armMechanismSensor.proportionalPositionGainToRawUnits(kP)
+        PIDConfig.kI = armMechanismSensor.integralPositionGainToRawUnits(kI)
+        PIDConfig.kD = armMechanismSensor.derivativePositionGainToRawUnits(kD)
+
+        armTalon.configurator.apply(PIDConfig)
+    }
 }
