@@ -14,7 +14,6 @@ class Arm(val io: ArmIO) {
 
     var armTargetVoltage: ElectricalPotential = 0.0.volts
     var armTargetPosition: Angle = 0.0.degrees
-    var armTolerance: Angle = 0.0.degrees
 
     var currentState = ArmState.UNINITIALIZED
     var currentRequest: Request.ArmRequest = Request.ArmRequest.Zero()
@@ -26,7 +25,6 @@ class Arm(val io: ArmIO) {
 
                 is Request.ArmRequest.CloseLoop -> {
                     armTargetPosition = value.armPosition
-                    armTolerance = value.armTolerance
                 }
 
                 else -> {}

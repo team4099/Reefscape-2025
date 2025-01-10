@@ -14,15 +14,17 @@ import org.team4099.lib.units.perSecond
 object ArmConstants {
     val ARM_TOLERANCE = 1.0.degrees
 
-    val ARM_GEAR_RATIO = (48.0 / 1.0)
+    val ARM_SPROCKET_RATIO = (66.0 / 16.0)
+    val ARM_MAX_PLANETARY_RATIO = (12.0 / 1.0)
+    val ARM_GEAR_RATIO = ARM_SPROCKET_RATIO / ARM_MAX_PLANETARY_RATIO
     val ARM_ENCODER_RATIO = 1.0
 
     val ARM_KP = 0.0.volts.perDegree
     val ARM_KI = 0.0.volts.perDegreeSeconds
     val ARM_KD = 0.0.volts / 1.degrees.perSecond
 
-    val STATOR_CURRENT_LIMIT = 40.0.amps
-    val SUPPLY_CURRENT_LIMIT = 120.0.amps
+    val STATOR_CURRENT_LIMIT = 30.0.amps
+    val SUPPLY_CURRENT_LIMIT = 30.0.amps
 
     val INVERSION_VALUE: InvertedValue = InvertedValue.Clockwise_Positive
     val NEUTRAL_MODE_VALUE: NeutralModeValue = NeutralModeValue.Brake

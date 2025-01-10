@@ -79,7 +79,8 @@ object RollersIOTalonFX: RollersIO {
 
 
     override fun setRollerVoltage(voltage: ElectricalPotential) {
-        rollersTalon.setControl(voltageControl.withOutput(voltage.inVolts))
+        rollersTalon.setControl(
+            voltageControl.withOutput(voltage.inVolts))
     }
 
     override fun setRollerBrakeMode(brake: Boolean) {

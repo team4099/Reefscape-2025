@@ -13,6 +13,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue
 import com.team4099.robot2025.config.constants.ArmConstants
 import com.team4099.robot2025.config.constants.Constants
 import com.team4099.robot2025.subsystems.arm.ArmIO.ArmIOInputs
+import com.team4099.robot2025.util.CustomLogger
 import org.team4099.lib.units.AngularMechanismSensor
 import edu.wpi.first.units.measure.AngularAcceleration as WPILibAngularAcceleration
 import edu.wpi.first.units.measure.AngularVelocity as WPILibAngularVelocity
@@ -125,15 +126,22 @@ object ArmIOTalonFX: ArmIO {
     }
 
     override fun setArmVoltage(voltage: ElectricalPotential) {
-        armTalon.setControl(voltageControl.withOutput(voltage.inVolts))
+        armTalon.setControl(
+            voltageControl.withOutput(voltage.inVolts))
     }
 
     override fun setArmPosition(position: Angle) {
-        armTalon.setControl(positionControl.withPosition(armMechanismSensor.positionToRawUnits(position)).withSlot(0))
+        armTalon.setControl(
+            positionControl.withPosition(armMechanismSensor.positionToRawUnits(position)).withSlot(0))
     }
 
     override fun zeroEncoder() {
-        absoluteEncoder.setPosition(0.0)
+        var angleToZero =
+            (absoluteEncoder.position.valueAsDouble).rotations /
+            ArmConstants.ARM_GEAR_RATIO
+
+        CustomLogger.recordOutput("Arm/angleToZero", angleToZero.inDegrees)
+        armTalon.setPosition(angleToZero.inRotations)
     }
 
     override fun setArmBrakeMode(brake: Boolean) {
