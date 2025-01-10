@@ -1,6 +1,7 @@
 package com.team4099.robot2025.subsystems.arm
 
 import com.team4099.robot2025.subsystems.superstructure.Request
+import com.team4099.robot2025.util.CustomLogger
 import org.littletonrobotics.junction.Logger
 import org.team4099.lib.units.derived.Angle
 import org.team4099.lib.units.derived.ElectricalPotential
@@ -35,11 +36,11 @@ class Arm(val io: ArmIO) {
 
     fun periodic() {
         io.updateInputs(inputs)
-        Logger.processInputs("Arm", inputs)
-        Logger.recordOutput("Arm/currentState", currentState.toString())
+        CustomLogger.processInputs("Arm", inputs)
+        CustomLogger.recordOutput("Arm/currentState", currentState.toString())
 
         var nextState = currentState
-        Logger.recordOutput("Arm/nextState", nextState.toString())
+        CustomLogger.recordOutput("Arm/nextState", nextState.toString())
 
         when (currentState) {
             ArmState.UNINITIALIZED -> {
@@ -62,6 +63,8 @@ class Arm(val io: ArmIO) {
                 nextState = fromRequestToState(currentRequest)
             }
         }
+
+        currentState = nextState
     }
 
     companion object {

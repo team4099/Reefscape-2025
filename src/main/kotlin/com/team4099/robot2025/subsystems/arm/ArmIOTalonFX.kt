@@ -34,13 +34,13 @@ object ArmIOTalonFX: ArmIO {
     private val absoluteEncoder: CANcoder = CANcoder(Constants.Arm.CANCODER_ID)
     private val absoluteEncoderConfiguration: MagnetSensorConfigs = MagnetSensorConfigs()
 
-    lateinit var armPositionStatusSignal: StatusSignal<WPILibAngle>
-    lateinit var armVelocityStatusSignal: StatusSignal<WPILibAngularVelocity>
-    lateinit var armAccelerationStatusSignal: StatusSignal<WPILibAngularAcceleration>
-    lateinit var armTempStatusSignal: StatusSignal<WPILibTemperature>
-    lateinit var armAppliedVoltageStatusSignal: StatusSignal<WPILibVoltage>
-    lateinit var armStatorCurrentStatusSignal: StatusSignal<WPILibCurrent>
-    lateinit var armSupplyCurrentStatusSignal: StatusSignal<WPILibCurrent>
+    var armPositionStatusSignal: StatusSignal<WPILibAngle>
+    var armVelocityStatusSignal: StatusSignal<WPILibAngularVelocity>
+    var armAccelerationStatusSignal: StatusSignal<WPILibAngularAcceleration>
+    var armTempStatusSignal: StatusSignal<WPILibTemperature>
+    var armAppliedVoltageStatusSignal: StatusSignal<WPILibVoltage>
+    var armStatorCurrentStatusSignal: StatusSignal<WPILibCurrent>
+    var armSupplyCurrentStatusSignal: StatusSignal<WPILibCurrent>
 
     val voltageControl: VoltageOut = VoltageOut(-1337.volts.inVolts)
     val positionControl: MotionMagicVoltage = MotionMagicVoltage(-1337.degrees.inDegrees)
@@ -56,7 +56,6 @@ object ArmIOTalonFX: ArmIO {
         armConfiguration.Slot0.kI = armMechanismSensor.integralPositionGainToRawUnits(ArmConstants.ARM_KI)
         armConfiguration.Slot0.kD = armMechanismSensor.derivativePositionGainToRawUnits(ArmConstants.ARM_KD)
         armConfiguration.Slot0.GravityType = ArmConstants.GRAVITY_TYPE
-
         // Configure Gear Ratio and Cancoder Fusing
         armConfiguration.Feedback.FeedbackRemoteSensorID = Constants.Arm.CANCODER_ID
         armConfiguration.Feedback.SensorToMechanismRatio = ArmConstants.ARM_ENCODER_RATIO
