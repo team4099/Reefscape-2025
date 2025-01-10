@@ -7,6 +7,7 @@ import com.team4099.robot2025.commands.drivetrain.ResetGyroYawCommand
 import com.team4099.robot2025.commands.drivetrain.TeleopDriveCommand
 import com.team4099.robot2025.config.ControlBoard
 import com.team4099.robot2025.config.constants.Constants
+import com.team4099.robot2025.config.constants.VisionConstants.Limelight.LIMELIGHT_NAME
 import com.team4099.robot2025.subsystems.drivetrain.drive.Drivetrain
 import com.team4099.robot2025.subsystems.drivetrain.drive.DrivetrainIOReal
 import com.team4099.robot2025.subsystems.drivetrain.drive.DrivetrainIOSim
@@ -14,6 +15,7 @@ import com.team4099.robot2025.subsystems.drivetrain.gyro.GyroIO
 import com.team4099.robot2025.subsystems.drivetrain.gyro.GyroIOPigeon2
 import com.team4099.robot2025.subsystems.limelight.LimelightVision
 import com.team4099.robot2025.subsystems.limelight.LimelightVisionIO
+import com.team4099.robot2025.subsystems.limelight.LimelightVisionIOSim
 import com.team4099.robot2025.util.driver.Jessika
 import edu.wpi.first.wpilibj.RobotBase
 import edu.wpi.first.wpilibj2.command.Command
@@ -43,11 +45,11 @@ object RobotContainer {
       // drivetrain = Drivetrain(object: GyroIO {},object: DrivetrainIO {}
 
       drivetrain = Drivetrain(GyroIOPigeon2, DrivetrainIOReal)
-      limelight = LimelightVision(LimelightVisionIOReal)
+      limelight = LimelightVision(LimelightVisionIOReal(LIMELIGHT_NAME))
     } else {
       // Simulation implementations
       drivetrain = Drivetrain(object : GyroIO {}, DrivetrainIOSim)
-      limelight = LimelightVision(object : LimelightVisionIO {})
+      limelight = LimelightVision(LimelightVisionIOSim(LIMELIGHT_NAME))
     }
 
     limelight.poseSupplier = { drivetrain.odomTRobot }

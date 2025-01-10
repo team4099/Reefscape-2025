@@ -1,9 +1,9 @@
 package com.team4099.robot2025.subsystems.limelight
 
 import com.team4099.lib.hal.Clock
+import com.team4099.lib.vision.LimelightNeuralDetectorReading
 import com.team4099.lib.vision.TargetCorner
 import com.team4099.robot2025.config.constants.VisionConstants
-import com.team4099.robot2025.util.LimelightReading
 import com.team4099.robot2025.util.findClosestPose
 import com.team4099.robot2025.util.rotateBy
 import com.team4099.robot2025.util.toPose3d
@@ -69,7 +69,7 @@ class LimelightVision(val io: LimelightVisionIO) : SubsystemBase() {
 
     val startTime = Clock.realTimestamp
     io.updateInputs(inputs)
-    Logger.processInputs("LimelightVision", inputs)
+    Logger.processInputs("LimelightVision/${io.cameraName}", inputs)
 
     var currentPose: Pose2d = poseSupplier.invoke()
 
@@ -124,7 +124,7 @@ class LimelightVision(val io: LimelightVisionIO) : SubsystemBase() {
 
   fun solveTargetPoseFromAngle(
     currentPose: Pose2d,
-    target: LimelightReading,
+    target: LimelightNeuralDetectorReading,
     targetHeight: Length
   ): Pose3d {
     val xyDistance = xyDistanceFromTarget(target, targetHeight)
@@ -154,7 +154,7 @@ class LimelightVision(val io: LimelightVisionIO) : SubsystemBase() {
       )
   }
 
-  fun xyDistanceFromTarget(target: LimelightReading, targetHeight: Length): Length {
+  fun xyDistanceFromTarget(target: LimelightNeuralDetectorReading, targetHeight: Length): Length {
     var x = target.tx.tan
     var y = target.ty.tan
     var z = 1.0

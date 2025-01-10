@@ -1,49 +1,31 @@
-package com.team4099.robot2023.subsystems.limelight
+package com.team4099.robot2025.subsystems.limelight
 
-import com.team4099.lib.hal.Clock
-import com.team4099.robot2025.config.constants.VisionConstants
-import com.team4099.robot2025.subsystems.limelight.LimelightVisionIO
-import com.team4099.robot2025.util.LimelightReading
-import com.team4099.robot2025.util.rotateBy
-import org.team4099.lib.geometry.Pose2d
-import org.team4099.lib.geometry.Rotation3d
+import com.team4099.lib.vision.LimelightAprilTagReading
+import com.team4099.lib.vision.LimelightNeuralDetectorReading
+import org.littletonrobotics.junction.LogTable
+import org.littletonrobotics.junction.inputs.LoggableInputs
+import org.team4099.lib.geometry.Pose3d
 import org.team4099.lib.geometry.Translation3d
+import org.team4099.lib.units.base.Decimal
+import org.team4099.lib.units.base.Length
 import org.team4099.lib.units.base.inMeters
+import org.team4099.lib.units.base.inSeconds
 import org.team4099.lib.units.base.meters
 import org.team4099.lib.units.base.percent
+import org.team4099.lib.units.base.seconds
+import org.team4099.lib.units.derived.Angle
 import org.team4099.lib.units.derived.degrees
-import org.team4099.lib.units.derived.radians
-import kotlin.math.acos
-import kotlin.math.pow
-import kotlin.math.sqrt
+import org.team4099.lib.units.derived.inDegrees
 
-object LimelightVisionIOSim : LimelightVisionIO {
+class LimelightVisionIOSim(override val cameraName: String) : LimelightVisionIO {
 
-  var poseSupplier: () -> Pose2d = { Pose2d() }
+  override fun updateInputs(inputs: LimelightVisionIO.LimelightVisionIOInputs) {}
 
-  override fun updateInputs(inputs: LimelightVisionIO.LimelightVisionIOInputs) {
-    inputs.timestamp = Clock.realTimestamp
-    inputs.xAngle = 0.0.radians
-    inputs.yAngle = 0.0.radians
-    inputs.targetSize = 0.0.percent
-    inputs.fps = 90.0
-    inputs.validReading = true
+  override fun setPipeline(pipelineIndex: Int) {}
 
-    inputs.gamePieceTargets =
-      listOf(
-        LimelightReading("cone", 0.0.percent, 0.0.degrees, 0.0.degrees, 0.0, 0.0, 0.0.percent)
-      )
-  }
+  override fun setCameraPose(pose: Pose3d) {}
 
-  private fun cartesianToSpherical(translationInCameraSpace: Translation3d): Rotation3d {
-    val x = translationInCameraSpace.x
-    val y = translationInCameraSpace.y
-    val z = translationInCameraSpace.z
+  override fun setTargetOffset(translation: Translation3d) {}
 
-    val r = sqrt(x.inMeters.pow(2) + y.inMeters.pow(2) + z.inMeters.pow(2)).meters
-    val theta = acos(z / r).radians.rotateBy(-VisionConstants.Limelight.LL_TRANSFORM.rotation.y)
-    val phi = (y.sign * acos(x.inMeters / sqrt(x.inMeters.pow(2) + y.inMeters.pow(2)))).radians
-
-    return Rotation3d(phi, theta, 0.0.degrees)
-  }
+  override fun setLeds(enabled: Boolean) {}
 }

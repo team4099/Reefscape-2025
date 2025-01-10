@@ -1,64 +1,90 @@
 package com.team4099.robot2023.subsystems.limelight
 
 import com.team4099.lib.hal.Clock
-import com.team4099.robot2025.config.constants.VisionConstants.Limelight.LIMELIGHT_NAME
+import com.team4099.lib.vision.LimelightAprilTagReading
 import com.team4099.robot2025.subsystems.limelight.LimelightVisionIO
-import com.team4099.robot2025.util.LimelightReading
+import com.team4099.lib.vision.LimelightNeuralDetectorReading
 import com.team4099.utils.LimelightHelpers
-import edu.wpi.first.networktables.NetworkTableEntry
-import edu.wpi.first.networktables.NetworkTableInstance
+import org.littletonrobotics.junction.Logger
+import org.team4099.lib.geometry.Pose3d
+import org.team4099.lib.geometry.Translation3d
+import org.team4099.lib.units.base.inMeters
 import org.team4099.lib.units.base.inMilliseconds
 import org.team4099.lib.units.base.percent
 import org.team4099.lib.units.base.seconds
 import org.team4099.lib.units.derived.degrees
+import org.team4099.lib.units.derived.inDegrees
 import org.team4099.lib.units.milli
 
-object LimelightVisionIOReal : LimelightVisionIO {
-
-  private val ledEntry: NetworkTableEntry =
-    NetworkTableInstance.getDefault().getTable(LIMELIGHT_NAME).getEntry("ledMode")
-  private val pipelineEntry: NetworkTableEntry =
-    NetworkTableInstance.getDefault().getTable(LIMELIGHT_NAME).getEntry("pipeline")
-  private val validEntry: NetworkTableEntry =
-    NetworkTableInstance.getDefault().getTable(LIMELIGHT_NAME).getEntry("tv")
-  private val latencyEntry: NetworkTableEntry =
-    NetworkTableInstance.getDefault().getTable(LIMELIGHT_NAME).getEntry("tl")
-  private val captureLatencyEntry: NetworkTableEntry =
-    NetworkTableInstance.getDefault().getTable(LIMELIGHT_NAME).getEntry("cl")
-  private val dataEntry: NetworkTableEntry =
-    NetworkTableInstance.getDefault().getTable(LIMELIGHT_NAME).getEntry("tcornxy")
-  private val xAngleEntry: NetworkTableEntry =
-    NetworkTableInstance.getDefault().getTable(LIMELIGHT_NAME).getEntry("tx")
-  private val yAngleEntry: NetworkTableEntry =
-    NetworkTableInstance.getDefault().getTable(LIMELIGHT_NAME).getEntry("ty")
-  private val targetSizeEntry: NetworkTableEntry =
-    NetworkTableInstance.getDefault().getTable(LIMELIGHT_NAME).getEntry("ta")
+class LimelightVisionIOReal(override val cameraName: String) : LimelightVisionIO {
 
   override fun updateInputs(inputs: LimelightVisionIO.LimelightVisionIOInputs) {
-    val totalLatency =
-      (
-        latencyEntry.getDouble(0.0).milli.seconds +
-          captureLatencyEntry.getDouble(0.0).milli.seconds
-        )
+    val totalLatency = LimelightHelpers.getLatency_Pipeline(cameraName).milli.seconds + LimelightHelpers.getLatency_Capture(cameraName).milli.seconds
 
     inputs.timestamp = Clock.realTimestamp - totalLatency
-    inputs.xAngle = xAngleEntry.getDouble(0.0).degrees
-    inputs.yAngle = yAngleEntry.getDouble(0.0).degrees
-    inputs.targetSize = (targetSizeEntry.getDouble(0.0) * 100).percent
+    inputs.xAngle = LimelightHelpers.getTX(cameraName).degrees
+    inputs.yAngle = LimelightHelpers.getTY(cameraName).degrees
+    inputs.targetSize = LimelightHelpers.getTA(cameraName).percent
     inputs.fps = 1000 / totalLatency.inMilliseconds
-    inputs.validReading = true
+    inputs.validReading = LimelightHelpers.getTV(cameraName)
+    inputs.pipelineType = LimelightHelpers.getCurrentPipelineType(cameraName)
 
-    inputs.gamePieceTargets =
-      LimelightHelpers.getLatestResults(LIMELIGHT_NAME).targetingResults.targets_Detector.map {
-        LimelightReading(it)
+
+
+    if (inputs.pipelineType == "pipe_fiducial") {
+      inputs.aprilTagTargets = LimelightHelpers.getRawFiducials(cameraName).map {
+        LimelightAprilTagReading(it)
       }
+
+      inputs.primaryTagID = LimelightHelpers.getFiducialID(cameraName).toInt()
+      inputs.cameraPoseTargetSpace = Pose3d(LimelightHelpers.getCameraPose3d_TargetSpace(cameraName))
+      inputs.targetPoseCameraSpace = Pose3d(LimelightHelpers.getTargetPose3d_CameraSpace(cameraName))
+      inputs.robotPoseTargetSpace = Pose3d(LimelightHelpers.getBotPose3d_TargetSpace(cameraName))
+      inputs.cameraPoseRobotSpace = Pose3d(LimelightHelpers.getCameraPose3d_RobotSpace(cameraName))
+      inputs.targetPoseRobotSpace = Pose3d(LimelightHelpers.getTargetPose3d_RobotSpace(cameraName))
+
+      Logger.recordOutput("LimelightVision/${cameraName}/primaryTag/id", inputs.primaryTagID)
+      Logger.recordOutput("LimelightVision/${cameraName}/primaryTag/cameraPoseTargetSpace", inputs.cameraPoseTargetSpace.pose3d)
+      Logger.recordOutput("LimelightVision/${cameraName}/primaryTag/targetPoseCameraSpace", inputs.targetPoseCameraSpace.pose3d)
+      Logger.recordOutput("LimelightVision/${cameraName}/primaryTag/robotPoseTargetSpace", inputs.robotPoseTargetSpace.pose3d)
+      Logger.recordOutput("LimelightVision/${cameraName}/primaryTag/cameraPoseRobotSpace", inputs.cameraPoseRobotSpace.pose3d)
+      Logger.recordOutput("LimelightVision/${cameraName}/primaryTag/targetPoseRobotSpace", inputs.targetPoseRobotSpace.pose3d)
+    }
+
+    if (inputs.pipelineType == "pipe_neuraldetector") {
+      // Parsing JSON is slow(~2ms) according to LL docs, should replace with RawDetections if we need to reduce loop times
+      inputs.gamePieceTargets =
+        LimelightHelpers.getLatestResults(cameraName).targets_Detector.map {
+          LimelightNeuralDetectorReading(it)
+        }
+    }
   }
 
   override fun setPipeline(pipelineIndex: Int) {
-    pipelineEntry.setInteger(pipelineIndex.toLong())
+    LimelightHelpers.setPipelineIndex(cameraName, pipelineIndex)
   }
 
   override fun setLeds(enabled: Boolean) {
-    ledEntry.setBoolean(enabled)
+    if (enabled) LimelightHelpers.setLEDMode_ForceOn(cameraName) else LimelightHelpers.setLEDMode_ForceOff(cameraName)
+  }
+
+  override fun setCameraPose(pose: Pose3d) {
+    LimelightHelpers.setCameraPose_RobotSpace(cameraName,
+      pose.translation.x.inMeters,
+      pose.translation.y.inMeters,
+      pose.translation.z.inMeters,
+      pose.rotation.x.inDegrees,
+      pose.rotation.y.inDegrees,
+      pose.rotation.z.inDegrees
+    )
+  }
+
+  override fun setTargetOffset(translation: Translation3d) {
+    LimelightHelpers.setFiducial3DOffset(
+      cameraName,
+      translation.x.inMeters,
+      translation.y.inMeters,
+      translation.z.inMeters
+      )
   }
 }
