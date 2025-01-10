@@ -64,19 +64,6 @@ class Elevator(val io: ElevatorIO) {
         ) ||
         (ElevatorTunableValues.TunableElevatorHeights.enableElevator.get() != 1.0)
 
-  val canContinueSafely: Boolean
-    get() =
-      (
-        currentRequest is ElevatorRequest.ClosedLoop &&
-          (
-            (
-              (inputs.elevatorPosition - elevatorPositionTarget).absoluteValue <=
-                ElevatorConstants.ELEVATOR_SAFE_THRESHOLD
-              ) &&
-              lastRequestedPosition == elevatorPositionTarget
-            )
-        )
-
   init {
     ElevatorTunableValues.TunableElevatorHeights
 
@@ -119,7 +106,6 @@ class Elevator(val io: ElevatorIO) {
     CustomLogger.recordOutput("Elevator/currentRequest", currentRequest.javaClass.simpleName)
 
     CustomLogger.recordDebugOutput("Elevator/isHomed", isHomed)
-    CustomLogger.recordDebugOutput("Elevator/canContinueSafely", canContinueSafely)
 
     CustomLogger.recordDebugOutput("Elevator/isAtTargetPosition", isAtTargetedPosition)
 
@@ -197,7 +183,6 @@ class Elevator(val io: ElevatorIO) {
         }
       }
     }
-
     currentState = nextState
   }
 
