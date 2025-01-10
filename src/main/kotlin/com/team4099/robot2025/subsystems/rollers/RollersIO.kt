@@ -2,6 +2,7 @@ package com.team4099.robot2025.subsystems.rollers
 
 import org.littletonrobotics.junction.LogTable
 import org.littletonrobotics.junction.inputs.LoggableInputs
+import org.team4099.lib.units.AngularVelocity
 import org.team4099.lib.units.base.amps
 import org.team4099.lib.units.base.celsius
 import org.team4099.lib.units.derived.rotations
@@ -45,8 +46,14 @@ interface RollersIO {
         }
 
     }
-    fun setRollerSpeed(speed: Double) {}
+
+    fun updateInputs(inputs: RollersIOInputs) {}
 
     fun setRollerVoltage(voltage: ElectricalPotential) {}
 
     fun setRollerBrakeMode(brake: Boolean) {}
+
+
+
+
+    }

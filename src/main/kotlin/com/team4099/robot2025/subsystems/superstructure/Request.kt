@@ -40,9 +40,11 @@ sealed interface Request {
     ) : ArmRequest
     class Zero() : ArmRequest
   }
-}
 
   sealed interface RollersRequest : Request {
-    class OpenLoop(val Rollersspeed: Double) : RollersRequest
-    class CloseLoop(val Rollersspeed: Double) : RollersRequest
+    class OpenLoop(val RollersVoltage: ElectricalPotential) : RollersRequest
+    class Zero(): RollersRequest
   }
+}
+
+

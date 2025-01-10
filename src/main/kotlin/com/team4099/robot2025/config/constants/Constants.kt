@@ -127,6 +127,10 @@ object Constants {
     const val CANCODER_ID = 42
   }
 
+  object Rollers {
+    const val ROLLERS_MOTOR_ID = 43
+  }
+
   object Alert {
     val TABS = arrayOf("Pre-match", "In-match")
   }
