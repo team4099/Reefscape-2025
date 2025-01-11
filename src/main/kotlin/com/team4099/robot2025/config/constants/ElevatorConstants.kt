@@ -11,7 +11,7 @@ import org.team4099.lib.units.perSecond
 object ElevatorConstants {
   const val ENABLE_ELEVATOR = true
 
-  val GEAR_RATIO = ((58.0 / 14.0) * (84.0 / 58.0) * (28.0 / 84.0))
+  val GEAR_RATIO = 16.0 / 48.0
   val CARRIAGE_MASS = 10.pounds
 
   val OPEN_LOOP_EXTEND_VOLTAGE = 8.0.volts
