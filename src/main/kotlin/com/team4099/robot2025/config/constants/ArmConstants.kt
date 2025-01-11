@@ -14,8 +14,8 @@ import org.team4099.lib.units.perSecond
 object ArmConstants {
     val ARM_TOLERANCE = 1.0.degrees
 
-    val ARM_SPROCKET_RATIO = (66.0 / 16.0)
-    val ARM_MAX_PLANETARY_RATIO = (12.0 / 1.0)
+    val ARM_SPROCKET_RATIO = (66.0 / 12.0)
+    val ARM_MAX_PLANETARY_RATIO = (9.0 / 1.0)
     val ARM_GEAR_RATIO = ARM_SPROCKET_RATIO / ARM_MAX_PLANETARY_RATIO
     val ARM_ENCODER_RATIO = 1.0
 
