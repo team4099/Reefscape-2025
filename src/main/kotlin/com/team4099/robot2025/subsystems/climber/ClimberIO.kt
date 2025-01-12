@@ -42,13 +42,9 @@ interface ClimberIO {
 
     fun updateInputs(inputs: ClimberInputs) {}
 
-    fun setClimberVoltage(voltage: ElectricalPotential) {}
+    fun setVoltage(voltage: ElectricalPotential) {}
 
-    fun setFramePerimeterVoltage(voltage: ElectricalPotential) {}
-
-    fun setClimberPosition(position: Angle, feedForward: ElectricalPotential, latched: Boolean) {}
-
-    fun setFramePerimeterPosition(position: Angle, feedForward: ElectricalPotential, latched: Boolean) {}
+    fun setPosition(position: Angle, feedforward: ElectricalPotential, latched: Boolean) {}
 
     fun zeroEncoder() {}
 

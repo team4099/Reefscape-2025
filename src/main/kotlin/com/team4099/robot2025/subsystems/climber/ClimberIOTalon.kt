@@ -1,16 +1,15 @@
 package com.team4099.robot2025.subsystems.climber
 import com.ctre.phoenix6.BaseStatusSignal
 import com.ctre.phoenix6.StatusSignal
-import com.ctre.phoenix6.configs.*
+import com.ctre.phoenix6.configs.Slot0Configs
+import com.ctre.phoenix6.configs.Slot1Configs
+import com.ctre.phoenix6.configs.Slot2Configs
+import com.ctre.phoenix6.configs.TalonFXConfiguration
 import com.ctre.phoenix6.controls.VoltageOut
-import com.ctre.phoenix6.hardware.CANcoder
 import com.ctre.phoenix6.hardware.TalonFX
-import com.ctre.phoenix6.signals.FeedbackSensorSourceValue
 import com.ctre.phoenix6.signals.InvertedValue
 import com.ctre.phoenix6.signals.NeutralModeValue
-import com.ctre.phoenix6.signals.SensorDirectionValue
 import com.team4099.lib.logging.LoggedTunableValue
-import com.team4099.lib.phoenix6.PositionVoltage
 import com.team4099.robot2025.config.constants.ClimberConstants
 import com.team4099.robot2025.config.constants.Constants
 import com.team4099.robot2025.util.CustomLogger
@@ -26,35 +25,27 @@ import org.team4099.lib.units.perSecond
 
 object ClimberIOTalon : ClimberIO {
     private val climberTalon: TalonFX = TalonFX(Constants.Climber.CLIMBER_MOTOR_ID)
-    private val framePerimeterTalon: TalonFX = TalonFX(Constants.Climber.FRAME_PERIMETER_MOTOR_ID)
     private val climberConfiguration: TalonFXConfiguration = TalonFXConfiguration()
-    private val framePerimeterConfiguration: TalonFXConfiguration = TalonFXConfiguration()
-
-    private val absoluteEncoder: CANcoder = CANcoder(Constants.Climber.CANCODER_ID)
-    private val absoluteEncoderConfiguration: MagnetSensorConfigs = MagnetSensorConfigs()
-
-    var positionRequest = PositionVoltage((-1337).radians, slot = 0, feedforward = (-1337).volts)
-
-    //TODO: Add pulleys when design is fully completed
+    private val climberMotionMagicConfiguration = climberConfiguration.MotionMagic
 
     val slot1PositionErrorSwitchThreshold =
         LoggedTunableValue("Climber/slot1PosErrSwitchThreshold", Pair({it.inRadians}, {it.radians}))
-    val slot1VelocitySwitchThreshold =
-        LoggedTunableValue("Climber/slot1VelSwitchThreshold", Pair({it.inRadiansPerSecond}, {it.radians.perSecond}))
+
+    val slot1VelocitySwitchThreshold = LoggedTunableValue(
+        "Climber/slot1VelSwitchThreshold",
+        Pair({it.inRadiansPerSecond}, {it.radians.perSecond})
+    )
 
     val slot2PositionErrorSwitchThreshold =
         LoggedTunableValue("Climber/slot2PosErrSwitchThreshold", Pair({it.inRadians}, {it.radians}))
-    val slot2VelocitySwitchThreshold =
-        LoggedTunableValue("Climber/slot2VelSwitchThreshold", Pair({it.inRadiansPerSecond}, {it.radians.perSecond}))
+
+    val slot2VelocitySwitchThreshold = LoggedTunableValue(
+        "Climber/slot2VelSwitchThreshold",
+        Pair({it.inRadiansPerSecond}, {it.radians.perSecond})
+    )
 
     private val climberSensor = ctreAngularMechanismSensor(
         climberTalon,
-        1.0,
-        ClimberConstants.VOLTAGE_COMPENSATION
-    )
-
-    private val framePerimeterSensor = ctreAngularMechanismSensor(
-        framePerimeterTalon,
         1.0,
         ClimberConstants.VOLTAGE_COMPENSATION
     )
@@ -66,15 +57,6 @@ object ClimberIOTalon : ClimberIO {
     private var climberMotorVoltage: StatusSignal<Voltage>
     private var climberMotorTorque: StatusSignal<Current>
     private var climberMotorAcceleration: StatusSignal<AngularAcceleration>
-    private var climberAbsoluteEncoderSignal: StatusSignal<edu.wpi.first.units.measure.Angle>
-    private var framePerimeterStatorCurrentSignal: StatusSignal<Current>
-    private var framePerimeterSupplyCurrentSignal: StatusSignal<Current>
-    private var framePerimeterTempSignal: StatusSignal<Temperature>
-    private var framePerimeterDutyCycle: StatusSignal<Double>
-    private var framePerimeterMotorVoltage: StatusSignal<Voltage>
-    private var framePerimeterMotorTorque: StatusSignal<Current>
-    private var framePerimeterMotorAcceleration: StatusSignal<AngularAcceleration>
-    private var framePerimeterAbsoluteEncoderSignal: StatusSignal<edu.wpi.first.units.measure.Angle>
 
     var angleToZero: Angle = 0.0.radians
 
@@ -84,39 +66,15 @@ object ClimberIOTalon : ClimberIO {
         slot2PositionErrorSwitchThreshold.initDefault(ClimberConstants.PID.SLOT2_POS_SWITCH_THRESHOLD)
         slot2VelocitySwitchThreshold.initDefault(ClimberConstants.PID.SLOT2_VEL_SWITCH_THRESHOLD)
 
-        climberTalon.configurator.apply(TalonFXConfiguration())
-        framePerimeterTalon.configurator.apply(TalonFXConfiguration())
         climberTalon.clearStickyFaults()
-        framePerimeterTalon.clearStickyFaults()
-
-        // TODO: Check if AbsoluteSensorDiscontinuityPoint is able to replace AbsoluteSensorRange
-        // AbsoluteSensorDiscontinuityPoint replaces AbsoluteSensorRange in Phoenix5
-        absoluteEncoderConfiguration.AbsoluteSensorDiscontinuityPoint = 0.5
-        absoluteEncoderConfiguration.SensorDirection = SensorDirectionValue.Clockwise_Positive
-        absoluteEncoderConfiguration.MagnetOffset = ClimberConstants.ABSOLUTE_ENCODER_OFFSET.inRotations
-        absoluteEncoder.configurator.apply(absoluteEncoderConfiguration)
-
-        climberConfiguration.Feedback.FeedbackRemoteSensorID = absoluteEncoder.deviceID
-        climberConfiguration.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder
-        climberConfiguration.Feedback.SensorToMechanismRatio = ClimberConstants.ABSOLUTE_ENCODER_TO_MECHANISM_GEAR_RATIO
-        climberConfiguration.Feedback.RotorToSensorRatio = ClimberConstants.MOTOR_TO_ABSOLUTE_ENCODER_GEAR_RATIO
-        framePerimeterConfiguration.Feedback.FeedbackRemoteSensorID = absoluteEncoder.deviceID
-        framePerimeterConfiguration.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder
-        framePerimeterConfiguration.Feedback.SensorToMechanismRatio =
-            ClimberConstants.ABSOLUTE_ENCODER_TO_MECHANISM_GEAR_RATIO
-        framePerimeterConfiguration.Feedback.RotorToSensorRatio = ClimberConstants.MOTOR_TO_ABSOLUTE_ENCODER_GEAR_RATIO
+        climberTalon.configurator.apply(TalonFXConfiguration())
+        climberTalon.clearStickyFaults()
 
         climberConfiguration.Slot0.kP =
             climberSensor.proportionalPositionGainToRawUnits(ClimberConstants.PID.KP_REAL)
         climberConfiguration.Slot0.kI =
             climberSensor.integralPositionGainToRawUnits(ClimberConstants.PID.KI_REAL)
         climberConfiguration.Slot0.kD =
-            climberSensor.derivativePositionGainToRawUnits(ClimberConstants.PID.KD_REAL)
-        framePerimeterConfiguration.Slot0.kP =
-            climberSensor.proportionalPositionGainToRawUnits(ClimberConstants.PID.KP_REAL)
-        framePerimeterConfiguration.Slot0.kI =
-            climberSensor.integralPositionGainToRawUnits(ClimberConstants.PID.KI_REAL)
-        framePerimeterConfiguration.Slot0.kD =
             climberSensor.derivativePositionGainToRawUnits(ClimberConstants.PID.KD_REAL)
 
         climberConfiguration.Slot1.kP =
@@ -125,28 +83,14 @@ object ClimberIOTalon : ClimberIO {
             climberSensor.integralPositionGainToRawUnits(ClimberConstants.PID.KI_UNLATCH)
         climberConfiguration.Slot1.kD =
             climberSensor.derivativePositionGainToRawUnits(ClimberConstants.PID.KD_UNLATCH)
-        framePerimeterConfiguration.Slot1.kP =
-            climberSensor.proportionalPositionGainToRawUnits(ClimberConstants.PID.KP_UNLATCH)
-        framePerimeterConfiguration.Slot1.kI =
-            climberSensor.integralPositionGainToRawUnits(ClimberConstants.PID.KI_UNLATCH)
-        framePerimeterConfiguration.Slot1.kD =
-            climberSensor.derivativePositionGainToRawUnits(ClimberConstants.PID.KD_UNLATCH)
 
         climberConfiguration.Slot2.kP = climberSensor.proportionalPositionGainToRawUnits(ClimberConstants.PID.KP_LATCH)
         climberConfiguration.Slot2.kI = climberSensor.integralPositionGainToRawUnits(ClimberConstants.PID.KI_LATCH)
         climberConfiguration.Slot2.kD = climberSensor.derivativePositionGainToRawUnits(ClimberConstants.PID.KD_LATCH)
-        framePerimeterConfiguration.Slot2.kP =
-            climberSensor.proportionalPositionGainToRawUnits(ClimberConstants.PID.KP_LATCH)
-        framePerimeterConfiguration.Slot2.kI =
-            climberSensor.integralPositionGainToRawUnits(ClimberConstants.PID.KI_LATCH)
-        framePerimeterConfiguration.Slot2.kD =
-            climberSensor.derivativePositionGainToRawUnits(ClimberConstants.PID.KD_LATCH)
 
         // TODO: Check if these are tunable values or not
         climberConfiguration.Voltage.PeakForwardVoltage = 3.0
         climberConfiguration.Voltage.PeakReverseVoltage = -3.0
-        framePerimeterConfiguration.Voltage.PeakForwardVoltage = 3.0
-        framePerimeterConfiguration.Voltage.PeakReverseVoltage = -3.0
 
         climberConfiguration.CurrentLimits.SupplyCurrentLimit = ClimberConstants.SUPPLY_CURRENT_LIMIT.inAmperes
         climberConfiguration.CurrentLimits.SupplyCurrentLowerLimit = ClimberConstants.THRESHOLD_CURRENT_LIMIT.inAmperes
@@ -154,21 +98,10 @@ object ClimberIOTalon : ClimberIO {
         climberConfiguration.CurrentLimits.StatorCurrentLimit = ClimberConstants.STATOR_CURRENT_LIMIT.inAmperes
         climberConfiguration.CurrentLimits.StatorCurrentLimitEnable = false
 
-        framePerimeterConfiguration.CurrentLimits.SupplyCurrentLimit = ClimberConstants.SUPPLY_CURRENT_LIMIT.inAmperes
-        framePerimeterConfiguration.CurrentLimits.SupplyCurrentLowerLimit =
-            ClimberConstants.THRESHOLD_CURRENT_LIMIT.inAmperes
-        framePerimeterConfiguration.CurrentLimits.SupplyCurrentLimitEnable = true
-        framePerimeterConfiguration.CurrentLimits.StatorCurrentLimit = ClimberConstants.STATOR_CURRENT_LIMIT.inAmperes
-        framePerimeterConfiguration.CurrentLimits.StatorCurrentLimitEnable = false
-
-
         climberConfiguration.MotorOutput.NeutralMode = NeutralModeValue.Brake
         climberConfiguration.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive
-        framePerimeterConfiguration.MotorOutput.NeutralMode = NeutralModeValue.Brake
-        framePerimeterConfiguration.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive
 
         climberTalon.configurator.apply(climberConfiguration)
-        framePerimeterTalon.configurator.apply(framePerimeterConfiguration)
 
         climberStatorCurrentSignal = climberTalon.statorCurrent
         climberSupplyCurrentSignal = climberTalon.supplyCurrent
@@ -177,16 +110,6 @@ object ClimberIOTalon : ClimberIO {
         climberMotorVoltage = climberTalon.motorVoltage
         climberMotorTorque = climberTalon.torqueCurrent
         climberMotorAcceleration = climberTalon.acceleration
-        climberAbsoluteEncoderSignal = absoluteEncoder.position
-
-        framePerimeterStatorCurrentSignal = framePerimeterTalon.statorCurrent
-        framePerimeterSupplyCurrentSignal = framePerimeterTalon.supplyCurrent
-        framePerimeterDutyCycle = framePerimeterTalon.dutyCycle
-        framePerimeterTempSignal = framePerimeterTalon.deviceTemp
-        framePerimeterMotorVoltage = framePerimeterTalon.motorVoltage
-        framePerimeterMotorTorque = framePerimeterTalon.torqueCurrent
-        framePerimeterMotorAcceleration = framePerimeterTalon.acceleration
-        framePerimeterAbsoluteEncoderSignal = absoluteEncoder.position
 
         // TODO: Add MotorChecker when falconspin is fixed
     }
@@ -201,12 +124,6 @@ object ClimberIOTalon : ClimberIO {
         climberPIDConfig.kI = climberSensor.integralPositionGainToRawUnits(kI)
         climberPIDConfig.kD = climberSensor.derivativePositionGainToRawUnits(kD)
         climberTalon.configurator.apply(climberPIDConfig)
-
-        val framePerimeterPIDConfig = Slot0Configs()
-        framePerimeterPIDConfig.kP = climberSensor.proportionalPositionGainToRawUnits(kP)
-        framePerimeterPIDConfig.kI = climberSensor.integralPositionGainToRawUnits(kI)
-        framePerimeterPIDConfig.kD = climberSensor.derivativePositionGainToRawUnits(kD)
-        framePerimeterTalon.configurator.apply(framePerimeterPIDConfig)
     }
 
     override fun configPIDSlot1 (
@@ -219,12 +136,6 @@ object ClimberIOTalon : ClimberIO {
         climberPIDConfig.kI = climberSensor.integralPositionGainToRawUnits(kI)
         climberPIDConfig.kD = climberSensor.derivativePositionGainToRawUnits(kD)
         climberTalon.configurator.apply(climberPIDConfig)
-
-        val framePerimeterPIDConfig = Slot1Configs()
-        framePerimeterPIDConfig.kP = climberSensor.proportionalPositionGainToRawUnits(kP)
-        framePerimeterPIDConfig.kI = climberSensor.integralPositionGainToRawUnits(kI)
-        framePerimeterPIDConfig.kD = climberSensor.derivativePositionGainToRawUnits(kD)
-        framePerimeterTalon.configurator.apply(framePerimeterPIDConfig)
     }
 
     override fun configPIDSlot2 (
@@ -237,26 +148,17 @@ object ClimberIOTalon : ClimberIO {
         climberPIDConfig.kI = climberSensor.integralPositionGainToRawUnits(kI)
         climberPIDConfig.kD = climberSensor.derivativePositionGainToRawUnits(kD)
         climberTalon.configurator.apply(climberPIDConfig)
-
-        val framePerimeterPIDConfig = Slot2Configs()
-        framePerimeterPIDConfig.kP = climberSensor.proportionalPositionGainToRawUnits(kP)
-        framePerimeterPIDConfig.kI = climberSensor.integralPositionGainToRawUnits(kI)
-        framePerimeterPIDConfig.kD = climberSensor.derivativePositionGainToRawUnits(kD)
-        framePerimeterTalon.configurator.apply(framePerimeterPIDConfig)
     }
 
-    override fun setClimberVoltage(voltage: ElectricalPotential) {
+    override fun setVoltage(voltage: ElectricalPotential) {
         climberTalon.setControl(VoltageOut(voltage.inVolts))
     }
 
-    override fun setFramePerimeterVoltage(voltage: ElectricalPotential) {
-        framePerimeterTalon.setControl(VoltageOut(voltage.inVolts))
+    override fun zeroEncoder() {
+        climberTalon.setPosition(0.0)
     }
     
-    override fun setClimberPosition(position: Angle, feedforward: ElectricalPotential, latched: Boolean) {
-        positionRequest.setFeedforward(feedforward)
-        positionRequest.setPosition(position)
-
+    override fun setPosition(position: Angle, feedforward: ElectricalPotential, latched: Boolean) {
         val currentError = climberSensor.position - position
         val currentVelocity = climberSensor.velocity
 
@@ -272,25 +174,7 @@ object ClimberIOTalon : ClimberIO {
         CustomLogger.recordOutput("Climber/feedForwardApplied", feedforward.inVolts)
         CustomLogger.recordOutput("Climber/slotBeingUsed", slot)
 
-        // TODO: Fix PositionDutyCycle parameters
-        /*
-        climberTalon.setControl(
-            PositionDutyCycle(
-                climberSensor.positionToRawUnits(position),
-                climberSensor.velocityToRawUnits(0.radians.perSecond),
-                true,
-                feedforward.inVolts,
-                slot,
-                false,
-                false,
-                false
-            )
-        )
-         */
-    }
-
-    override fun setFramePerimeterPosition(position: Angle, feedforward: ElectricalPotential, latched: Boolean) {
-
+        // climberTalon.setControl()
     }
 
     private fun updateSignals() {
@@ -301,19 +185,7 @@ object ClimberIOTalon : ClimberIO {
             climberSupplyCurrentSignal,
             climberStatorCurrentSignal,
             climberTempSignal,
-            climberMotorAcceleration,
-            climberAbsoluteEncoderSignal
-        )
-
-        BaseStatusSignal.refreshAll(
-            framePerimeterMotorTorque,
-            framePerimeterMotorVoltage,
-            framePerimeterDutyCycle,
-            framePerimeterSupplyCurrentSignal,
-            framePerimeterStatorCurrentSignal,
-            framePerimeterTempSignal,
-            framePerimeterMotorAcceleration,
-            framePerimeterAbsoluteEncoderSignal
+            climberMotorAcceleration
         )
     }
 
@@ -321,9 +193,7 @@ object ClimberIOTalon : ClimberIO {
         updateSignals()
 
         climberTalon.rotorPosition.refresh()
-        framePerimeterTalon.rotorPosition.refresh()
         climberTalon.position.refresh()
-        framePerimeterTalon.position.refresh()
 
         /*
         CustomLogger.recordOutput("Climber/climberRotorTMechanismRadians",
