@@ -21,11 +21,6 @@ object ClimberConstants {
     val STATOR_CURRENT_LIMIT = 0.0.amps
     val SUPPLY_CURRENT_LIMIT = 0.amps
     val THRESHOLD_CURRENT_LIMIT = 0.0.amps
-    val TRIGGER_THRESHOLD_TIME = 0.0.seconds
-
-    val ABSOLUTE_ENCODER_OFFSET = 0.0.radians
-    val ABSOLUTE_ENCODER_TO_MECHANISM_GEAR_RATIO = 0.0
-    val MOTOR_TO_ABSOLUTE_ENCODER_GEAR_RATIO = 0.0
 
     // TODO: Tune the PID values
     object PID {
