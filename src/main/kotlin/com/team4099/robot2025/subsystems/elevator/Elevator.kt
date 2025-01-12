@@ -80,19 +80,41 @@ class Elevator(val io: ElevatorIO) {
       ElevatorTunableValues.slot0kI.initDefault(ElevatorConstants.PID.SIM_KI)
       ElevatorTunableValues.slot0kD.initDefault(ElevatorConstants.PID.SIM_KD)
 
-      io.configFirstStagePID(ElevatorTunableValues.slot0kP.get(), ElevatorTunableValues.slot0kI.get(),ElevatorTunableValues.slot0kD.get())
-      io.configSecondStagePID(ElevatorTunableValues.slot1kP.get(), ElevatorTunableValues.slot1kI.get(), ElevatorTunableValues.slot1kD.get())
+      io.configFirstStagePID(
+        ElevatorTunableValues.slot0kP.get(),
+        ElevatorTunableValues.slot0kI.get(),
+        ElevatorTunableValues.slot0kD.get()
+      )
+      io.configSecondStagePID(
+        ElevatorTunableValues.slot1kP.get(),
+        ElevatorTunableValues.slot1kI.get(),
+        ElevatorTunableValues.slot1kD.get()
+      )
     }
   }
 
   fun periodic() {
     io.updateInputs(inputs)
 
-    if (ElevatorTunableValues.slot0kP.hasChanged() || ElevatorTunableValues.slot0kI.hasChanged() || ElevatorTunableValues.slot0kD.hasChanged()) {
-      io.configFirstStagePID(ElevatorTunableValues.slot0kP.get(), ElevatorTunableValues.slot0kI.get(), ElevatorTunableValues.slot0kD.get())
+    if (ElevatorTunableValues.slot0kP.hasChanged() ||
+      ElevatorTunableValues.slot0kI.hasChanged() ||
+      ElevatorTunableValues.slot0kD.hasChanged()
+    ) {
+      io.configFirstStagePID(
+        ElevatorTunableValues.slot0kP.get(),
+        ElevatorTunableValues.slot0kI.get(),
+        ElevatorTunableValues.slot0kD.get()
+      )
     }
-    if (ElevatorTunableValues.slot1kD.hasChanged() || ElevatorTunableValues.slot1kP.hasChanged() || ElevatorTunableValues.slot1kI.hasChanged()) {
-      io.configSecondStagePID(ElevatorTunableValues.slot1kP.get(), ElevatorTunableValues.slot1kI.get(), ElevatorTunableValues.slot1kD.get())
+    if (ElevatorTunableValues.slot1kD.hasChanged() ||
+      ElevatorTunableValues.slot1kP.hasChanged() ||
+      ElevatorTunableValues.slot1kI.hasChanged()
+    ) {
+      io.configSecondStagePID(
+        ElevatorTunableValues.slot1kP.get(),
+        ElevatorTunableValues.slot1kI.get(),
+        ElevatorTunableValues.slot1kD.get()
+      )
     }
 
     CustomLogger.processInputs("Elevator", inputs)

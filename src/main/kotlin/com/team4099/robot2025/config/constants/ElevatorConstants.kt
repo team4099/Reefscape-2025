@@ -2,7 +2,6 @@ package com.team4099.robot2025.config.constants
 
 import org.team4099.lib.units.base.amps
 import org.team4099.lib.units.base.inches
-import org.team4099.lib.units.base.meters
 import org.team4099.lib.units.base.pounds
 import org.team4099.lib.units.base.seconds
 import org.team4099.lib.units.derived.volts
@@ -22,7 +21,6 @@ object ElevatorConstants {
   val UPWARDS_EXTENSION_LIMIT = 0.0.inches
   val DOWNWARDS_EXTENSION_LIMIT = 0.0.inches
 
-  val ELEVATOR_PULLEY_TO_MOTOR = 0.0
   val SPOOL_DIAMETER = 0.0.inches
   val VOLTAGE_COMPENSATION = 12.0.volts
 
@@ -30,15 +28,15 @@ object ElevatorConstants {
 
   val ELEVATOR_TOLERANCE = 0.5.inches
 
-  val LEADER_STATOR_CURRENT_LIMIT = 0.0
-  val LEADER_SUPPLY_CURRENT_LIMIT = 0.0
-  val LEADER_SUPPLY_CURRENT_LOWER_LIMIT = 0.0
-  val LEADER_SUPPLY_CURRENT_LOWER_TIME = 0.0
+  val LEADER_STATOR_CURRENT_LIMIT = 0.0.amps
+  val LEADER_SUPPLY_CURRENT_LIMIT = 0.0.amps
+  val LEADER_SUPPLY_CURRENT_LOWER_LIMIT = 0.0.amps
+  val LEADER_SUPPLY_CURRENT_LOWER_TIME = 0.0.amps
 
-  val FOLLOWER_STATOR_CURRENT_LIMIT = 0.0
-  val FOLLOWER_SUPPLY_CURRENT_LIMIT = 0.0
-  val FOLLOWER_SUPPLY_CURRENT_LOWER_LIMIT = 0.0
-  val FOLLOWER_SUPPLY_CURRENT_LOWER_TIME = 0.0
+  val FOLLOWER_STATOR_CURRENT_LIMIT = 0.0.amps
+  val FOLLOWER_SUPPLY_CURRENT_LIMIT = 0.0.amps
+  val FOLLOWER_SUPPLY_CURRENT_LOWER_LIMIT = 0.0.amps
+  val FOLLOWER_SUPPLY_CURRENT_LOWER_TIME = 0.0.amps
 
   // change if incorrect
   val FIRST_STAGE_HEIGHT = 30.5.inches
@@ -65,16 +63,16 @@ object ElevatorConstants {
     val SIM_KI = 0.0.volts / (1.inches * 1.seconds)
     val SIM_KD = 0.25.volts / (1.inches.perSecond)
 
-    val SIM_ELEVATOR_KS_SECOND_STAGE = 0.0.volts
-    val REAL_ELEVATOR_KS_SECOND_STAGE = 0.54.volts
-    val ELEVATOR_KG_SECOND_STAGE = 1.0.volts
-    val ELEVATOR_KV_SECOND_STAGE = 0.037.volts / 1.0.inches.perSecond
-    val ELEVATOR_KA_SECOND_STAGE = 0.0025.volts / 1.0.inches.perSecond.perSecond
+    val SIM_KS_SECOND_STAGE = 0.0.volts
+    val REAL_KS_SECOND_STAGE = 0.54.volts
+    val KG_SECOND_STAGE = 1.0.volts
+    val KV_SECOND_STAGE = 0.037.volts / 1.0.inches.perSecond
+    val KA_SECOND_STAGE = 0.0025.volts / 1.0.inches.perSecond.perSecond
 
-    val SIM_ELEVATOR_KS_FIRST_STAGE = 0.0.volts
-    val REAL_ELEVATOR_KS_FIRST_STAGE = 0.54.volts
-    val ELEVATOR_KG_FIRST_STAGE = 0.25.volts
-    val ELEVATOR_KV_FIRST_STAGE = 0.037.volts / 1.0.inches.perSecond
-    val ELEVATOR_KA_FIRST_STAGE = 0.0025.volts / 1.0.inches.perSecond.perSecond
+    val SIM_KS_FIRST_STAGE = 0.0.volts
+    val REAL_KS_FIRST_STAGE = 0.54.volts
+    val KG_FIRST_STAGE = 0.25.volts
+    val KV_FIRST_STAGE = 0.037.volts / 1.0.inches.perSecond
+    val KA_FIRST_STAGE = 0.0025.volts / 1.0.inches.perSecond.perSecond
   }
 }
