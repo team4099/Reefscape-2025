@@ -92,6 +92,7 @@ class Climber(private val io: ClimberIO) {
     private var lastHomingCurrentSpikeTime = Clock.fpgaTime
     private var climberTolerance: Angle = ClimberConstants.TOLERANCE
     private var timeProfileGeneratedAt = Clock.fpgaTime
+    private var latched: Boolean = false
 
     private val isAtTargetedPosition: Boolean
         get() =
@@ -270,7 +271,7 @@ class Climber(private val io: ClimberIO) {
         if (isOutOfBounds(setpoint.velocity)) {
             io.setVoltage(0.volts)
         } else {
-            io.setPosition(setpoint.position, feedforward)
+            io.setPosition(setpoint.position, feedforward, latched)
         }
 
         CustomLogger.recordDebugOutput("Climber/profileOutOfBounds", isOutOfBounds(setpoint.velocity))
