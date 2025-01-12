@@ -78,8 +78,8 @@ object ArmIOTalonFX: ArmIO {
         armConfiguration.MotionMagic.MotionMagicCruiseVelocity = armMechanismSensor.velocityToRawUnits(ArmConstants.MOTION_MAGIC_CRUISE_VELOCITY)
 
         // Configure Softlimits
-        armConfiguration.SoftwareLimitSwitch.ForwardSoftLimitThreshold = armMechanismSensor.positionToRawUnits(ArmConstants.FORWRARD_SOFT_LIMIT_THRESHOLD)
-        armConfiguration.SoftwareLimitSwitch.ReverseSoftLimitThreshold = armMechanismSensor.positionToRawUnits(ArmConstants.REVERSE_SOFT_LIMIT_THRESHOLD)
+        armConfiguration.SoftwareLimitSwitch.ForwardSoftLimitThreshold = armMechanismSensor.positionToRawUnits(ArmConstants.ARM_MAX_ANGLE)
+        armConfiguration.SoftwareLimitSwitch.ReverseSoftLimitThreshold = armMechanismSensor.positionToRawUnits(ArmConstants.ARM_MIN_ANGLE)
 
         armConfiguration.SoftwareLimitSwitch.ForwardSoftLimitEnable = true
         armConfiguration.SoftwareLimitSwitch.ReverseSoftLimitEnable = true
