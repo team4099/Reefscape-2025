@@ -1,7 +1,5 @@
 package com.team4099.robot2025.subsystems.arm
 
-import com.ctre.phoenix6.hardware.TalonFX
-import com.ctre.phoenix6.sim.TalonFXSimState
 import com.team4099.lib.math.clamp
 import com.team4099.robot2025.config.constants.ArmConstants
 import com.team4099.robot2025.config.constants.Constants
