@@ -4,6 +4,7 @@ import com.ctre.phoenix6.BaseStatusSignal
 import com.ctre.phoenix6.StatusSignal
 import com.ctre.phoenix6.configs.Slot0Configs
 import com.ctre.phoenix6.configs.Slot1Configs
+import com.ctre.phoenix6.configs.Slot2Configs
 import com.ctre.phoenix6.configs.TalonFXConfiguration
 import com.ctre.phoenix6.controls.Follower
 import com.ctre.phoenix6.controls.MotionMagicVoltage
@@ -90,11 +91,11 @@ object ElevatorIOTalon : ElevatorIO {
     followerTalon.clearStickyFaults()
 
     leaderConfigs.Slot0.kP =
-      leaderSensor.proportionalPositionGainToRawUnits(ElevatorConstants.PID.REAL_KP)
+      leaderSensor.proportionalPositionGainToRawUnits(ElevatorConstants.PID.REAL_KP_FIRST_STAGE)
     leaderConfigs.Slot0.kI =
-      leaderSensor.integralPositionGainToRawUnits(ElevatorConstants.PID.REAL_KI)
+      leaderSensor.integralPositionGainToRawUnits(ElevatorConstants.PID.REAL_KI_FIRST_STAGE)
     leaderConfigs.Slot0.kD =
-      leaderSensor.derivativePositionGainToRawUnits(ElevatorConstants.PID.REAL_KD)
+      leaderSensor.derivativePositionGainToRawUnits(ElevatorConstants.PID.REAL_KD_FIRST_STAGE)
     leaderConfigs.Slot0.kG = ElevatorConstants.PID.KG_FIRST_STAGE.inVolts
     leaderConfigs.Slot0.kS = ElevatorConstants.PID.REAL_KS_FIRST_STAGE.inVolts
     leaderConfigs.Slot0.kV = ElevatorConstants.PID.KV_FIRST_STAGE.inVoltsPerMeterPerSecond
@@ -102,23 +103,35 @@ object ElevatorIOTalon : ElevatorIO {
     leaderConfigs.Slot0.GravityType = GravityTypeValue.Elevator_Static
 
     leaderConfigs.Slot1.kP =
-      leaderSensor.proportionalPositionGainToRawUnits(ElevatorConstants.PID.REAL_KP)
+      leaderSensor.proportionalPositionGainToRawUnits(ElevatorConstants.PID.REAL_KP_SECOND_STAGE)
     leaderConfigs.Slot1.kI =
-      leaderSensor.integralPositionGainToRawUnits(ElevatorConstants.PID.REAL_KI)
+      leaderSensor.integralPositionGainToRawUnits(ElevatorConstants.PID.REAL_KI_SECOND_STAGE)
     leaderConfigs.Slot1.kD =
-      leaderSensor.derivativePositionGainToRawUnits(ElevatorConstants.PID.REAL_KD)
+      leaderSensor.derivativePositionGainToRawUnits(ElevatorConstants.PID.REAL_KD_SECOND_STAGE)
     leaderConfigs.Slot1.kG = ElevatorConstants.PID.KG_SECOND_STAGE.inVolts
     leaderConfigs.Slot1.kS = ElevatorConstants.PID.REAL_KS_SECOND_STAGE.inVolts
     leaderConfigs.Slot1.kV = ElevatorConstants.PID.KV_SECOND_STAGE.inVoltsPerMeterPerSecond
     leaderConfigs.Slot1.kA = ElevatorConstants.PID.KA_SECOND_STAGE.inVoltsPerMeterPerSecondPerSecond
     leaderConfigs.Slot1.GravityType = GravityTypeValue.Elevator_Static
 
+    leaderConfigs.Slot2.kP =
+      leaderSensor.proportionalPositionGainToRawUnits(ElevatorConstants.PID.REAL_KP_THIRD_STAGE)
+    leaderConfigs.Slot2.kI =
+      leaderSensor.integralPositionGainToRawUnits(ElevatorConstants.PID.REAL_KI_THIRD_STAGE)
+    leaderConfigs.Slot2.kD =
+      leaderSensor.derivativePositionGainToRawUnits(ElevatorConstants.PID.REAL_KD_THIRD_STAGE)
+    leaderConfigs.Slot2.kG = ElevatorConstants.PID.KG_THIRD_STAGE.inVolts
+    leaderConfigs.Slot2.kS = ElevatorConstants.PID.REAL_KS_THIRD_STAGE.inVolts
+    leaderConfigs.Slot2.kV = ElevatorConstants.PID.KV_THIRD_STAGE.inVoltsPerMeterPerSecond
+    leaderConfigs.Slot2.kA = ElevatorConstants.PID.KA_THIRD_STAGE.inVoltsPerMeterPerSecondPerSecond
+    leaderConfigs.Slot2.GravityType = GravityTypeValue.Elevator_Static
+
     followerConfigs.Slot0.kP =
-      followerSensor.proportionalPositionGainToRawUnits(ElevatorConstants.PID.REAL_KP)
+      followerSensor.proportionalPositionGainToRawUnits(ElevatorConstants.PID.REAL_KP_FIRST_STAGE)
     followerConfigs.Slot0.kI =
-      followerSensor.integralPositionGainToRawUnits(ElevatorConstants.PID.REAL_KI)
+      followerSensor.integralPositionGainToRawUnits(ElevatorConstants.PID.REAL_KI_FIRST_STAGE)
     followerConfigs.Slot0.kD =
-      followerSensor.derivativePositionGainToRawUnits(ElevatorConstants.PID.REAL_KD)
+      followerSensor.derivativePositionGainToRawUnits(ElevatorConstants.PID.REAL_KD_FIRST_STAGE)
     followerConfigs.Slot0.kG = ElevatorConstants.PID.KG_FIRST_STAGE.inVolts
     followerConfigs.Slot0.kS = ElevatorConstants.PID.REAL_KS_FIRST_STAGE.inVolts
     followerConfigs.Slot0.kV = ElevatorConstants.PID.KV_FIRST_STAGE.inVoltsPerMeterPerSecond
@@ -127,17 +140,30 @@ object ElevatorIOTalon : ElevatorIO {
     followerConfigs.Slot0.GravityType = GravityTypeValue.Elevator_Static
 
     followerConfigs.Slot1.kP =
-      followerSensor.proportionalPositionGainToRawUnits(ElevatorConstants.PID.REAL_KP)
+      followerSensor.proportionalPositionGainToRawUnits(ElevatorConstants.PID.REAL_KP_SECOND_STAGE)
     followerConfigs.Slot1.kI =
-      followerSensor.integralPositionGainToRawUnits(ElevatorConstants.PID.REAL_KI)
+      followerSensor.integralPositionGainToRawUnits(ElevatorConstants.PID.REAL_KI_SECOND_STAGE)
     followerConfigs.Slot1.kD =
-      followerSensor.derivativePositionGainToRawUnits(ElevatorConstants.PID.REAL_KD)
+      followerSensor.derivativePositionGainToRawUnits(ElevatorConstants.PID.REAL_KD_SECOND_STAGE)
     followerConfigs.Slot1.kG = ElevatorConstants.PID.KG_SECOND_STAGE.inVolts
     followerConfigs.Slot1.kS = ElevatorConstants.PID.REAL_KS_SECOND_STAGE.inVolts
     followerConfigs.Slot1.kV = ElevatorConstants.PID.KV_SECOND_STAGE.inVoltsPerMeterPerSecond
     followerConfigs.Slot1.kA =
       ElevatorConstants.PID.KA_SECOND_STAGE.inVoltsPerMeterPerSecondPerSecond
     followerConfigs.Slot1.GravityType = GravityTypeValue.Elevator_Static
+
+    followerConfigs.Slot2.kP =
+      followerSensor.proportionalPositionGainToRawUnits(ElevatorConstants.PID.REAL_KP_THIRD_STAGE)
+    followerConfigs.Slot2.kI =
+      followerSensor.integralPositionGainToRawUnits(ElevatorConstants.PID.REAL_KI_THIRD_STAGE)
+    followerConfigs.Slot2.kD =
+      followerSensor.derivativePositionGainToRawUnits(ElevatorConstants.PID.REAL_KD_THIRD_STAGE)
+    followerConfigs.Slot2.kG = ElevatorConstants.PID.KG_THIRD_STAGE.inVolts
+    followerConfigs.Slot2.kS = ElevatorConstants.PID.REAL_KS_THIRD_STAGE.inVolts
+    followerConfigs.Slot2.kV = ElevatorConstants.PID.KV_THIRD_STAGE.inVoltsPerMeterPerSecond
+    followerConfigs.Slot2.kA =
+      ElevatorConstants.PID.KA_THIRD_STAGE.inVoltsPerMeterPerSecondPerSecond
+    followerConfigs.Slot2.GravityType = GravityTypeValue.Elevator_Static
 
     leaderConfigs.CurrentLimits.SupplyCurrentLimit =
       ElevatorConstants.LEADER_SUPPLY_CURRENT_LIMIT.inAmperes
@@ -232,6 +258,19 @@ object ElevatorIOTalon : ElevatorIO {
     kD: DerivativeGain<Meter, Volt>
   ) {
     val pidConfiguration = Slot1Configs()
+    pidConfiguration.kP = leaderSensor.proportionalPositionGainToRawUnits(kP)
+    pidConfiguration.kI = leaderSensor.integralPositionGainToRawUnits(kI)
+    pidConfiguration.kD = leaderSensor.derivativePositionGainToRawUnits(kD)
+
+    leaderTalon.configurator.apply(pidConfiguration)
+  }
+
+  override fun configThirdStagePID(
+    kP: ProportionalGain<Meter, Volt>,
+    kI: IntegralGain<Meter, Volt>,
+    kD: DerivativeGain<Meter, Volt>
+  ) {
+    val pidConfiguration = Slot2Configs()
     pidConfiguration.kP = leaderSensor.proportionalPositionGainToRawUnits(kP)
     pidConfiguration.kI = leaderSensor.integralPositionGainToRawUnits(kI)
     pidConfiguration.kD = leaderSensor.derivativePositionGainToRawUnits(kD)

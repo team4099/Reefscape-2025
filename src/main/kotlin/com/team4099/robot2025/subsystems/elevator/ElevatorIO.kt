@@ -113,4 +113,9 @@ interface ElevatorIO {
     kI: IntegralGain<Meter, Volt>,
     kD: DerivativeGain<Meter, Volt>
   ) {}
+  fun configThirdStagePID(
+    kP: ProportionalGain<Meter, Volt>,
+    kI: IntegralGain<Meter, Volt>,
+    kD: DerivativeGain<Meter, Volt>
+  ) {}
 }
