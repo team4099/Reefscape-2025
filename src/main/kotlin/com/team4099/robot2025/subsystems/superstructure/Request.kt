@@ -10,7 +10,36 @@ import org.team4099.lib.units.derived.degrees
 
 sealed interface Request {
 
-  sealed interface SuperstructureRequest : Request
+  sealed interface SuperstructureRequest : Request {
+    enum class CoralLevel {
+      L1,
+      L2,
+      L3,
+      L4
+    }
+
+    enum class AlgaeLevel {
+      GROUND,
+      L2,
+      L3
+    }
+
+    class Idle() : SuperstructureRequest
+    class Home() : SuperstructureRequest
+
+    class IntakeCoral() : SuperstructureRequest
+    class IntakeAlgae(level: AlgaeLevel) : SuperstructureRequest
+
+    class ScorePrepCoral(level: CoralLevel) : SuperstructureRequest
+
+    // Named processor specifically in case we add scoring into barge later so we don't have to
+    // refactor
+    class ScorePrepAlgaeProcessor() : SuperstructureRequest
+    class Score() : SuperstructureRequest
+
+    class ClimbExtend() : SuperstructureRequest
+    class ClimbRetract() : SuperstructureRequest
+  }
 
   sealed interface DrivetrainRequest : Request {
     class OpenLoop(
