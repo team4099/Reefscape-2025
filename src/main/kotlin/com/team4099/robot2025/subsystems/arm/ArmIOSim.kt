@@ -16,6 +16,11 @@ import org.team4099.lib.units.perSecond
 
 class ArmIOSim : ArmIO {
 
+    var kV: VelocityFeedforward<Radian, Volt> = ArmConstants.ARM_KV
+    var kA: AccelerationFeedforward<Radian, Volt> = ArmConstants.ARM_KA
+    var kG: ElectricalPotential = ArmConstants.ARM_KG
+    var kS: ElectricalPotential = ArmConstants.ARM_KS
+
     val armSim: SingleJointedArmSim =
         SingleJointedArmSim(
             DCMotor.getKrakenX60(1),
@@ -74,5 +79,17 @@ class ArmIOSim : ArmIO {
         kD: DerivativeGain<Radian, Volt>
     ) {
         armPIDController.setPID(kP, kI, kD)
+    }
+
+    override fun configureFeedforward(
+        kG: ElectricalPotential,
+        kS: ElectricalPotential,
+        kA: AccelerationFeedforward<Radian, Volt>,
+        kV: VelocityFeedforward<Radian, Volt>
+    ) {
+        this.kA = kA
+        this.kG = kG
+        this.kS = kS
+        this.kV = kV
     }
 }

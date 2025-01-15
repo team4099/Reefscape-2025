@@ -75,6 +75,13 @@ interface ArmIO {
         kD: DerivativeGain<Radian, Volt>
     ) {}
 
+    fun configureFeedforward(
+        kG: ElectricalPotential,
+        kS: ElectricalPotential,
+        kA: AccelerationFeedforward<Radian, Volt>,
+        kV: VelocityFeedforward<Radian, Volt>
+    )
+
 
 
 }

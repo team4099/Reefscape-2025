@@ -26,12 +26,12 @@ interface RollersIO {
             table?.put("rollerAppliedVoltage", rollerAppliedVoltage.inVolts)
             table?.put("rollerStatorCurrentAmps", rollerStatorCurrent.inAmperes)
             table?.put("rollerSupplyCurrentAmps", rollerSupplyCurrent.inAmperes)
-            table?.put("rollerTempCelcius", rollerTemp.inCelsius)
+            table?.put("rollerTempCelsius", rollerTemp.inCelsius)
 
         }
 
         override fun fromLog(table: LogTable?) {
-            table?.get("rollerVelocity", rollerVelocity.inRotationsPerMinute)?.let {
+            table?.get("rollerVelocityRPM", rollerVelocity.inRotationsPerMinute)?.let {
                 rollerVelocity = it.rotations.perMinute
             }
             table?.get("rollerAppliedVoltage", rollerAppliedVoltage.inVolts)?.let {
@@ -42,6 +42,9 @@ interface RollersIO {
             }
             table?.get("rollerSupplyCurrentAmps", rollerSupplyCurrent.inAmperes)?.let {
                 rollerSupplyCurrent = it.amps
+            }
+            table?.get("rollerTempCelsius", rollerTemp.inCelsius)?.let {
+                rollerTemp = it.celsius
             }
         }
 

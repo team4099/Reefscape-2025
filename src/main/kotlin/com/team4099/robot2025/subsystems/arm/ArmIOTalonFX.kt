@@ -9,6 +9,7 @@ import com.ctre.phoenix6.controls.VoltageOut
 import com.ctre.phoenix6.hardware.CANcoder
 import com.ctre.phoenix6.hardware.TalonFX
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue
+import com.ctre.phoenix6.signals.GravityTypeValue
 import com.ctre.phoenix6.signals.NeutralModeValue
 import com.team4099.robot2025.config.constants.ArmConstants
 import com.team4099.robot2025.config.constants.Constants
@@ -56,7 +57,14 @@ object ArmIOTalonFX: ArmIO {
         armConfiguration.Slot0.kP = armMechanismSensor.proportionalPositionGainToRawUnits(ArmConstants.ARM_KP)
         armConfiguration.Slot0.kI = armMechanismSensor.integralPositionGainToRawUnits(ArmConstants.ARM_KI)
         armConfiguration.Slot0.kD = armMechanismSensor.derivativePositionGainToRawUnits(ArmConstants.ARM_KD)
-        armConfiguration.Slot0.GravityType = ArmConstants.GRAVITY_TYPE
+        armConfiguration.Slot0.GravityType = GravityTypeValue.Arm_Cosine
+
+        // Configure Feedforward Values
+        armConfiguration.Slot0.kG = ArmConstants.ARM_KG.inVolts
+        armConfiguration.Slot0.kS = ArmConstants.ARM_KS.inVolts
+        armConfiguration.Slot0.kA = ArmConstants.ARM_KA.inVoltsPerDegreesPerSecondPerSecond
+        armConfiguration.Slot0.kV = ArmConstants.ARM_KV.inVoltsPerDegreePerSecond
+
         // Configure Gear Ratio and Cancoder Fusing
         armConfiguration.Feedback.FeedbackRemoteSensorID = Constants.Arm.CANCODER_ID
         armConfiguration.Feedback.SensorToMechanismRatio = ArmConstants.ARM_ENCODER_RATIO
@@ -166,5 +174,20 @@ object ArmIOTalonFX: ArmIO {
         PIDConfig.kD = armMechanismSensor.derivativePositionGainToRawUnits(kD)
 
         armTalon.configurator.apply(PIDConfig)
+    }
+
+    override fun configureFeedforward(
+        kG: ElectricalPotential,
+        kS: ElectricalPotential,
+        kA: AccelerationFeedforward<Radian, Volt>,
+        kV: VelocityFeedforward<Radian, Volt>
+    ) {
+        val FeedforwardConfig = armConfiguration.Slot0
+        FeedforwardConfig.kA = kA.inVoltsPerDegreesPerSecondPerSecond
+        FeedforwardConfig.kV = kV.inVoltsPerDegreePerSecond
+        FeedforwardConfig.kG = kG.inVolts
+        FeedforwardConfig.kS = kS.inVolts
+
+        armTalon.configurator.apply(FeedforwardConfig)
     }
 }

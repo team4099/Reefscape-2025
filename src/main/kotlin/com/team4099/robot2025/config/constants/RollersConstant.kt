@@ -25,11 +25,4 @@ object RollersConstant {
     const val GEAR_RATIO = 10.0
     const val MAX_VOLTAGE = 12.0
     val INERTIA = 0.0010.kilo.grams * 1.0.meters.squared // put it to somethig random get actual ones
-
-
-    object PID {
-        val KP = 0.0.volts.perDegree
-        val KI = 0.0.volts.perDegreeSeconds
-        val KD = 0.0.volts / 1.degrees.perSecond
-    }
 }
