@@ -1,6 +1,5 @@
 package com.team4099.robot2025.subsystems.rollers
 
-import com.team4099.robot2025.subsystems.rollers.RollersIO
 import com.team4099.robot2025.subsystems.superstructure.Request
 import com.team4099.robot2025.util.CustomLogger
 import org.team4099.lib.units.derived.ElectricalPotential

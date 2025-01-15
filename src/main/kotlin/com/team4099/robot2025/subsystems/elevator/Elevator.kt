@@ -49,7 +49,7 @@ class Elevator(val io: ElevatorIO) : SubsystemBase() {
 
   private var lastHomingStatorCurrentTripTime = Clock.fpgaTime
 
-  private val isAtTargetedPosition: Boolean
+  val isAtTargetedPosition: Boolean
     get() =
       (
         currentRequest is ElevatorRequest.ClosedLoop &&
@@ -59,7 +59,6 @@ class Elevator(val io: ElevatorIO) : SubsystemBase() {
         (ElevatorTunableValues.enableElevator.get() != 1.0)
 
   init {
-    ElevatorTunableValues.TunableElevatorHeights
 
     if (RobotBase.isReal()) {
       isHomed = false
@@ -138,9 +137,7 @@ class Elevator(val io: ElevatorIO) : SubsystemBase() {
 
     CustomLogger.recordOutput("Elevator/isAtTargetPosition", isAtTargetedPosition)
 
-    CustomLogger.recordOutput(
-      "Elevator/elevatorPositionTarget", elevatorPositionTarget.inInches
-    )
+    CustomLogger.recordOutput("Elevator/elevatorPositionTarget", elevatorPositionTarget.inInches)
     CustomLogger.recordOutput(
       "Elevator/elevatorVelocityTarget", elevatorVelocityTarget.inInchesPerSecond
     )
@@ -188,7 +185,6 @@ class Elevator(val io: ElevatorIO) : SubsystemBase() {
         io.setPosition(elevatorPositionTarget)
 
         nextState = fromElevatorRequestToState(currentRequest)
-
       }
     }
     currentState = nextState

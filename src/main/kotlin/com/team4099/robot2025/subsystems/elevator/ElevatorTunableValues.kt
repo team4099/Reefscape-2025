@@ -50,19 +50,74 @@ object ElevatorTunableValues {
   val kGSecond = LoggedTunableValue("Elevator/kGSecondStage", Pair({ it.inVolts }, { it.volts }))
   val kGThird = LoggedTunableValue("Elevator/kGThirdStage", Pair({ it.inVolts }, { it.volts }))
 
-
-  object TunableElevatorHeights {
-    val minPosition =
+  object ElevatorHeights {
+    val minHeight =
       LoggedTunableValue(
         "Elevator/minPosition",
         ElevatorConstants.DOWNWARDS_EXTENSION_LIMIT,
         Pair({ it.inInches }, { it.inches })
       )
 
-    val maxPosition =
+    val maxHeight =
       LoggedTunableValue(
         "Elevator/maxPosition",
         ElevatorConstants.UPWARDS_EXTENSION_LIMIT,
+        Pair({ it.inInches }, { it.inches })
+      )
+
+    val idleHeight =
+      LoggedTunableValue(
+        "Elevator/idleHeight",
+        ElevatorConstants.IDLE_HEIGHT,
+        Pair({ it.inInches }, { it.inches })
+      )
+
+    val idleCoralHeight =
+      LoggedTunableValue(
+        "Elevator/idleCoralHeight",
+        ElevatorConstants.IDLE_CORAL_HEIGHT,
+        Pair({ it.inInches }, { it.inches })
+      )
+
+    val idleAlgaeHeight =
+      LoggedTunableValue(
+        "Elevator/idleAlgaeHeight",
+        ElevatorConstants.IDLE_CORAL_HEIGHT,
+        Pair({ it.inInches }, { it.inches })
+      )
+
+    val intakeAlgaeGroundHeight =
+      LoggedTunableValue(
+        "Elevator/intakeAlgaeGroundHeight",
+        ElevatorConstants.INTAKE_ALGAE_GROUND_HEIGHT,
+        Pair({ it.inInches }, { it.inches })
+      )
+
+    val intakeAlgaeL2Height =
+      LoggedTunableValue(
+        "Elevator/intakeAlgaeL2Height",
+        ElevatorConstants.INTAKE_ALGAE_L2_HEIGHT,
+        Pair({ it.inInches }, { it.inches })
+      )
+
+    val intakeAlgaeL3Height =
+      LoggedTunableValue(
+        "Elevator/intakeAlgaeL3Height",
+        ElevatorConstants.INTAKE_ALGAE_L3_HEIGHT,
+        Pair({ it.inInches }, { it.inches })
+      )
+
+    val scoreAlgaeProcessorHeight =
+      LoggedTunableValue(
+        "Elevator/scoreAlgaeProcessorHeight",
+        ElevatorConstants.SCORE_PROCESSOR_HEIGHT,
+        Pair({ it.inInches }, { it.inches })
+      )
+
+    val scoreAlgaeBargeHeight =
+      LoggedTunableValue(
+        "Elevator/scoreBargeProcessorHeight",
+        ElevatorConstants.SCORE_BARGE_HEIGHT,
         Pair({ it.inInches }, { it.inches })
       )
 

@@ -30,15 +30,7 @@ import org.team4099.lib.units.derived.StaticFeedforward
 import org.team4099.lib.units.derived.VelocityFeedforward
 import org.team4099.lib.units.derived.Volt
 import org.team4099.lib.units.derived.inVolts
-import org.team4099.lib.units.derived.inVoltsPerMeter
-import org.team4099.lib.units.derived.inVoltsPerMeterPerSecond
-import org.team4099.lib.units.derived.inVoltsPerMeterPerSecondPerSecond
-import org.team4099.lib.units.derived.inVoltsPerMeterSeconds
 import org.team4099.lib.units.derived.volts
-import org.team4099.lib.units.inMetersPerSecond
-import org.team4099.lib.units.inMetersPerSecondPerSecond
-import edu.wpi.first.units.measure.Angle as WPILibAngle
-import edu.wpi.first.units.measure.AngularVelocity as WPILibAngularVelocity
 import edu.wpi.first.units.measure.Current as WPILibCurrent
 import edu.wpi.first.units.measure.Temperature as WPILibTemperature
 import edu.wpi.first.units.measure.Voltage as WPILibVoltage
@@ -160,7 +152,6 @@ object ElevatorIOTalon : ElevatorIO {
     slot0Configs.kI = leaderSensor.integralPositionGainToRawUnits(kI)
     slot0Configs.kD = leaderSensor.derivativePositionGainToRawUnits(kD)
 
-
     leaderTalon.configurator.apply(slot0Configs)
     followerTalon.configurator.apply(slot0Configs)
   }
@@ -180,7 +171,6 @@ object ElevatorIOTalon : ElevatorIO {
     leaderTalon.configurator.apply(slot0Configs)
     followerTalon.configurator.apply(slot0Configs)
   }
-
 
   override fun setPosition(position: Length) {
 
@@ -210,5 +200,4 @@ object ElevatorIOTalon : ElevatorIO {
     leaderTalon.setPosition(0.0)
     followerTalon.setPosition(0.0)
   }
-
 }

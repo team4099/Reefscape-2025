@@ -7,9 +7,9 @@ import org.team4099.lib.units.perSecond
 
 typealias GamePiece = Constants.Universal.GamePiece
 
-typealias Substation = Constants.Universal.Substation
+typealias CoralLevel = Constants.Universal.CoralLevel
 
-typealias NodeTier = Constants.Universal.NodeTier
+typealias AlgaeLevel = Constants.Universal.AlgaeLevel
 
 object Constants {
   object Universal {
@@ -28,15 +28,24 @@ object Constants {
     val POWER_DISTRIBUTION_HUB_ID = 1
 
     enum class GamePiece {
+      CORAL,
+      ALGAE,
       NONE
     }
 
-    enum class NodeTier {
-      NONE
+    enum class CoralLevel {
+      NONE,
+      L1,
+      L2,
+      L3,
+      L4
     }
 
-    enum class Substation {
-      NONE
+    enum class AlgaeLevel {
+      NONE,
+      GROUND,
+      L2,
+      L3
     }
   }
 
@@ -103,11 +112,6 @@ object Constants {
   object Elevator {
     const val LEADER_MOTOR_ID = 42
     const val FOLLOWER_MOTOR_ID = 41
-  }
-
-  object Climber {
-    // TODO: Get the motor ids
-    const val CLIMBER_MOTOR_ID = 0
   }
 
   object Gyro {

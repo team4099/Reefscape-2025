@@ -26,13 +26,21 @@ class Arm(val io: ArmIO) {
         is Request.ArmRequest.OpenLoop -> {
           armTargetVoltage = value.armVoltage
         }
-        is Request.ArmRequest.CloseLoop -> {
+        is Request.ArmRequest.ClosedLoop -> {
           armTargetPosition = value.armPosition
         }
         else -> {}
       }
       field = value
     }
+
+  val isAtTargetedPosition: Boolean
+    get() =
+      (
+        currentState == ArmState.CLOSED_LOOP &&
+          (inputs.armPosition - armTargetPosition).absoluteValue <= ArmConstants.ARM_TOLERANCE
+        ) ||
+        inputs.isSimulating
 
   init {
     // Initialize Arm Tunable Values
@@ -62,7 +70,7 @@ class Arm(val io: ArmIO) {
         io.setArmVoltage(armTargetVoltage)
         nextState = fromRequestToState(currentRequest)
       }
-      ArmState.CLOSE_LOOP -> {
+      ArmState.CLOSED_LOOP -> {
         io.setArmPosition(armTargetPosition)
         nextState = fromRequestToState(currentRequest)
       }
@@ -81,7 +89,7 @@ class Arm(val io: ArmIO) {
     enum class ArmState {
       UNINITIALIZED,
       OPEN_LOOP,
-      CLOSE_LOOP,
+      CLOSED_LOOP,
       ZERO,
     }
 
@@ -89,7 +97,7 @@ class Arm(val io: ArmIO) {
     fun fromRequestToState(request: Request.ArmRequest): ArmState {
       return when (request) {
         is Request.ArmRequest.OpenLoop -> ArmState.OPEN_LOOP
-        is Request.ArmRequest.CloseLoop -> ArmState.CLOSE_LOOP
+        is Request.ArmRequest.ClosedLoop -> ArmState.CLOSED_LOOP
         is Request.ArmRequest.Zero -> ArmState.ZERO
       }
     }

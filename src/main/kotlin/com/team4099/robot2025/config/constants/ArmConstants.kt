@@ -26,6 +26,23 @@ object ArmConstants {
   val ARM_GEAR_RATIO = ARM_SPROCKET_RATIO / ARM_MAX_PLANETARY_RATIO
   val ARM_ENCODER_TO_MECHANISM_RATIO = 1.0
 
+  val IDLE_ANGLE = 0.0.degrees
+  val IDLE_CORAL_ANGLE = 0.0.degrees
+  val IDLE_ALGAE_ANGLE = 0.0.degrees
+
+  val SAFE_ELEVATOR_FRONT_ANGLE = 0.0.degrees
+  val SAFE_ELEVATOR_BACK_ANGLE = 0.0.degrees
+
+  val INTAKE_CORAL_ANGLE = 0.0.degrees
+  val INTAKE_ALGAE_GROUND_ANGLE = 0.0.degrees
+  val INTAKE_ALGAE_L2_ANGLE = 0.0.degrees
+  val INTAKE_ALGAE_L3_ANGLE = 0.0.degrees
+
+  val SCORE_CORAL_ANGLED_ANGLE = 0.0.degrees
+  val SCORE_CORAL_STRAIGHT_ANGLE = 0.0.degrees
+  val SCORE_ALGAE_PROCESSOR_ANGLE = 0.0.degrees
+  val SCORE_ALGAE_BARGE_ANGLE = 0.0.degrees
+
   // PID Constants
   val ARM_KP: ProportionalGain<Radian, Volt> = 0.35.volts / 1.0.degrees
   val ARM_KI: IntegralGain<Radian, Volt> = 0.0.volts / (1.0.degrees * 1.0.seconds)
@@ -53,6 +70,7 @@ object ArmConstants {
   val ARM_LENGTH = 9.678.inches
   val ARM_MAX_ANGLE = 235.degrees
   val ARM_MIN_ANGLE = -70.degrees
+  val ARM_TOLERANCE = 0.0.degrees
 
   val VOLTAGE_COMPENSATION = 12.volts
 }

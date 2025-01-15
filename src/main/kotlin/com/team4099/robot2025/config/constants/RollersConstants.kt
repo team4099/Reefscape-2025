@@ -13,6 +13,9 @@ object RollersConstants {
   val STATOR_CURRENT_LIMIT = 40.0.amps
   val SUPPLY_CURRENT_LIMIT = 60.0.amps
 
+  val INTAKE_VOLTAGE = 0.0.volts
+  val SCORE_VOLTAGE = 0.0.volts
+
   val INVERSION_VALUE: InvertedValue = InvertedValue.Clockwise_Positive
   val NEUTRAL_MODE_VALUE: NeutralModeValue = NeutralModeValue.Coast
 
