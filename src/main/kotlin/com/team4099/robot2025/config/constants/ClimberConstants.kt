@@ -24,10 +24,6 @@ object ClimberConstants {
 
     // TODO: Tune the PID values
     object PID {
-        val KP_REAL: ProportionalGain<Radian, Volt>  = 0.0.volts / 1.0.radians
-        val KI_REAL: IntegralGain<Radian, Volt>  = 0.0.volts / (1.0.radians * 1.0.seconds)
-        val KD_REAL: DerivativeGain<Radian, Volt> = 0.0.volts / 1.0.radians.perSecond
-
         val KP_UNLATCH: ProportionalGain<Radian, Volt>  = 0.0.volts / 1.0.radians
         val KI_UNLATCH: IntegralGain<Radian, Volt>  = 0.0.volts / (1.0.radians * 1.0.seconds)
         val KD_UNLATCH: DerivativeGain<Radian, Volt> = 0.0.volts / 1.0.radians.perSecond

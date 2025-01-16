@@ -108,8 +108,6 @@ object Constants {
   object Climber {
     //TODO: Get the motor ids
     const val CLIMBER_MOTOR_ID = 0
-    const val FRAME_PERIMETER_MOTOR_ID = 0
-    const val CANCODER_ID = 0
   }
 
   object Gyro {

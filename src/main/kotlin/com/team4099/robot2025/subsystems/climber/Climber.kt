@@ -35,17 +35,17 @@ class Climber(private val io: ClimberIO) {
         Pair({it.inVoltsPerRadianPerSecondPerSecond}, {it.volts.perRadianPerSecondPerSecond})
     )
 
-    private val kP = LoggedTunableValue(
+    private val kPSlot0 = LoggedTunableValue(
         "Climber/kP",
         Pair({ it.inVoltsPerRadian }, { it.volts.perRadian })
     )
 
-    private val kI = LoggedTunableValue(
+    private val kISlot0 = LoggedTunableValue(
         "Climber/kI",
         Pair({ it.inVoltsPerRadianSeconds }, { it.volts.perRadianSeconds })
     )
 
-    private val kD = LoggedTunableValue(
+    private val kDSlot0 = LoggedTunableValue(
         "Climber/kD",
         Pair({ it.inVoltsPerRadianPerSecond }, { it.volts.perRadianPerSecond })
     )
@@ -120,9 +120,9 @@ class Climber(private val io: ClimberIO) {
 
     init {
         if (RobotBase.isReal()) {
-            kP.initDefault(ClimberConstants.PID.KP_REAL)
-            kI.initDefault(ClimberConstants.PID.KI_REAL)
-            kD.initDefault(ClimberConstants.PID.KD_REAL)
+            kPSlot0.initDefault(ClimberConstants.PID.KP_UNLATCH)
+            kISlot0.initDefault(ClimberConstants.PID.KI_UNLATCH)
+            kDSlot0.initDefault(ClimberConstants.PID.KD_UNLATCH)
 
             kPSlot1.initDefault(ClimberConstants.PID.KP_LATCH)
             kISlot1.initDefault(ClimberConstants.PID.KI_LATCH)
@@ -138,9 +138,9 @@ class Climber(private val io: ClimberIO) {
                 ClimberConstants.PID.KA
             )
         } else {
-            kP.initDefault(ClimberConstants.PID.KP_SIM)
-            kI.initDefault(ClimberConstants.PID.KI_SIM)
-            kD.initDefault(ClimberConstants.PID.KD_SIM)
+            kPSlot0.initDefault(ClimberConstants.PID.KP_SIM)
+            kISlot0.initDefault(ClimberConstants.PID.KI_SIM)
+            kDSlot0.initDefault(ClimberConstants.PID.KD_SIM)
 
             kV.initDefault(ClimberConstants.PID.KV)
             kA.initDefault(ClimberConstants.PID.KA)
@@ -157,12 +157,12 @@ class Climber(private val io: ClimberIO) {
     fun periodic() {
         io.updateInputs(inputs)
 
-        if(kP.hasChanged() || kI.hasChanged() || kD.hasChanged()) {
-            io.configPID(kP.get(), kI.get(), kD.get())
+        if(kPSlot0.hasChanged() || kISlot0.hasChanged() || kDSlot0.hasChanged()) {
+            io.configPIDSlot0(kPSlot0.get(), kISlot0.get(), kDSlot0.get())
         }
 
         if(kPSlot1.hasChanged() || kISlot1.hasChanged() || kDSlot1.hasChanged()) {
-            io.configPID(kPSlot1.get(), kISlot1.get(), kDSlot1.get())
+            io.configPIDSlot0(kPSlot1.get(), kISlot1.get(), kDSlot1.get())
         }
 
         if(kS.hasChanged() || kV.hasChanged() || kA.hasChanged()) {

@@ -3,7 +3,6 @@ import com.ctre.phoenix6.BaseStatusSignal
 import com.ctre.phoenix6.StatusSignal
 import com.ctre.phoenix6.configs.Slot0Configs
 import com.ctre.phoenix6.configs.Slot1Configs
-import com.ctre.phoenix6.configs.Slot2Configs
 import com.ctre.phoenix6.configs.TalonFXConfiguration
 import com.ctre.phoenix6.controls.MotionMagicVoltage
 import com.ctre.phoenix6.controls.VoltageOut
@@ -50,11 +49,11 @@ object ClimberIOTalon : ClimberIO {
         climberTalon.clearStickyFaults()
 
         climberConfiguration.Slot0.kP =
-            climberSensor.proportionalPositionGainToRawUnits(ClimberConstants.PID.KP_REAL)
+            climberSensor.proportionalPositionGainToRawUnits(ClimberConstants.PID.KP_UNLATCH)
         climberConfiguration.Slot0.kI =
-            climberSensor.integralPositionGainToRawUnits(ClimberConstants.PID.KI_REAL)
+            climberSensor.integralPositionGainToRawUnits(ClimberConstants.PID.KI_UNLATCH)
         climberConfiguration.Slot0.kD =
-            climberSensor.derivativePositionGainToRawUnits(ClimberConstants.PID.KD_REAL)
+            climberSensor.derivativePositionGainToRawUnits(ClimberConstants.PID.KD_UNLATCH)
 
         climberConfiguration.Slot1.kP =
             climberSensor.proportionalPositionGainToRawUnits(ClimberConstants.PID.KP_UNLATCH)
@@ -94,7 +93,7 @@ object ClimberIOTalon : ClimberIO {
         climberTalon.setPosition(0.0)
     }
 
-    override fun configPID(
+    override fun configPIDSlot0(
         kP: ProportionalGain<Radian, Volt>,
         kI: IntegralGain<Radian, Volt>,
         kD: DerivativeGain<Radian, Volt>
@@ -112,18 +111,6 @@ object ClimberIOTalon : ClimberIO {
         kD: DerivativeGain<Radian, Volt>
     ) {
         val climberPIDConfig = Slot1Configs()
-        climberPIDConfig.kP = climberSensor.proportionalPositionGainToRawUnits(kP)
-        climberPIDConfig.kI = climberSensor.integralPositionGainToRawUnits(kI)
-        climberPIDConfig.kD = climberSensor.derivativePositionGainToRawUnits(kD)
-        climberTalon.configurator.apply(climberPIDConfig)
-    }
-
-    override fun configPIDSlot2 (
-        kP: ProportionalGain<Radian, Volt>,
-        kI: IntegralGain<Radian, Volt>,
-        kD: DerivativeGain<Radian, Volt>
-    ) {
-        val climberPIDConfig = Slot2Configs()
         climberPIDConfig.kP = climberSensor.proportionalPositionGainToRawUnits(kP)
         climberPIDConfig.kI = climberSensor.integralPositionGainToRawUnits(kI)
         climberPIDConfig.kD = climberSensor.derivativePositionGainToRawUnits(kD)
