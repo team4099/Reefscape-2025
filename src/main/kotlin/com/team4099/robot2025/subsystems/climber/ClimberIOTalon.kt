@@ -157,7 +157,7 @@ object ClimberIOTalon : ClimberIO {
         inputs.climberPosition = climberSensor.position
         inputs.climberVelocity = climberSensor.velocity
         inputs.climberAcceleration = motorAcceleration.valueAsDouble.radians.perSecond.perSecond
-        inputs.climberTorque = motorTorque.valueAsDouble
+        inputs.climberTorque = motorTorque.valueAsDouble.newtons
         inputs.climberAppliedVoltage = motorVoltage.valueAsDouble.volts
         inputs.climberDutyCycle = dutyCycle.valueAsDouble.volts
         inputs.climberStatorCurrent = statorCurrentSignal.valueAsDouble.amps

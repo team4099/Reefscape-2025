@@ -16,7 +16,7 @@ interface ClimberIO {
         var climberPosition = 0.0.radians
         var climberVelocity = 0.0.radians.perSecond
         var climberAcceleration = 0.0.radians.perSecond.perSecond
-        var climberTorque = 0.0
+        var climberTorque = 0.0.newtons
         var climberAppliedVoltage = 0.0.volts
         var climberDutyCycle = 0.0.volts
         var climberStatorCurrent = 0.0.amps
@@ -29,7 +29,7 @@ interface ClimberIO {
             table.put("climberPosition", climberPosition.inRadians)
             table.put("climberVelocity", climberVelocity.inRadiansPerSecond)
             table.put("climberAcceleration", climberAcceleration.inRadiansPerSecondPerSecond)
-            table.put("climberTorque", climberTorque)
+            table.put("climberTorque", climberTorque.inNewtons)
             table.put("climberAppliedVoltage", climberAppliedVoltage.inVolts)
             table.put("climberDutyCycle", climberDutyCycle.inVolts)
             table.put("climberStatorCurrent", climberStatorCurrent.inAmperes)
@@ -51,7 +51,7 @@ interface ClimberIO {
                 climberAcceleration = it.radians.perSecond.perSecond
             }
 
-            table?.get("climberTorque", climberTorque)?.let { climberTorque = it }
+            table?.get("climberTorque", climberTorque.inNewtons)?.let { climberTorque = it.newtons }
             table?.get("climberAppliedVolts", climberAppliedVoltage.inVolts)?.let { climberAppliedVoltage = it.volts }
             table?.get("climberDutyCycleVolts", climberDutyCycle.inVolts)?.let { climberDutyCycle = it.volts }
             table?.get("climberStatorCurrentAmps", climberStatorCurrent.inAmperes)?.let { climberStatorCurrent = it.amps }
