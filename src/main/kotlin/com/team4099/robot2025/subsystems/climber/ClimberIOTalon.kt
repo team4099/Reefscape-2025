@@ -10,7 +10,6 @@ import com.ctre.phoenix6.controls.VoltageOut
 import com.ctre.phoenix6.hardware.TalonFX
 import com.ctre.phoenix6.signals.InvertedValue
 import com.ctre.phoenix6.signals.NeutralModeValue
-import com.team4099.lib.logging.LoggedTunableValue
 import com.team4099.robot2025.config.constants.ClimberConstants
 import com.team4099.robot2025.config.constants.Constants
 import com.team4099.robot2025.util.CustomLogger
@@ -21,7 +20,6 @@ import org.team4099.lib.units.base.inAmperes
 import org.team4099.lib.units.ctreAngularMechanismSensor
 import org.team4099.lib.units.derived.*
 import org.team4099.lib.units.derived.Angle
-import org.team4099.lib.units.inRadiansPerSecond
 import org.team4099.lib.units.perSecond
 
 object ClimberIOTalon : ClimberIO {
@@ -47,28 +45,7 @@ object ClimberIOTalon : ClimberIO {
     private var motorVelocity: StatusSignal<AngularVelocity>
     private var motorAcceleration: StatusSignal<AngularAcceleration>
 
-    private val slot1PositionErrorSwitchThreshold =
-        LoggedTunableValue("Climber/slot1PosErrSwitchThreshold", Pair({it.inRadians}, {it.radians}))
-
-    private val slot1VelocitySwitchThreshold = LoggedTunableValue(
-        "Climber/slot1VelSwitchThreshold",
-        Pair({it.inRadiansPerSecond}, {it.radians.perSecond})
-    )
-
-    private val slot2PositionErrorSwitchThreshold =
-        LoggedTunableValue("Climber/slot2PosErrSwitchThreshold", Pair({it.inRadians}, {it.radians}))
-
-    private val slot2VelocitySwitchThreshold = LoggedTunableValue(
-        "Climber/slot2VelSwitchThreshold",
-        Pair({it.inRadiansPerSecond}, {it.radians.perSecond})
-    )
-
     init {
-        slot1PositionErrorSwitchThreshold.initDefault(ClimberConstants.PID.SLOT1_POS_SWITCH_THRESHOLD)
-        slot1VelocitySwitchThreshold.initDefault(ClimberConstants.PID.SLOT1_VEL_SWITCH_THRESHOLD)
-        slot2PositionErrorSwitchThreshold.initDefault(ClimberConstants.PID.SLOT2_POS_SWITCH_THRESHOLD)
-        slot2VelocitySwitchThreshold.initDefault(ClimberConstants.PID.SLOT2_VEL_SWITCH_THRESHOLD)
-
         climberTalon.configurator.apply(TalonFXConfiguration())
         climberTalon.clearStickyFaults()
 
@@ -158,17 +135,7 @@ object ClimberIOTalon : ClimberIO {
     }
     
     override fun setPosition(position: Angle, feedforward: ElectricalPotential, latched: Boolean) {
-        val currentError = climberSensor.position - position
-        val currentVelocity = climberSensor.velocity
-
-        var slot = if (latched) 0 else 1
-
-
-        if (currentError.absoluteValue <= slot2PositionErrorSwitchThreshold.get() &&
-            currentVelocity.absoluteValue <= slot2VelocitySwitchThreshold.get())
-        {
-            slot = 2
-        }
+        val slot = if (latched) 0 else 1
 
         CustomLogger.recordOutput("Climber/feedForwardApplied", feedforward.inVolts)
         CustomLogger.recordOutput("Climber/slotBeingUsed", slot)

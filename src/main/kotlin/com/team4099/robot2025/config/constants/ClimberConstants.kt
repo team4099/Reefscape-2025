@@ -24,11 +24,6 @@ object ClimberConstants {
 
     // TODO: Tune the PID values
     object PID {
-        val SLOT1_POS_SWITCH_THRESHOLD = 0.0.radians
-        val SLOT1_VEL_SWITCH_THRESHOLD = 0.0.radians.perSecond
-        val SLOT2_POS_SWITCH_THRESHOLD = 0.0.radians
-        val SLOT2_VEL_SWITCH_THRESHOLD = 0.0.radians.perSecond
-
         val KP_REAL: ProportionalGain<Radian, Volt>  = 0.0.volts / 1.0.radians
         val KI_REAL: IntegralGain<Radian, Volt>  = 0.0.volts / (1.0.radians * 1.0.seconds)
         val KD_REAL: DerivativeGain<Radian, Volt> = 0.0.volts / 1.0.radians.perSecond
