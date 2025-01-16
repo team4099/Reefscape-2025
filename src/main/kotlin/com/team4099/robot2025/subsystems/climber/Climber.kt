@@ -257,8 +257,6 @@ class Climber(private val io: ClimberIO) {
         } else {
             io.setVoltage(voltage)
         }
-
-        CustomLogger.recordDebugOutput("Climber/voltageOutOfBounds", isOutOfBounds(voltage))
     }
 
     private fun setPosition(setpoint: TrapezoidProfile.State<Radian>) {

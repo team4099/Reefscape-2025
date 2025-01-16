@@ -26,15 +26,15 @@ interface ClimberIO {
         var isSimulated = false
 
         override fun toLog(table: LogTable) {
-            table.put("climberPosition", climberPosition.inRadians)
-            table.put("climberVelocity", climberVelocity.inRadiansPerSecond)
-            table.put("climberAcceleration", climberAcceleration.inRadiansPerSecondPerSecond)
-            table.put("climberTorque", climberTorque.inNewtons)
-            table.put("climberAppliedVoltage", climberAppliedVoltage.inVolts)
-            table.put("climberDutyCycle", climberDutyCycle.inVolts)
-            table.put("climberStatorCurrent", climberStatorCurrent.inAmperes)
-            table.put("climberSupplyCurrent", climberSupplyCurrent.inAmperes)
-            table.put("climberTemperature", climberTemperature.inCelsius)
+            table.put("climberPositionRadians", climberPosition.inRadians)
+            table.put("climberVelocityRadiansPerSecond", climberVelocity.inRadiansPerSecond)
+            table.put("climberAccelerationRadiansPerSecondPerSecond", climberAcceleration.inRadiansPerSecondPerSecond)
+            table.put("climberTorqueNewtonMeters", climberTorque.inNewtons)
+            table.put("climberAppliedVolts", climberAppliedVoltage.inVolts)
+            table.put("climberDutyCycleVolts", climberDutyCycle.inVolts)
+            table.put("climberStatorCurrentAmps", climberStatorCurrent.inAmperes)
+            table.put("climberSupplyCurrentAmps", climberSupplyCurrent.inAmperes)
+            table.put("climberTemperatureCelsius", climberTemperature.inCelsius)
         }
 
         override fun fromLog(table: LogTable?) {
@@ -51,7 +51,7 @@ interface ClimberIO {
                 climberAcceleration = it.radians.perSecond.perSecond
             }
 
-            table?.get("climberTorque", climberTorque.inNewtons)?.let { climberTorque = it.newtons }
+            table?.get("climberTorqueNewtonMeters", climberTorque.inNewtons)?.let { climberTorque = it.newtons }
             table?.get("climberAppliedVolts", climberAppliedVoltage.inVolts)?.let { climberAppliedVoltage = it.volts }
             table?.get("climberDutyCycleVolts", climberDutyCycle.inVolts)?.let { climberDutyCycle = it.volts }
             table?.get("climberStatorCurrentAmps", climberStatorCurrent.inAmperes)?.let { climberStatorCurrent = it.amps }
