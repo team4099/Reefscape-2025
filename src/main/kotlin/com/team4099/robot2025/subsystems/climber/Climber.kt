@@ -12,7 +12,7 @@ import org.team4099.lib.controller.TrapezoidProfile
 import org.team4099.lib.units.AngularVelocity
 import org.team4099.lib.units.base.inSeconds
 import org.team4099.lib.units.derived.*
-import org.team4099.lib.units.inRadiansPerSecond
+import org.team4099.lib.units.inDegreesPerSecond
 import org.team4099.lib.units.perSecond
 
 class Climber(private val io: ClimberIO) {
@@ -27,42 +27,42 @@ class Climber(private val io: ClimberIO) {
 
     private val kV = LoggedTunableValue(
         "Climber/kV",
-        Pair({it.inVoltsPerRadianPerSecond}, {it.volts.perRadianPerSecond})
+        Pair({it.inVoltsPerDegreePerSecond}, {it.volts.perDegreePerSecond})
     )
 
     private val kA = LoggedTunableValue(
         "Climber/kA",
-        Pair({it.inVoltsPerRadianPerSecondPerSecond}, {it.volts.perRadianPerSecondPerSecond})
+        Pair({it.inVoltsPerDegreePerSecondPerSecond}, {it.volts.perDegreePerSecondPerSecond})
     )
 
     private val kPSlot0 = LoggedTunableValue(
         "Climber/kP",
-        Pair({ it.inVoltsPerRadian }, { it.volts.perRadian })
+        Pair({ it.inVoltsPerDegree }, { it.volts.perDegree })
     )
 
     private val kISlot0 = LoggedTunableValue(
         "Climber/kI",
-        Pair({ it.inVoltsPerRadianSeconds }, { it.volts.perRadianSeconds })
+        Pair({ it.inVoltsPerDegreeSeconds }, { it.volts.perDegreeSeconds })
     )
 
     private val kDSlot0 = LoggedTunableValue(
         "Climber/kD",
-        Pair({ it.inVoltsPerRadianPerSecond }, { it.volts.perRadianPerSecond })
+        Pair({ it.inVoltsPerDegreePerSecond }, { it.volts.perDegreePerSecond })
     )
 
     private val kPSlot1 = LoggedTunableValue(
         "Climber/kPSlot1",
-        Pair({ it.inVoltsPerRadian }, { it.volts.perRadian })
+        Pair({ it.inVoltsPerDegree }, { it.volts.perDegree })
     )
 
     private val kISlot1 = LoggedTunableValue(
         "Climber/kISlot1",
-        Pair({ it.inVoltsPerRadianSeconds }, { it.volts.perRadianSeconds })
+        Pair({ it.inVoltsPerDegreeSeconds }, { it.volts.perDegreeSeconds })
     )
 
     private val kDSlot1 = LoggedTunableValue(
         "Climber/kDSlot1",
-        Pair({ it.inVoltsPerRadianPerSecond }, { it.volts.perRadianPerSecond })
+        Pair({ it.inVoltsPerDegreePerSecond }, { it.volts.perDegreePerSecond })
     )
 
     private var climberConstraints: TrapezoidProfile.Constraints<Radian> = TrapezoidProfile.Constraints(
@@ -72,8 +72,8 @@ class Climber(private val io: ClimberIO) {
 
     private var climberProfile = TrapezoidProfile(
         climberConstraints,
-        TrapezoidProfile.State((-1337.0).radians, -1337.0.radians.perSecond),
-        TrapezoidProfile.State((-1337.0).radians, -1337.0.radians.perSecond)
+        TrapezoidProfile.State((-1337.0).degrees, -1337.0.degrees.perSecond),
+        TrapezoidProfile.State((-1337.0).degrees, -1337.0.degrees.perSecond)
     )
 
     private val maxAngleReached: Boolean
@@ -82,9 +82,9 @@ class Climber(private val io: ClimberIO) {
     private val minAngleReached: Boolean
         get() = inputs.climberPosition <= ClimberConstants.MIN_ANGLE
 
-    private var targetPosition: Angle = 0.radians
+    private var targetPosition: Angle = 0.degrees
     private var targetVoltage: ElectricalPotential = 0.volts
-    private var lastTargetPosition: Angle = (-1337).radians
+    private var lastTargetPosition: Angle = (-1337).degrees
     private var lastVoltage = (-1337).volts
     private var lastSetpoint: TrapezoidProfile.State<Radian> = TrapezoidProfile.State()
 
@@ -173,7 +173,7 @@ class Climber(private val io: ClimberIO) {
         CustomLogger.recordOutput("Climber/currentState", currentState.name)
         CustomLogger.recordOutput("Climber/requestedState", currentRequest.javaClass.simpleName)
         CustomLogger.recordOutput("Climber/isAtTargetedPosition", isAtTargetedPosition)
-        CustomLogger.recordOutput("Climber/requestedPosition", targetPosition.inRadians)
+        CustomLogger.recordOutput("Climber/requestedPosition", targetPosition.inDegrees)
 
         var nextState = currentState
 
@@ -193,7 +193,7 @@ class Climber(private val io: ClimberIO) {
 
                     climberProfile = TrapezoidProfile(
                         climberConstraints,
-                        TrapezoidProfile.State(targetPosition, 0.radians.perSecond),
+                        TrapezoidProfile.State(targetPosition, 0.degrees.perSecond),
                         TrapezoidProfile.State(inputs.climberPosition, inputs.climberVelocity)
                     )
 
@@ -213,7 +213,7 @@ class Climber(private val io: ClimberIO) {
                 nextState = fromRequestToState(currentRequest)
 
                 if (!currentState.equivalentToRequest(currentRequest)) {
-                    lastTargetPosition = (-1337).radians
+                    lastTargetPosition = (-1337).degrees
                     lastVoltage = (-1337).volts
                 }
             }
@@ -242,8 +242,8 @@ class Climber(private val io: ClimberIO) {
     }
 
     private fun isOutOfBounds(setpointVelocity: AngularVelocity): Boolean {
-        return (maxAngleReached && setpointVelocity > 0.radians.perSecond) ||
-                (minAngleReached && setpointVelocity < 0.radians.perSecond)
+        return (maxAngleReached && setpointVelocity > 0.degrees.perSecond) ||
+                (minAngleReached && setpointVelocity < 0.degrees.perSecond)
     }
 
     private fun isOutOfBounds(voltage: ElectricalPotential): Boolean {
@@ -274,8 +274,8 @@ class Climber(private val io: ClimberIO) {
 
         CustomLogger.recordDebugOutput("Climber/profileOutOfBounds", isOutOfBounds(setpoint.velocity))
         CustomLogger.recordOutput("Climber/feedforward", feedforward.inVolts)
-        CustomLogger.recordOutput("Climber/targetPosition", setpoint.position.inRadians)
-        CustomLogger.recordOutput("Climber/targetVelocity", setpoint.velocity.inRadiansPerSecond)
+        CustomLogger.recordOutput("Climber/targetPosition", setpoint.position.inDegrees)
+        CustomLogger.recordOutput("Climber/targetVelocity", setpoint.velocity.inDegreesPerSecond)
     }
 
     companion object {

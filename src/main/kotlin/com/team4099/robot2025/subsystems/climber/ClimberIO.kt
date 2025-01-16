@@ -7,15 +7,15 @@ import org.team4099.lib.units.base.celsius
 import org.team4099.lib.units.base.inAmperes
 import org.team4099.lib.units.base.inCelsius
 import org.team4099.lib.units.derived.*
-import org.team4099.lib.units.inRadiansPerSecond
-import org.team4099.lib.units.inRadiansPerSecondPerSecond
+import org.team4099.lib.units.inDegreesPerSecond
+import org.team4099.lib.units.inDegreesPerSecondPerSecond
 import org.team4099.lib.units.perSecond
 
 interface ClimberIO {
     class ClimberInputs: LoggableInputs {
-        var climberPosition = 0.0.radians
-        var climberVelocity = 0.0.radians.perSecond
-        var climberAcceleration = 0.0.radians.perSecond.perSecond
+        var climberPosition = 0.0.degrees
+        var climberVelocity = 0.0.degrees.perSecond
+        var climberAcceleration = 0.0.degrees.perSecond.perSecond
         var climberTorque = 0.0.newtons
         var climberAppliedVoltage = 0.0.volts
         var climberDutyCycle = 0.0.volts
@@ -26,9 +26,9 @@ interface ClimberIO {
         var isSimulated = false
 
         override fun toLog(table: LogTable) {
-            table.put("climberPositionRadians", climberPosition.inRadians)
-            table.put("climberVelocityRadiansPerSecond", climberVelocity.inRadiansPerSecond)
-            table.put("climberAccelerationRadiansPerSecondPerSecond", climberAcceleration.inRadiansPerSecondPerSecond)
+            table.put("climberPositionDegrees", climberPosition.inDegrees)
+            table.put("climberVelocityDegreesPerSecond", climberVelocity.inDegreesPerSecond)
+            table.put("climberAccelerationDegreesPerSecondPerSecond", climberAcceleration.inDegreesPerSecondPerSecond)
             table.put("climberTorqueNewtonMeters", climberTorque.inNewtons)
             table.put("climberAppliedVolts", climberAppliedVoltage.inVolts)
             table.put("climberDutyCycleVolts", climberDutyCycle.inVolts)
@@ -38,25 +38,38 @@ interface ClimberIO {
         }
 
         override fun fromLog(table: LogTable?) {
-            table?.get("climberPositionRadians", climberPosition.inRadians)?.let { climberPosition = it.radians }
+            table?.get("climberPositionDegrees", climberPosition.inDegrees)?.let { climberPosition = it.degrees }
 
-            table?.get("climberVelocityRadiansPerSecond", climberVelocity.inRadiansPerSecond)?.let {
-                climberVelocity = it.radians.perSecond
+            table?.get("climberVelocityDegreesPerSecond", climberVelocity.inDegreesPerSecond)?.let {
+                climberVelocity = it.degrees.perSecond
             }
 
             table?.get(
-                "climberAccelerationRadiansPerSecondPerSecond",
-                climberAcceleration.inRadiansPerSecondPerSecond
+                "climberAccelerationDegreesPerSecondPerSecond",
+                climberAcceleration.inDegreesPerSecondPerSecond
             )?.let {
-                climberAcceleration = it.radians.perSecond.perSecond
+                climberAcceleration = it.degrees.perSecond.perSecond
             }
 
             table?.get("climberTorqueNewtonMeters", climberTorque.inNewtons)?.let { climberTorque = it.newtons }
-            table?.get("climberAppliedVolts", climberAppliedVoltage.inVolts)?.let { climberAppliedVoltage = it.volts }
+
+            table?.get("climberAppliedVolts", climberAppliedVoltage.inVolts)?.let {
+                climberAppliedVoltage = it.volts
+
+            }
             table?.get("climberDutyCycleVolts", climberDutyCycle.inVolts)?.let { climberDutyCycle = it.volts }
-            table?.get("climberStatorCurrentAmps", climberStatorCurrent.inAmperes)?.let { climberStatorCurrent = it.amps }
-            table?.get("climberSupplyCurrentAmps", climberSupplyCurrent.inAmperes)?.let { climberSupplyCurrent = it.amps }
-            table?.get("climberTemperatureCelsius", climberTemperature.inCelsius)?.let { climberTemperature = it.celsius }
+
+            table?.get("climberStatorCurrentAmps", climberStatorCurrent.inAmperes)?.let {
+                climberStatorCurrent = it.amps
+
+            }
+            table?.get("climberSupplyCurrentAmps", climberSupplyCurrent.inAmperes)?.let {
+                climberSupplyCurrent = it.amps
+            }
+
+            table?.get("climberTemperatureCelsius", climberTemperature.inCelsius)?.let {
+                climberTemperature = it.celsius
+            }
         }
     }
 
