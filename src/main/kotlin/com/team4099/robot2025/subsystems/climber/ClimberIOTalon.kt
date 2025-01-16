@@ -19,6 +19,8 @@ import org.team4099.lib.units.base.inAmperes
 import org.team4099.lib.units.ctreAngularMechanismSensor
 import org.team4099.lib.units.derived.*
 import org.team4099.lib.units.derived.Angle
+import org.team4099.lib.units.inRotationsPerSecond
+import org.team4099.lib.units.inRotationsPerSecondPerSecond
 import org.team4099.lib.units.perSecond
 
 object ClimberIOTalon : ClimberIO {
@@ -71,8 +73,9 @@ object ClimberIOTalon : ClimberIO {
         climberConfiguration.CurrentLimits.SupplyCurrentLimitEnable = true
         climberConfiguration.CurrentLimits.StatorCurrentLimit = ClimberConstants.STATOR_CURRENT_LIMIT.inAmperes
         climberConfiguration.CurrentLimits.StatorCurrentLimitEnable = false
-        motionMagicConfiguration.MotionMagicCruiseVelocity = 80.0
-        motionMagicConfiguration.MotionMagicAcceleration = 160.0
+        motionMagicConfiguration.MotionMagicCruiseVelocity = ClimberConstants.MAX_VELOCITY.inRotationsPerSecond
+        motionMagicConfiguration.MotionMagicAcceleration =
+            ClimberConstants.MAX_ACCELERATION.inRotationsPerSecondPerSecond
 
         climberConfiguration.MotorOutput.NeutralMode = NeutralModeValue.Brake
         climberConfiguration.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive
