@@ -38,7 +38,7 @@ class Arm(val io: ArmIO) {
     private var armKD = LoggedTunableValue("Arm/armKD", Pair({it.inVoltsPerDegreePerSecond}, {it.volts.perDegreePerSecond}))
 
     init {
-        // Initilize Arm Tunable Values
+        // Initialize Arm Tunable Values
         armKP.initDefault(ArmConstants.ARM_KP)
         armKI.initDefault(ArmConstants.ARM_KI)
         armKD.initDefault(ArmConstants.ARM_KD)
@@ -49,7 +49,7 @@ class Arm(val io: ArmIO) {
         CustomLogger.processInputs("Arm", inputs)
         CustomLogger.recordOutput("Arm/currentState", currentState.toString())
 
-        // Configure Tuneable Values
+        // Configure Tunable Values
         if (armKP.hasChanged() || armKI.hasChanged() || armKD.hasChanged()) {
             io.configurePID(armKP.get(), armKI.get(), armKD.get())
         }
