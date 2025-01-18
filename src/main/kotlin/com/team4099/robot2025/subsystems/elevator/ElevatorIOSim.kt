@@ -43,54 +43,13 @@ object ElevatorIOSim : ElevatorIO {
 
   private var lastAppliedVoltage = 0.0.volts
 
-  private var elevatorPIDControllerFirstStage =
+  private val elevatorPIDController =
     ProfiledPIDController(
-      ElevatorConstants.PID.SIM_KP_FIRST_STAGE,
-      ElevatorConstants.PID.SIM_KI_FIRST_STAGE,
-      ElevatorConstants.PID.SIM_KD_FIRST_STAGE,
+      ElevatorConstants.PID.SIM_KP,
+      ElevatorConstants.PID.SIM_KI,
+      ElevatorConstants.PID.SIM_KD,
       TrapezoidProfile.Constraints(ElevatorConstants.MAX_VELOCITY, ElevatorConstants.MAX_ACCELERATION)
     )
-
-  private val elevatorPIDControllerSecondStage =
-    ProfiledPIDController(
-      ElevatorConstants.PID.SIM_KP_SECOND_STAGE,
-      ElevatorConstants.PID.SIM_KI_SECOND_STAGE,
-      ElevatorConstants.PID.SIM_KD_SECOND_STAGE,
-      TrapezoidProfile.Constraints(ElevatorConstants.MAX_VELOCITY, ElevatorConstants.MAX_ACCELERATION)
-    )
-
-  private val elevatorPIDControllerThirdStage =
-    ProfiledPIDController(
-      ElevatorConstants.PID.SIM_KP_THIRD_STAGE,
-      ElevatorConstants.PID.SIM_KI_THIRD_STAGE,
-      ElevatorConstants.PID.SIM_KD_THIRD_STAGE,
-      TrapezoidProfile.Constraints(ElevatorConstants.MAX_VELOCITY, ElevatorConstants.MAX_ACCELERATION)
-    )
-
-  private var elevatorPIDController = elevatorPIDControllerFirstStage
-
-  private val elevatorFFControllerFirstStage = ElevatorFeedforward(
-    ElevatorConstants.PID.SIM_KS_FIRST_STAGE,
-    ElevatorConstants.PID.KG_FIRST_STAGE,
-    ElevatorConstants.PID.KV_FIRST_STAGE,
-    ElevatorConstants.PID.KA_FIRST_STAGE
-  )
-
-  private val elevatorFFControllerSecondStage = ElevatorFeedforward(
-    ElevatorConstants.PID.SIM_KS_SECOND_STAGE,
-    ElevatorConstants.PID.KG_SECOND_STAGE,
-    ElevatorConstants.PID.KV_SECOND_STAGE,
-    ElevatorConstants.PID.KA_SECOND_STAGE
-  )
-
-  private val elevatorFFControllerThirdStage = ElevatorFeedforward(
-    ElevatorConstants.PID.SIM_KS_THIRD_STAGE,
-    ElevatorConstants.PID.KG_THIRD_STAGE,
-    ElevatorConstants.PID.KV_THIRD_STAGE,
-    ElevatorConstants.PID.KA_THIRD_STAGE
-  )
-
-  private var elevatorFFController = elevatorFFControllerFirstStage;
 
   override fun updateInputs(inputs: ElevatorIO.ElevatorInputs) {
     elevatorSim.update(Constants.Universal.LOOP_PERIOD_TIME.inSeconds)
@@ -128,68 +87,26 @@ object ElevatorIOSim : ElevatorIO {
   }
 
   override fun setPosition(position: Length) {
-    if (elevatorSim.positionMeters < ElevatorConstants.FIRST_STAGE_HEIGHT.inMeters) {
-      elevatorPIDController = elevatorPIDControllerFirstStage
-      elevatorFFController = elevatorFFControllerFirstStage
-    } else if (elevatorSim.positionMeters < ElevatorConstants.SECOND_STAGE_HEIGHT.inMeters) {
-      elevatorPIDController = elevatorPIDControllerSecondStage
-      elevatorFFController = elevatorFFControllerSecondStage
-    } else {
-      elevatorPIDController = elevatorPIDControllerThirdStage
-      elevatorFFController = elevatorFFControllerThirdStage
-    }
-
     elevatorPIDController.setGoal(position)
 
     val pidOutput = elevatorPIDController.calculate(elevatorSim.positionMeters.meters)
-    val feedforwardOutput = elevatorFFController.calculate(Value(elevatorPIDController.wpiPidController.getSetpoint().velocity))
-    setVoltage(pidOutput + feedforwardOutput)
+    setVoltage(pidOutput)
   }
 
   override fun zeroEncoder() {}
 
   /**
-   * Updates the PID controller for the first stage of the elevator
+   * Updates the PID controller
    *
    * @param kP a constant which will be used to scale the proportion gain
    * @param kI a constant which will be used to scale the integral gain
    * @param kD a constant which will be used to scale the derivative gain
    */
-  override fun configFirstStagePID(
+  override fun configPID(
     kP: ProportionalGain<Meter, Volt>,
     kI: IntegralGain<Meter, Volt>,
     kD: DerivativeGain<Meter, Volt>
   ) {
-    elevatorPIDControllerFirstStage.setPID(kP, kI, kD)
-  }
-
-  /**
-   * Updates the PID controller for the second stage of the elevator
-   *
-   * @param kP a constant which will be used to scale the proportion gain
-   * @param kI a constant which will be used to scale the integral gain
-   * @param kD a constant which will be used to scale the derivative gain
-   */
-  override fun configSecondStagePID(
-    kP: ProportionalGain<Meter, Volt>,
-    kI: IntegralGain<Meter, Volt>,
-    kD: DerivativeGain<Meter, Volt>
-  ) {
-    elevatorPIDControllerSecondStage.setPID(kP, kI, kD)
-  }
-
-  /**
-   * Updates the PID controller for the third stage of the elevator
-   *
-   * @param kP a constant which will be used to scale the proportion gain
-   * @param kI a constant which will be used to scale the integral gain
-   * @param kD a constant which will be used to scale the derivative gain
-   */
-  override fun configThirdStagePID(
-    kP: ProportionalGain<Meter, Volt>,
-    kI: IntegralGain<Meter, Volt>,
-    kD: DerivativeGain<Meter, Volt>
-  ) {
-    elevatorPIDControllerThirdStage.setPID(kP, kI, kD)
+    elevatorPIDController.setPID(kP, kI, kD)
   }
 }

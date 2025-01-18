@@ -18,7 +18,7 @@ object ElevatorConstants {
   val HOMING_APPLIED_VOLTAGE = 0.0.volts
   val HOMING_STALL_CURRENT = 0.0.amps
   val HOMING_STALL_TIME_THRESHOLD = 0.0.seconds
-  val UPWARDS_EXTENSION_LIMIT = 54.25.inches
+  val UPWARDS_EXTENSION_LIMIT = 50.0.inches
   val DOWNWARDS_EXTENSION_LIMIT = 0.0.inches
 
   val SPOOL_DIAMETER = 1.5038.inches
@@ -59,29 +59,13 @@ object ElevatorConstants {
 
   object PID {
     // TODO: tune all
-    val REAL_KP_FIRST_STAGE = 8.0.volts / 1.inches
-    val REAL_KI_FIRST_STAGE = 0.0.volts / (1.inches * 1.seconds)
-    val REAL_KD_FIRST_STAGE = 0.0.volts / (1.inches.perSecond)
+    val REAL_KP = 8.0.volts / 1.inches
+    val REAL_KI = 0.0.volts / (1.inches * 1.seconds)
+    val REAL_KD = 0.0.volts / (1.inches.perSecond)
 
-    val REAL_KP_SECOND_STAGE = 8.0.volts / 1.inches
-    val REAL_KI_SECOND_STAGE = 0.0.volts / (1.inches * 1.seconds)
-    val REAL_KD_SECOND_STAGE = 0.0.volts / (1.inches.perSecond)
-
-    val REAL_KP_THIRD_STAGE = 8.0.volts / 1.inches
-    val REAL_KI_THIRD_STAGE = 0.0.volts / (1.inches * 1.seconds)
-    val REAL_KD_THIRD_STAGE = 0.0.volts / (1.inches.perSecond)
-
-    val SIM_KP_FIRST_STAGE = 1.5.volts / 1.inches
-    val SIM_KI_FIRST_STAGE = 0.0.volts / (1.inches * 1.seconds)
-    val SIM_KD_FIRST_STAGE = 0.25.volts / (1.inches.perSecond)
-
-    val SIM_KP_SECOND_STAGE = 1.5.volts / 1.inches
-    val SIM_KI_SECOND_STAGE = 0.0.volts / (1.inches * 1.seconds)
-    val SIM_KD_SECOND_STAGE = 0.25.volts / (1.inches.perSecond)
-
-    val SIM_KP_THIRD_STAGE = 1.5.volts / 1.inches
-    val SIM_KI_THIRD_STAGE = 0.0.volts / (1.inches * 1.seconds)
-    val SIM_KD_THIRD_STAGE = 0.25.volts / (1.inches.perSecond)
+    val SIM_KP = 1.5.volts / 1.inches
+    val SIM_KI = 0.0.volts / (1.inches * 1.seconds)
+    val SIM_KD = 0.25.volts / (1.inches.perSecond)
 
     val SIM_KS_SECOND_STAGE = 0.0.volts
     val REAL_KS_SECOND_STAGE = 0.54.volts

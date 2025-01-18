@@ -3,8 +3,6 @@ package com.team4099.robot2025.subsystems.elevator
 import com.ctre.phoenix6.BaseStatusSignal
 import com.ctre.phoenix6.StatusSignal
 import com.ctre.phoenix6.configs.Slot0Configs
-import com.ctre.phoenix6.configs.Slot1Configs
-import com.ctre.phoenix6.configs.Slot2Configs
 import com.ctre.phoenix6.configs.TalonFXConfiguration
 import com.ctre.phoenix6.controls.Follower
 import com.ctre.phoenix6.controls.MotionMagicVoltage
@@ -80,7 +78,6 @@ object ElevatorIOTalon : ElevatorIO {
   var motorTorque: StatusSignal<WPILibCurrent>
 
   init {
-
     leaderTalon.clearStickyFaults()
     followerTalon.clearStickyFaults()
 
@@ -91,79 +88,29 @@ object ElevatorIOTalon : ElevatorIO {
     followerTalon.clearStickyFaults()
 
     leaderConfigs.Slot0.kP =
-      leaderSensor.proportionalPositionGainToRawUnits(ElevatorConstants.PID.REAL_KP_FIRST_STAGE)
+      leaderSensor.proportionalPositionGainToRawUnits(ElevatorConstants.PID.REAL_KP)
     leaderConfigs.Slot0.kI =
-      leaderSensor.integralPositionGainToRawUnits(ElevatorConstants.PID.REAL_KI_FIRST_STAGE)
+      leaderSensor.integralPositionGainToRawUnits(ElevatorConstants.PID.REAL_KI)
     leaderConfigs.Slot0.kD =
-      leaderSensor.derivativePositionGainToRawUnits(ElevatorConstants.PID.REAL_KD_FIRST_STAGE)
+      leaderSensor.derivativePositionGainToRawUnits(ElevatorConstants.PID.REAL_KD)
     leaderConfigs.Slot0.kG = ElevatorConstants.PID.KG_FIRST_STAGE.inVolts
     leaderConfigs.Slot0.kS = ElevatorConstants.PID.REAL_KS_FIRST_STAGE.inVolts
     leaderConfigs.Slot0.kV = ElevatorConstants.PID.KV_FIRST_STAGE.inVoltsPerMeterPerSecond
     leaderConfigs.Slot0.kA = ElevatorConstants.PID.KA_FIRST_STAGE.inVoltsPerMeterPerSecondPerSecond
     leaderConfigs.Slot0.GravityType = GravityTypeValue.Elevator_Static
 
-    leaderConfigs.Slot1.kP =
-      leaderSensor.proportionalPositionGainToRawUnits(ElevatorConstants.PID.REAL_KP_SECOND_STAGE)
-    leaderConfigs.Slot1.kI =
-      leaderSensor.integralPositionGainToRawUnits(ElevatorConstants.PID.REAL_KI_SECOND_STAGE)
-    leaderConfigs.Slot1.kD =
-      leaderSensor.derivativePositionGainToRawUnits(ElevatorConstants.PID.REAL_KD_SECOND_STAGE)
-    leaderConfigs.Slot1.kG = ElevatorConstants.PID.KG_SECOND_STAGE.inVolts
-    leaderConfigs.Slot1.kS = ElevatorConstants.PID.REAL_KS_SECOND_STAGE.inVolts
-    leaderConfigs.Slot1.kV = ElevatorConstants.PID.KV_SECOND_STAGE.inVoltsPerMeterPerSecond
-    leaderConfigs.Slot1.kA = ElevatorConstants.PID.KA_SECOND_STAGE.inVoltsPerMeterPerSecondPerSecond
-    leaderConfigs.Slot1.GravityType = GravityTypeValue.Elevator_Static
-
-    leaderConfigs.Slot2.kP =
-      leaderSensor.proportionalPositionGainToRawUnits(ElevatorConstants.PID.REAL_KP_THIRD_STAGE)
-    leaderConfigs.Slot2.kI =
-      leaderSensor.integralPositionGainToRawUnits(ElevatorConstants.PID.REAL_KI_THIRD_STAGE)
-    leaderConfigs.Slot2.kD =
-      leaderSensor.derivativePositionGainToRawUnits(ElevatorConstants.PID.REAL_KD_THIRD_STAGE)
-    leaderConfigs.Slot2.kG = ElevatorConstants.PID.KG_THIRD_STAGE.inVolts
-    leaderConfigs.Slot2.kS = ElevatorConstants.PID.REAL_KS_THIRD_STAGE.inVolts
-    leaderConfigs.Slot2.kV = ElevatorConstants.PID.KV_THIRD_STAGE.inVoltsPerMeterPerSecond
-    leaderConfigs.Slot2.kA = ElevatorConstants.PID.KA_THIRD_STAGE.inVoltsPerMeterPerSecondPerSecond
-    leaderConfigs.Slot2.GravityType = GravityTypeValue.Elevator_Static
-
     followerConfigs.Slot0.kP =
-      followerSensor.proportionalPositionGainToRawUnits(ElevatorConstants.PID.REAL_KP_FIRST_STAGE)
+      followerSensor.proportionalPositionGainToRawUnits(ElevatorConstants.PID.REAL_KP)
     followerConfigs.Slot0.kI =
-      followerSensor.integralPositionGainToRawUnits(ElevatorConstants.PID.REAL_KI_FIRST_STAGE)
+      followerSensor.integralPositionGainToRawUnits(ElevatorConstants.PID.REAL_KI)
     followerConfigs.Slot0.kD =
-      followerSensor.derivativePositionGainToRawUnits(ElevatorConstants.PID.REAL_KD_FIRST_STAGE)
+      followerSensor.derivativePositionGainToRawUnits(ElevatorConstants.PID.REAL_KD)
     followerConfigs.Slot0.kG = ElevatorConstants.PID.KG_FIRST_STAGE.inVolts
     followerConfigs.Slot0.kS = ElevatorConstants.PID.REAL_KS_FIRST_STAGE.inVolts
     followerConfigs.Slot0.kV = ElevatorConstants.PID.KV_FIRST_STAGE.inVoltsPerMeterPerSecond
     followerConfigs.Slot0.kA =
       ElevatorConstants.PID.KA_FIRST_STAGE.inVoltsPerMeterPerSecondPerSecond
     followerConfigs.Slot0.GravityType = GravityTypeValue.Elevator_Static
-
-    followerConfigs.Slot1.kP =
-      followerSensor.proportionalPositionGainToRawUnits(ElevatorConstants.PID.REAL_KP_SECOND_STAGE)
-    followerConfigs.Slot1.kI =
-      followerSensor.integralPositionGainToRawUnits(ElevatorConstants.PID.REAL_KI_SECOND_STAGE)
-    followerConfigs.Slot1.kD =
-      followerSensor.derivativePositionGainToRawUnits(ElevatorConstants.PID.REAL_KD_SECOND_STAGE)
-    followerConfigs.Slot1.kG = ElevatorConstants.PID.KG_SECOND_STAGE.inVolts
-    followerConfigs.Slot1.kS = ElevatorConstants.PID.REAL_KS_SECOND_STAGE.inVolts
-    followerConfigs.Slot1.kV = ElevatorConstants.PID.KV_SECOND_STAGE.inVoltsPerMeterPerSecond
-    followerConfigs.Slot1.kA =
-      ElevatorConstants.PID.KA_SECOND_STAGE.inVoltsPerMeterPerSecondPerSecond
-    followerConfigs.Slot1.GravityType = GravityTypeValue.Elevator_Static
-
-    followerConfigs.Slot2.kP =
-      followerSensor.proportionalPositionGainToRawUnits(ElevatorConstants.PID.REAL_KP_THIRD_STAGE)
-    followerConfigs.Slot2.kI =
-      followerSensor.integralPositionGainToRawUnits(ElevatorConstants.PID.REAL_KI_THIRD_STAGE)
-    followerConfigs.Slot2.kD =
-      followerSensor.derivativePositionGainToRawUnits(ElevatorConstants.PID.REAL_KD_THIRD_STAGE)
-    followerConfigs.Slot2.kG = ElevatorConstants.PID.KG_THIRD_STAGE.inVolts
-    followerConfigs.Slot2.kS = ElevatorConstants.PID.REAL_KS_THIRD_STAGE.inVolts
-    followerConfigs.Slot2.kV = ElevatorConstants.PID.KV_THIRD_STAGE.inVoltsPerMeterPerSecond
-    followerConfigs.Slot2.kA =
-      ElevatorConstants.PID.KA_THIRD_STAGE.inVoltsPerMeterPerSecondPerSecond
-    followerConfigs.Slot2.GravityType = GravityTypeValue.Elevator_Static
 
     leaderConfigs.CurrentLimits.SupplyCurrentLimit =
       ElevatorConstants.LEADER_SUPPLY_CURRENT_LIMIT.inAmperes
@@ -222,7 +169,6 @@ object ElevatorIOTalon : ElevatorIO {
   }
 
   override fun updateInputs(inputs: ElevatorIO.ElevatorInputs) {
-
     updateSignals()
 
     inputs.elevatorPosition = leaderSensor.position
@@ -239,7 +185,7 @@ object ElevatorIOTalon : ElevatorIO {
     inputs.followerAppliedVoltage = followerTalon.dutyCycle.valueAsDouble.volts
   }
 
-  override fun configFirstStagePID(
+  override fun configPID(
     kP: ProportionalGain<Meter, Volt>,
     kI: IntegralGain<Meter, Volt>,
     kD: DerivativeGain<Meter, Volt>
@@ -252,37 +198,10 @@ object ElevatorIOTalon : ElevatorIO {
     leaderTalon.configurator.apply(pidConfiguration)
   }
 
-  override fun configSecondStagePID(
-    kP: ProportionalGain<Meter, Volt>,
-    kI: IntegralGain<Meter, Volt>,
-    kD: DerivativeGain<Meter, Volt>
-  ) {
-    val pidConfiguration = Slot1Configs()
-    pidConfiguration.kP = leaderSensor.proportionalPositionGainToRawUnits(kP)
-    pidConfiguration.kI = leaderSensor.integralPositionGainToRawUnits(kI)
-    pidConfiguration.kD = leaderSensor.derivativePositionGainToRawUnits(kD)
-
-    leaderTalon.configurator.apply(pidConfiguration)
-  }
-
-  override fun configThirdStagePID(
-    kP: ProportionalGain<Meter, Volt>,
-    kI: IntegralGain<Meter, Volt>,
-    kD: DerivativeGain<Meter, Volt>
-  ) {
-    val pidConfiguration = Slot2Configs()
-    pidConfiguration.kP = leaderSensor.proportionalPositionGainToRawUnits(kP)
-    pidConfiguration.kI = leaderSensor.integralPositionGainToRawUnits(kI)
-    pidConfiguration.kD = leaderSensor.derivativePositionGainToRawUnits(kD)
-
-    leaderTalon.configurator.apply(pidConfiguration)
-  }
 
   override fun setPosition(position: Length) {
-    val slot = if (leaderSensor.position > ElevatorConstants.FIRST_STAGE_HEIGHT) 1 else 0
-
     leaderTalon.setControl(
-      motionMagicControl.withPosition(leaderSensor.positionToRawUnits(position)).withSlot(slot)
+      motionMagicControl.withPosition(leaderSensor.positionToRawUnits(position)).withSlot(0)
     )
   }
 

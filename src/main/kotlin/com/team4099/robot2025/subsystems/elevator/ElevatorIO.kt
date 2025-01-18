@@ -39,9 +39,6 @@ interface ElevatorIO {
     var leaderStatorCurrent = 0.0.amps
     var followerStatorCurrent = 0.0.amps
 
-    var leaderRawPosition = 0.0.radians
-    var followerRawPosition = 0.0.radians
-
     var isSimulating = false
 
     override fun toLog(table: LogTable?) {
@@ -55,8 +52,6 @@ interface ElevatorIO {
       table?.put("elevatorFollowerSupplyCurrent", followerSupplyCurrent.inAmperes)
       table?.put("elevatorLeaderStatorCurrent", leaderStatorCurrent.inAmperes)
       table?.put("elevatorFollowerStatorCurrent", followerStatorCurrent.inAmperes)
-      table?.put("elevatorLeaderRawPosition", leaderRawPosition.inRadians)
-      table?.put("elevatorFollowerRawPosition", followerRawPosition.inRadians)
     }
 
     override fun fromLog(table: LogTable?) {
@@ -90,12 +85,6 @@ interface ElevatorIO {
       table?.get("elevatorFollowerSupplyCurrent", followerStatorCurrent.inAmperes)?.let {
         followerStatorCurrent = it.amps
       }
-      table?.get("elevatorLeaderRawPosition", leaderRawPosition.inRadians)?.let {
-        leaderRawPosition = it.radians
-      }
-      table?.get("elevatorFollowerRawPosition", followerRawPosition.inRadians)?.let {
-        followerRawPosition = it.radians
-      }
     }
   }
   fun updateInputs(inputs: ElevatorInputs) {}
@@ -103,17 +92,7 @@ interface ElevatorIO {
   fun setVoltage(targetVoltage: ElectricalPotential) {}
   fun zeroEncoder() {}
 
-  fun configFirstStagePID(
-    kP: ProportionalGain<Meter, Volt>,
-    kI: IntegralGain<Meter, Volt>,
-    kD: DerivativeGain<Meter, Volt>
-  ) {}
-  fun configSecondStagePID(
-    kP: ProportionalGain<Meter, Volt>,
-    kI: IntegralGain<Meter, Volt>,
-    kD: DerivativeGain<Meter, Volt>
-  ) {}
-  fun configThirdStagePID(
+  fun configPID(
     kP: ProportionalGain<Meter, Volt>,
     kI: IntegralGain<Meter, Volt>,
     kD: DerivativeGain<Meter, Volt>

@@ -4,7 +4,6 @@ import com.team4099.lib.hal.Clock
 import com.team4099.robot2025.config.constants.ElevatorConstants
 import com.team4099.robot2025.util.CustomLogger
 import edu.wpi.first.wpilibj.RobotBase
-import edu.wpi.first.wpilibj2.command.Subsystem
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import org.team4099.lib.units.base.inInches
 import org.team4099.lib.units.base.inches
@@ -72,81 +71,35 @@ class Elevator(val io: ElevatorIO) : SubsystemBase() {
     if (RobotBase.isReal()) {
       isHomed = false
 
-      ElevatorTunableValues.slot0kP.initDefault(ElevatorConstants.PID.REAL_KP_FIRST_STAGE)
-      ElevatorTunableValues.slot0kI.initDefault(ElevatorConstants.PID.REAL_KI_FIRST_STAGE)
-      ElevatorTunableValues.slot0kD.initDefault(ElevatorConstants.PID.REAL_KD_FIRST_STAGE)
-
-      ElevatorTunableValues.slot1kP.initDefault(ElevatorConstants.PID.REAL_KP_SECOND_STAGE)
-      ElevatorTunableValues.slot1kI.initDefault(ElevatorConstants.PID.REAL_KI_SECOND_STAGE)
-      ElevatorTunableValues.slot1kD.initDefault(ElevatorConstants.PID.REAL_KD_SECOND_STAGE)
-
-      ElevatorTunableValues.slot2kP.initDefault(ElevatorConstants.PID.REAL_KP_THIRD_STAGE)
-      ElevatorTunableValues.slot2kI.initDefault(ElevatorConstants.PID.REAL_KI_THIRD_STAGE)
-      ElevatorTunableValues.slot2kD.initDefault(ElevatorConstants.PID.REAL_KD_THIRD_STAGE)
+      ElevatorTunableValues.kP.initDefault(ElevatorConstants.PID.REAL_KP)
+      ElevatorTunableValues.kI.initDefault(ElevatorConstants.PID.REAL_KI)
+      ElevatorTunableValues.kD.initDefault(ElevatorConstants.PID.REAL_KD)
     } else {
       isHomed = true
 
-      ElevatorTunableValues.slot0kP.initDefault(ElevatorConstants.PID.SIM_KP_FIRST_STAGE)
-      ElevatorTunableValues.slot0kI.initDefault(ElevatorConstants.PID.SIM_KI_FIRST_STAGE)
-      ElevatorTunableValues.slot0kD.initDefault(ElevatorConstants.PID.SIM_KD_FIRST_STAGE)
-
-      ElevatorTunableValues.slot1kP.initDefault(ElevatorConstants.PID.SIM_KP_SECOND_STAGE)
-      ElevatorTunableValues.slot1kI.initDefault(ElevatorConstants.PID.SIM_KI_SECOND_STAGE)
-      ElevatorTunableValues.slot1kD.initDefault(ElevatorConstants.PID.SIM_KD_SECOND_STAGE)
-
-      ElevatorTunableValues.slot2kP.initDefault(ElevatorConstants.PID.SIM_KP_THIRD_STAGE)
-      ElevatorTunableValues.slot2kI.initDefault(ElevatorConstants.PID.REAL_KI_THIRD_STAGE)
-      ElevatorTunableValues.slot2kD.initDefault(ElevatorConstants.PID.SIM_KD_THIRD_STAGE)
+      ElevatorTunableValues.kP.initDefault(ElevatorConstants.PID.SIM_KP)
+      ElevatorTunableValues.kI.initDefault(ElevatorConstants.PID.SIM_KI)
+      ElevatorTunableValues.kD.initDefault(ElevatorConstants.PID.SIM_KD)
     }
 
-    io.configFirstStagePID(
-      ElevatorTunableValues.slot0kP.get(),
-      ElevatorTunableValues.slot0kI.get(),
-      ElevatorTunableValues.slot0kD.get()
-    )
-    io.configSecondStagePID(
-      ElevatorTunableValues.slot1kP.get(),
-      ElevatorTunableValues.slot1kI.get(),
-      ElevatorTunableValues.slot1kD.get()
-    )
-    io.configThirdStagePID(
-      ElevatorTunableValues.slot2kP.get(),
-      ElevatorTunableValues.slot2kI.get(),
-      ElevatorTunableValues.slot2kD.get()
+    io.configPID(
+      ElevatorTunableValues.kP.get(),
+      ElevatorTunableValues.kI.get(),
+      ElevatorTunableValues.kD.get()
     )
   }
 
   override fun periodic() {
     io.updateInputs(inputs)
 
-    if (ElevatorTunableValues.slot0kP.hasChanged() ||
-      ElevatorTunableValues.slot0kI.hasChanged() ||
-      ElevatorTunableValues.slot0kD.hasChanged()
+    if (ElevatorTunableValues.kP.hasChanged() ||
+      ElevatorTunableValues.kI.hasChanged() ||
+      ElevatorTunableValues.kD.hasChanged()
     ) {
-      io.configFirstStagePID(
-        ElevatorTunableValues.slot0kP.get(),
-        ElevatorTunableValues.slot0kI.get(),
-        ElevatorTunableValues.slot0kD.get()
-      )
-    }
-    if (ElevatorTunableValues.slot1kD.hasChanged() ||
-      ElevatorTunableValues.slot1kP.hasChanged() ||
-      ElevatorTunableValues.slot1kI.hasChanged()
-    ) {
-      io.configSecondStagePID(
-        ElevatorTunableValues.slot1kP.get(),
-        ElevatorTunableValues.slot1kI.get(),
-        ElevatorTunableValues.slot1kD.get()
-      )
-    }
-    if (ElevatorTunableValues.slot2kD.hasChanged() ||
-      ElevatorTunableValues.slot2kP.hasChanged() ||
-      ElevatorTunableValues.slot2kI.hasChanged()
-    ) {
-      io.configThirdStagePID(
-        ElevatorTunableValues.slot2kP.get(),
-        ElevatorTunableValues.slot2kI.get(),
-        ElevatorTunableValues.slot2kD.get()
+      io.configPID(
+        ElevatorTunableValues.kP.get(),
+        ElevatorTunableValues.kI.get(),
+        ElevatorTunableValues.kD.get()
       )
     }
 

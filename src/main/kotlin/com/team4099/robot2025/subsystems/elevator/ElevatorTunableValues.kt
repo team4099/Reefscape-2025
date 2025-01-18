@@ -17,38 +17,14 @@ import org.team4099.lib.units.perSecond
 
 object ElevatorTunableValues {
 
-  val slot0kP = LoggedTunableValue("Elevator/slot0kP", Pair({ it.inVoltsPerInch }, { it.volts.perInch }))
-  val slot0kI =
+  val kP = LoggedTunableValue("Elevator/kP", Pair({ it.inVoltsPerInch }, { it.volts.perInch }))
+  val kI =
     LoggedTunableValue(
-      "Elevator/slot0kI", Pair({ it.inVoltsPerInchSeconds }, { it.volts.perInchSeconds })
+      "Elevator/kI", Pair({ it.inVoltsPerInchSeconds }, { it.volts.perInchSeconds })
     )
-  val slot0kD =
+  val kD =
     LoggedTunableValue(
-      "Elevator/slot0kD", Pair({ it.inVoltsPerInchPerSecond }, { it.volts / 1.0.inches.perSecond })
-    )
-
-  val slot1kP =
-    LoggedTunableValue("Elevator/slot1kP", Pair({ it.inVoltsPerInch }, { it.volts.perInch }))
-  val slot1kI =
-    LoggedTunableValue(
-      "Elevator/slot1kI", Pair({ it.inVoltsPerInchSeconds }, { it.volts.perInchSeconds })
-    )
-  val slot1kD =
-    LoggedTunableValue(
-      "Elevator/slot1kD",
-      Pair({ it.inVoltsPerInchPerSecond }, { it.volts / 1.0.inches.perSecond })
-    )
-
-  val slot2kP =
-    LoggedTunableValue("Elevator/slot2kP", Pair({ it.inVoltsPerInch }, { it.volts.perInch }))
-  val slot2kI =
-    LoggedTunableValue(
-      "Elevator/slot2kI", Pair({ it.inVoltsPerInchSeconds }, { it.volts.perInchSeconds })
-    )
-  val slot2kD =
-    LoggedTunableValue(
-      "Elevator/slot2kD",
-      Pair({ it.inVoltsPerInchPerSecond }, { it.volts / 1.0.inches.perSecond })
+      "Elevator/kD", Pair({ it.inVoltsPerInchPerSecond }, { it.volts / 1.0.inches.perSecond })
     )
 
   object TunableElevatorHeights {
