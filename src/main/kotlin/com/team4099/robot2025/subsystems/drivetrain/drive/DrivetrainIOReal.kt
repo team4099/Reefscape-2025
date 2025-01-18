@@ -12,8 +12,12 @@ object DrivetrainIOReal : DrivetrainIO {
     return listOf(
       SwerveModule(
         SwerveModuleIOTalon(
-          TalonFX(Constants.Drivetrain.FRONT_LEFT_STEERING_ID, Constants.Universal.CANIVORE_NAME),
-          TalonFX(Constants.Drivetrain.FRONT_LEFT_DRIVE_ID, Constants.Universal.CANIVORE_NAME),
+          TalonFX(
+            Constants.Drivetrain.FRONT_LEFT_STEERING_ID, Constants.Universal.CANIVORE_NAME
+          ),
+          TalonFX(
+            Constants.Drivetrain.FRONT_LEFT_DRIVE_ID, Constants.Universal.CANIVORE_NAME
+          ),
           AnalogInput(Constants.Drivetrain.FRONT_LEFT_ANALOG_POTENTIOMETER),
           DrivetrainConstants.FRONT_LEFT_MODULE_ZERO,
           Constants.Drivetrain.FRONT_LEFT_MODULE_NAME
@@ -21,8 +25,13 @@ object DrivetrainIOReal : DrivetrainIO {
       ),
       SwerveModule(
         SwerveModuleIOTalon(
-          TalonFX(Constants.Drivetrain.FRONT_RIGHT_STEERING_ID, Constants.Universal.CANIVORE_NAME),
-          TalonFX(Constants.Drivetrain.FRONT_RIGHT_DRIVE_ID, Constants.Universal.CANIVORE_NAME),
+          TalonFX(
+            Constants.Drivetrain.FRONT_RIGHT_STEERING_ID,
+            Constants.Universal.CANIVORE_NAME
+          ),
+          TalonFX(
+            Constants.Drivetrain.FRONT_RIGHT_DRIVE_ID, Constants.Universal.CANIVORE_NAME
+          ),
           AnalogInput(Constants.Drivetrain.FRONT_RIGHT_ANALOG_POTENTIOMETER),
           DrivetrainConstants.FRONT_RIGHT_MODULE_ZERO,
           Constants.Drivetrain.FRONT_RIGHT_MODULE_NAME
@@ -30,7 +39,9 @@ object DrivetrainIOReal : DrivetrainIO {
       ),
       SwerveModule(
         SwerveModuleIOTalon(
-          TalonFX(Constants.Drivetrain.BACK_LEFT_STEERING_ID, Constants.Universal.CANIVORE_NAME),
+          TalonFX(
+            Constants.Drivetrain.BACK_LEFT_STEERING_ID, Constants.Universal.CANIVORE_NAME
+          ),
           TalonFX(Constants.Drivetrain.BACK_LEFT_DRIVE_ID, Constants.Universal.CANIVORE_NAME),
           AnalogInput(Constants.Drivetrain.BACK_LEFT_ANALOG_POTENTIOMETER),
           DrivetrainConstants.BACK_LEFT_MODULE_ZERO,
@@ -42,8 +53,12 @@ object DrivetrainIOReal : DrivetrainIO {
         //          override val label: String = Constants.Drivetrain.BACK_RIGHT_MODULE_NAME
         //        }
         SwerveModuleIOTalon(
-          TalonFX(Constants.Drivetrain.BACK_RIGHT_STEERING_ID, Constants.Universal.CANIVORE_NAME),
-          TalonFX(Constants.Drivetrain.BACK_RIGHT_DRIVE_ID, Constants.Universal.CANIVORE_NAME),
+          TalonFX(
+            Constants.Drivetrain.BACK_RIGHT_STEERING_ID, Constants.Universal.CANIVORE_NAME
+          ),
+          TalonFX(
+            Constants.Drivetrain.BACK_RIGHT_DRIVE_ID, Constants.Universal.CANIVORE_NAME
+          ),
           AnalogInput(Constants.Drivetrain.BACK_RIGHT_ANALOG_POTENTIOMETER),
           DrivetrainConstants.BACK_RIGHT_MODULE_ZERO,
           Constants.Drivetrain.BACK_RIGHT_MODULE_NAME

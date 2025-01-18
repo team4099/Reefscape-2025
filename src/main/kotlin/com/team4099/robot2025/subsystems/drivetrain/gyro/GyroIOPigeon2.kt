@@ -20,7 +20,7 @@ import java.util.Queue
 import kotlin.math.IEEErem
 
 object GyroIOPigeon2 : GyroIO {
-private var pigeon2 = Pigeon2(Constants.Gyro.PIGEON_2_ID, Constants.Universal.CANIVORE_NAME)
+  private var pigeon2 = Pigeon2(Constants.Gyro.PIGEON_2_ID, Constants.Universal.CANIVORE_NAME)
 
   private val yawSignal = pigeon2.yaw
   private val upTimeSignal = pigeon2.upTime

@@ -42,6 +42,8 @@ object ControlBoard {
 
   val resetGyro = Trigger { driver.startButton && driver.selectButton }
 
+  val targetTag = Trigger { driver.rightShoulderButton }
+
   // sim triggers
   val score = Trigger { driver.leftTriggerAxis > 0.5 }
   val intake = Trigger { driver.rightShoulderButton }

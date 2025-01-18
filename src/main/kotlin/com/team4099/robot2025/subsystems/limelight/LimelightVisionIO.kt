@@ -5,7 +5,6 @@ import com.team4099.lib.vision.LimelightNeuralDetectorReading
 import org.littletonrobotics.junction.LogTable
 import org.littletonrobotics.junction.inputs.LoggableInputs
 import org.team4099.lib.geometry.Pose3d
-import org.team4099.lib.geometry.Pose3dWPILIB
 import org.team4099.lib.geometry.Translation3d
 import org.team4099.lib.units.base.Decimal
 import org.team4099.lib.units.base.Length
@@ -40,6 +39,7 @@ interface LimelightVisionIO {
     var cameraPoseRobotSpace = Pose3d()
     var targetPoseRobotSpace = Pose3d()
     var robotPoseTargetSpace = Pose3d()
+    var botPoseFieldSpace = Pose3d()
 
     override fun fromLog(table: LogTable?) {
       table?.get("timestampSeconds", timestamp.inSeconds)?.let { timestamp = it.seconds }
@@ -48,8 +48,7 @@ interface LimelightVisionIO {
       table?.get("xAngleDegrees", xAngle.inDegrees)?.let { xAngle = it.degrees }
       table?.get("yAngleDegrees", yAngle.inDegrees)?.let { yAngle = it.degrees }
       table?.get("targetSizePercent", targetSize.value)?.let { targetSize = it.percent }
-      table?.get("pipelineType", pipelineType)?.let {pipelineType = it}
-
+      table?.get("pipelineType", pipelineType)?.let { pipelineType = it }
 
       val numOfTargets = table?.get("numOfTargets", 0) ?: 0
 
@@ -63,8 +62,7 @@ interface LimelightVisionIO {
           val distToCamera: Length? = table?.get("rawTags/$targetIndex/distToCamera", 0.0)?.meters
           val distToRobot: Length? = table?.get("rawTags/$targetIndex/distToRobot", 0.0)?.meters
           val targetTa: Decimal? = table?.get("rawTags/$targetIndex/ta", 0.0)?.percent
-          if (
-            tagID != null &&
+          if (tagID != null &&
             targetTx != null &&
             targetTy != null &&
             ambiguity != null &&
@@ -74,13 +72,7 @@ interface LimelightVisionIO {
           ) {
             retrievedTargets.add(
               LimelightAprilTagReading(
-                tagID,
-                targetTx,
-                targetTy,
-                targetTa,
-                distToCamera,
-                distToRobot,
-                ambiguity
+                tagID, targetTx, targetTy, targetTa, distToCamera, distToRobot, ambiguity
               )
             )
           }
@@ -121,7 +113,6 @@ interface LimelightVisionIO {
         }
         gamePieceTargets = retrievedTargets.toList()
       }
-
     }
 
     override fun toLog(table: LogTable?) {
@@ -132,7 +123,6 @@ interface LimelightVisionIO {
       table?.put("yAngleDegrees", yAngle.inDegrees)
       table?.put("targetSizePercent", targetSize.value)
       table?.put("pipelineType", pipelineType)
-
 
       if (pipelineType == "pipe_fiducial") {
         table?.put("numOfTargets", aprilTagTargets.size.toLong())
@@ -160,8 +150,6 @@ interface LimelightVisionIO {
           table?.put("Detection/$i/ta", gamePieceTargets[i].ta.value)
         }
       }
-
-
     }
   }
 

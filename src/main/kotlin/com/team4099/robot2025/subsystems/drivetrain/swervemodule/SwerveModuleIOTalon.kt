@@ -22,13 +22,10 @@ import edu.wpi.first.wpilibj.AnalogInput
 import edu.wpi.first.wpilibj.RobotController
 import org.littletonrobotics.junction.Logger
 import org.team4099.lib.units.AngularAcceleration
-import org.team4099.lib.units.AngularMechanismSensor
 import org.team4099.lib.units.AngularVelocity
 import org.team4099.lib.units.Fraction
 import org.team4099.lib.units.LinearAcceleration
-import org.team4099.lib.units.LinearMechanismSensor
 import org.team4099.lib.units.LinearVelocity
-import org.team4099.lib.units.Timescale
 import org.team4099.lib.units.Value
 import org.team4099.lib.units.Velocity
 import org.team4099.lib.units.base.Meter

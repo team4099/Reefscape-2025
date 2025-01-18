@@ -4,6 +4,7 @@ import com.team4099.lib.logging.LoggedTunableValue
 import com.team4099.robot2023.subsystems.limelight.LimelightVisionIOReal
 import com.team4099.robot2025.auto.AutonomousSelector
 import com.team4099.robot2025.commands.drivetrain.ResetGyroYawCommand
+import com.team4099.robot2025.commands.drivetrain.TargetTagCommand
 import com.team4099.robot2025.commands.drivetrain.TeleopDriveCommand
 import com.team4099.robot2025.config.ControlBoard
 import com.team4099.robot2025.config.constants.Constants
@@ -14,7 +15,6 @@ import com.team4099.robot2025.subsystems.drivetrain.drive.DrivetrainIOSim
 import com.team4099.robot2025.subsystems.drivetrain.gyro.GyroIO
 import com.team4099.robot2025.subsystems.drivetrain.gyro.GyroIOPigeon2
 import com.team4099.robot2025.subsystems.limelight.LimelightVision
-import com.team4099.robot2025.subsystems.limelight.LimelightVisionIO
 import com.team4099.robot2025.subsystems.limelight.LimelightVisionIOSim
 import com.team4099.robot2025.util.driver.Jessika
 import edu.wpi.first.wpilibj.RobotBase
@@ -110,6 +110,19 @@ object RobotContainer {
   fun mapTeleopControls() {
 
     ControlBoard.resetGyro.whileTrue(ResetGyroYawCommand(drivetrain))
+
+    ControlBoard.targetTag.whileTrue(
+      TargetTagCommand(
+        driver = Jessika(),
+        { ControlBoard.forward.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
+        { ControlBoard.strafe.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
+        { ControlBoard.turn.smoothDeadband(Constants.Joysticks.TURN_DEADBAND) },
+        { ControlBoard.slowMode },
+        drivetrain,
+        limelight,
+        { 90.degrees }
+      )
+    )
   }
 
   fun mapTestControls() {}
