@@ -7,10 +7,8 @@ import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.wpilibj.simulation.BatterySim
 import edu.wpi.first.wpilibj.simulation.ElevatorSim
 import edu.wpi.first.wpilibj.simulation.RoboRioSim
-import org.team4099.lib.controller.ElevatorFeedforward
 import org.team4099.lib.controller.ProfiledPIDController
 import org.team4099.lib.controller.TrapezoidProfile
-import org.team4099.lib.units.Value
 import org.team4099.lib.units.base.Length
 import org.team4099.lib.units.base.Meter
 import org.team4099.lib.units.base.amps
@@ -19,10 +17,13 @@ import org.team4099.lib.units.base.inKilograms
 import org.team4099.lib.units.base.inMeters
 import org.team4099.lib.units.base.inSeconds
 import org.team4099.lib.units.base.meters
+import org.team4099.lib.units.derived.AccelerationFeedforward
 import org.team4099.lib.units.derived.DerivativeGain
 import org.team4099.lib.units.derived.ElectricalPotential
 import org.team4099.lib.units.derived.IntegralGain
 import org.team4099.lib.units.derived.ProportionalGain
+import org.team4099.lib.units.derived.StaticFeedforward
+import org.team4099.lib.units.derived.VelocityFeedforward
 import org.team4099.lib.units.derived.Volt
 import org.team4099.lib.units.derived.inVolts
 import org.team4099.lib.units.derived.volts
@@ -48,7 +49,9 @@ object ElevatorIOSim : ElevatorIO {
       ElevatorConstants.PID.SIM_KP,
       ElevatorConstants.PID.SIM_KI,
       ElevatorConstants.PID.SIM_KD,
-      TrapezoidProfile.Constraints(ElevatorConstants.MAX_VELOCITY, ElevatorConstants.MAX_ACCELERATION)
+      TrapezoidProfile.Constraints(
+        ElevatorConstants.MAX_VELOCITY, ElevatorConstants.MAX_ACCELERATION
+      )
     )
 
   override fun updateInputs(inputs: ElevatorIO.ElevatorInputs) {
@@ -109,4 +112,24 @@ object ElevatorIOSim : ElevatorIO {
   ) {
     elevatorPIDController.setPID(kP, kI, kD)
   }
+
+  /** no ff in sim */
+  override fun configFFFirstStage(
+    kG: ElectricalPotential,
+    kS: StaticFeedforward<Volt>,
+    kV: VelocityFeedforward<Meter, Volt>,
+    kA: AccelerationFeedforward<Meter, Volt>
+  ) {}
+  override fun configFFSecondStage(
+    kG: ElectricalPotential,
+    kS: StaticFeedforward<Volt>,
+    kV: VelocityFeedforward<Meter, Volt>,
+    kA: AccelerationFeedforward<Meter, Volt>
+  ) {}
+  override fun configFFThirdStage(
+    kG: ElectricalPotential,
+    kS: StaticFeedforward<Volt>,
+    kV: VelocityFeedforward<Meter, Volt>,
+    kA: AccelerationFeedforward<Meter, Volt>
+  ) {}
 }

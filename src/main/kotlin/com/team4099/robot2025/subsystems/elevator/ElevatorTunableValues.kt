@@ -5,17 +5,22 @@ import com.team4099.lib.logging.LoggedTunableValue
 import com.team4099.robot2025.config.constants.ElevatorConstants
 import org.team4099.lib.units.base.inInches
 import org.team4099.lib.units.base.inches
-import org.team4099.lib.units.base.meters
 import org.team4099.lib.units.derived.inVolts
 import org.team4099.lib.units.derived.inVoltsPerInch
 import org.team4099.lib.units.derived.inVoltsPerInchPerSecond
 import org.team4099.lib.units.derived.inVoltsPerInchSeconds
+import org.team4099.lib.units.derived.inVoltsPerMeterPerSecondPerSecond
 import org.team4099.lib.units.derived.perInch
 import org.team4099.lib.units.derived.perInchSeconds
+import org.team4099.lib.units.derived.perMeterPerSecondPerSecond
 import org.team4099.lib.units.derived.volts
 import org.team4099.lib.units.perSecond
 
 object ElevatorTunableValues {
+  val enableElevator =
+    LoggedTunableNumber(
+      "Elevator/enableMovementElevator", if (ElevatorConstants.ENABLE_ELEVATOR) 1.0 else 0.0
+    )
 
   val kP = LoggedTunableValue("Elevator/kP", Pair({ it.inVoltsPerInch }, { it.volts.perInch }))
   val kI =
@@ -26,13 +31,41 @@ object ElevatorTunableValues {
     LoggedTunableValue(
       "Elevator/kD", Pair({ it.inVoltsPerInchPerSecond }, { it.volts / 1.0.inches.perSecond })
     )
+  val kGFirst = LoggedTunableValue("Elevator/kG", Pair({ it.inVolts }, { it.volts }))
+  val kSFirst = LoggedTunableValue("Elevator/kS", Pair({ it.inVolts }, { it.volts }))
+  val kVFirst =
+    LoggedTunableValue(
+      "Elevator/kV", Pair({ it.inVoltsPerInchPerSecond }, { it.volts / 1.0.inches.perSecond })
+    )
+  val kAFirst =
+    LoggedTunableValue(
+      "Elevator/kA",
+      Pair({ it.inVoltsPerMeterPerSecondPerSecond }, { it.volts.perMeterPerSecondPerSecond })
+    )
+  val kGSecond = LoggedTunableValue("Elevator/kG", Pair({ it.inVolts }, { it.volts }))
+  val kSSecond = LoggedTunableValue("Elevator/kS", Pair({ it.inVolts }, { it.volts }))
+  val kVSecond =
+    LoggedTunableValue(
+      "Elevator/kV", Pair({ it.inVoltsPerInchPerSecond }, { it.volts / 1.0.inches.perSecond })
+    )
+  val kASecond =
+    LoggedTunableValue(
+      "Elevator/kA",
+      Pair({ it.inVoltsPerMeterPerSecondPerSecond }, { it.volts.perMeterPerSecondPerSecond })
+    )
+  val kGThird = LoggedTunableValue("Elevator/kG", Pair({ it.inVolts }, { it.volts }))
+  val kSThird = LoggedTunableValue("Elevator/kS", Pair({ it.inVolts }, { it.volts }))
+  val kVThird =
+    LoggedTunableValue(
+      "Elevator/kV", Pair({ it.inVoltsPerInchPerSecond }, { it.volts / 1.0.inches.perSecond })
+    )
+  val kAThird =
+    LoggedTunableValue(
+      "Elevator/kA",
+      Pair({ it.inVoltsPerMeterPerSecondPerSecond }, { it.volts.perMeterPerSecondPerSecond })
+    )
 
   object TunableElevatorHeights {
-    val enableElevator =
-      LoggedTunableNumber(
-        "Elevator/enableMovementElevator", if (ElevatorConstants.ENABLE_ELEVATOR) 1.0 else 0.0
-      )
-
     val minPosition =
       LoggedTunableValue(
         "Elevator/minPosition",
@@ -99,18 +132,6 @@ object ElevatorTunableValues {
         "Elevator/algaeHighHeight",
         ElevatorConstants.ALGAE_LOW_HEIGHT,
         Pair({ it.inInches }, { it.inches })
-      )
-
-    val yPos =
-      LoggedTunableValue(
-        "Elevator/yPos",
-        0.0.meters,
-      )
-
-    val y1Pos =
-      LoggedTunableValue(
-        "Elevator/y1Pos",
-        0.0.meters,
       )
   }
 }

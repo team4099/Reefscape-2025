@@ -63,7 +63,7 @@ class Elevator(val io: ElevatorIO) : SubsystemBase() {
           (inputs.elevatorPosition - elevatorPositionTarget).absoluteValue <=
           ElevatorConstants.ELEVATOR_TOLERANCE
         ) ||
-        (ElevatorTunableValues.TunableElevatorHeights.enableElevator.get() != 1.0)
+        (ElevatorTunableValues.enableElevator.get() != 1.0)
 
   init {
     ElevatorTunableValues.TunableElevatorHeights
@@ -74,18 +74,52 @@ class Elevator(val io: ElevatorIO) : SubsystemBase() {
       ElevatorTunableValues.kP.initDefault(ElevatorConstants.PID.REAL_KP)
       ElevatorTunableValues.kI.initDefault(ElevatorConstants.PID.REAL_KI)
       ElevatorTunableValues.kD.initDefault(ElevatorConstants.PID.REAL_KD)
+      ElevatorTunableValues.kSFirst.initDefault(ElevatorConstants.PID.REAL_KS_FIRST_STAGE)
+      ElevatorTunableValues.kSSecond.initDefault(ElevatorConstants.PID.REAL_KS_SECOND_STAGE)
+      ElevatorTunableValues.kSThird.initDefault(ElevatorConstants.PID.REAL_KS_THIRD_STAGE)
     } else {
       isHomed = true
 
       ElevatorTunableValues.kP.initDefault(ElevatorConstants.PID.SIM_KP)
       ElevatorTunableValues.kI.initDefault(ElevatorConstants.PID.SIM_KI)
       ElevatorTunableValues.kD.initDefault(ElevatorConstants.PID.SIM_KD)
+      ElevatorTunableValues.kSFirst.initDefault(ElevatorConstants.PID.SIM_KS_FIRST_STAGE)
+      ElevatorTunableValues.kSSecond.initDefault(ElevatorConstants.PID.SIM_KS_SECOND_STAGE)
+      ElevatorTunableValues.kSThird.initDefault(ElevatorConstants.PID.SIM_KS_THIRD_STAGE)
     }
+
+    ElevatorTunableValues.kGFirst.initDefault(ElevatorConstants.PID.KG_FIRST_STAGE)
+    ElevatorTunableValues.kVFirst.initDefault(ElevatorConstants.PID.KV_FIRST_STAGE)
+    ElevatorTunableValues.kAFirst.initDefault(ElevatorConstants.PID.KA_FIRST_STAGE)
+    ElevatorTunableValues.kGSecond.initDefault(ElevatorConstants.PID.KG_SECOND_STAGE)
+    ElevatorTunableValues.kVSecond.initDefault(ElevatorConstants.PID.KV_SECOND_STAGE)
+    ElevatorTunableValues.kASecond.initDefault(ElevatorConstants.PID.KA_SECOND_STAGE)
+    ElevatorTunableValues.kGThird.initDefault(ElevatorConstants.PID.KG_THIRD_STAGE)
+    ElevatorTunableValues.kVThird.initDefault(ElevatorConstants.PID.KV_THIRD_STAGE)
+    ElevatorTunableValues.kAThird.initDefault(ElevatorConstants.PID.KA_THIRD_STAGE)
 
     io.configPID(
       ElevatorTunableValues.kP.get(),
       ElevatorTunableValues.kI.get(),
       ElevatorTunableValues.kD.get()
+    )
+    io.configFFFirstStage(
+      ElevatorTunableValues.kGFirst.get(),
+      ElevatorTunableValues.kSFirst.get(),
+      ElevatorTunableValues.kVFirst.get(),
+      ElevatorTunableValues.kAFirst.get()
+    )
+    io.configFFSecondStage(
+      ElevatorTunableValues.kGSecond.get(),
+      ElevatorTunableValues.kSSecond.get(),
+      ElevatorTunableValues.kVSecond.get(),
+      ElevatorTunableValues.kASecond.get()
+    )
+    io.configFFThirdStage(
+      ElevatorTunableValues.kGThird.get(),
+      ElevatorTunableValues.kSThird.get(),
+      ElevatorTunableValues.kVThird.get(),
+      ElevatorTunableValues.kAThird.get()
     )
   }
 
@@ -100,6 +134,45 @@ class Elevator(val io: ElevatorIO) : SubsystemBase() {
         ElevatorTunableValues.kP.get(),
         ElevatorTunableValues.kI.get(),
         ElevatorTunableValues.kD.get()
+      )
+    }
+
+    if (ElevatorTunableValues.kGFirst.hasChanged() ||
+      ElevatorTunableValues.kSFirst.hasChanged() ||
+      ElevatorTunableValues.kVFirst.hasChanged() ||
+      ElevatorTunableValues.kAFirst.hasChanged()
+    ) {
+      io.configFFFirstStage(
+        ElevatorTunableValues.kGFirst.get(),
+        ElevatorTunableValues.kSFirst.get(),
+        ElevatorTunableValues.kVFirst.get(),
+        ElevatorTunableValues.kAFirst.get()
+      )
+    }
+
+    if (ElevatorTunableValues.kGSecond.hasChanged() ||
+      ElevatorTunableValues.kSSecond.hasChanged() ||
+      ElevatorTunableValues.kVSecond.hasChanged() ||
+      ElevatorTunableValues.kASecond.hasChanged()
+    ) {
+      io.configFFSecondStage(
+        ElevatorTunableValues.kGSecond.get(),
+        ElevatorTunableValues.kSSecond.get(),
+        ElevatorTunableValues.kVSecond.get(),
+        ElevatorTunableValues.kASecond.get()
+      )
+    }
+
+    if (ElevatorTunableValues.kGThird.hasChanged() ||
+      ElevatorTunableValues.kSThird.hasChanged() ||
+      ElevatorTunableValues.kVThird.hasChanged() ||
+      ElevatorTunableValues.kAThird.hasChanged()
+    ) {
+      io.configFFThirdStage(
+        ElevatorTunableValues.kGThird.get(),
+        ElevatorTunableValues.kSThird.get(),
+        ElevatorTunableValues.kVThird.get(),
+        ElevatorTunableValues.kAThird.get()
       )
     }
 

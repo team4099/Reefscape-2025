@@ -10,14 +10,15 @@ import org.team4099.lib.units.base.inAmperes
 import org.team4099.lib.units.base.inCelsius
 import org.team4099.lib.units.base.inInches
 import org.team4099.lib.units.base.inches
+import org.team4099.lib.units.derived.AccelerationFeedforward
 import org.team4099.lib.units.derived.DerivativeGain
 import org.team4099.lib.units.derived.ElectricalPotential
 import org.team4099.lib.units.derived.IntegralGain
 import org.team4099.lib.units.derived.ProportionalGain
+import org.team4099.lib.units.derived.StaticFeedforward
+import org.team4099.lib.units.derived.VelocityFeedforward
 import org.team4099.lib.units.derived.Volt
-import org.team4099.lib.units.derived.inRadians
 import org.team4099.lib.units.derived.inVolts
-import org.team4099.lib.units.derived.radians
 import org.team4099.lib.units.derived.volts
 import org.team4099.lib.units.inInchesPerSecond
 import org.team4099.lib.units.perSecond
@@ -96,5 +97,23 @@ interface ElevatorIO {
     kP: ProportionalGain<Meter, Volt>,
     kI: IntegralGain<Meter, Volt>,
     kD: DerivativeGain<Meter, Volt>
+  ) {}
+  fun configFFFirstStage(
+    kG: ElectricalPotential,
+    kS: StaticFeedforward<Volt>,
+    kV: VelocityFeedforward<Meter, Volt>,
+    kA: AccelerationFeedforward<Meter, Volt>
+  ) {}
+  fun configFFSecondStage(
+    kG: ElectricalPotential,
+    kS: StaticFeedforward<Volt>,
+    kV: VelocityFeedforward<Meter, Volt>,
+    kA: AccelerationFeedforward<Meter, Volt>
+  ) {}
+  fun configFFThirdStage(
+    kG: ElectricalPotential,
+    kS: StaticFeedforward<Volt>,
+    kV: VelocityFeedforward<Meter, Volt>,
+    kA: AccelerationFeedforward<Meter, Volt>
   ) {}
 }

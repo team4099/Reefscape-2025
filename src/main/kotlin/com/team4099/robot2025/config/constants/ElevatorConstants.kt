@@ -11,7 +11,7 @@ object ElevatorConstants {
   const val ENABLE_ELEVATOR = true
 
   val GEAR_RATIO = 16.0 / 48.0
-  val CARRIAGE_MASS = 0.0.pounds
+  val CARRIAGE_MASS = 12.0.pounds
 
   val OPEN_LOOP_EXTEND_VOLTAGE = 8.0.volts
   val OPEN_LOOP_RETRACT_VOLTAGE = -(12.0.volts)
@@ -36,12 +36,12 @@ object ElevatorConstants {
   val FOLLOWER_SUPPLY_CURRENT_LOWER_LIMIT = 0.0.amps
   val FOLLOWER_SUPPLY_CURRENT_LOWER_TIME = 0.0.amps
 
-  // TODO: recheck please
-  // thresholds for changing PID/FF values
+  // TODO: recheck
+  /* thresholds for changing PID/FF values */
   val FIRST_STAGE_HEIGHT = 24.25.inches
   val SECOND_STAGE_HEIGHT = 49.5.inches
 
-  // TODO: adjust scoring heights
+  // TODO: adjust scoring/intaking heights for end-effector offset
   val L1_HEIGHT = 18.0.inches
   val L2_HEIGHT = (24.0 + 7.0 + 7.0 / 8.0).inches
   val L3_HEIGHT = (36.0 + 11.0 + 5.0 / 8.0).inches
@@ -54,6 +54,7 @@ object ElevatorConstants {
 
   val ELEVATOR_GROUND_OFFSET = 3.829.inches
 
+  // TODO: make real maxes
   val MAX_VELOCITY = 36.0.inches.perSecond
   val MAX_ACCELERATION = 24.0.inches.perSecond.perSecond
 

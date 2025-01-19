@@ -2,7 +2,7 @@ package com.team4099.robot2025.subsystems.elevator
 
 import com.ctre.phoenix6.BaseStatusSignal
 import com.ctre.phoenix6.StatusSignal
-import com.ctre.phoenix6.configs.Slot0Configs
+import com.ctre.phoenix6.configs.MotionMagicConfigs
 import com.ctre.phoenix6.configs.TalonFXConfiguration
 import com.ctre.phoenix6.controls.Follower
 import com.ctre.phoenix6.controls.MotionMagicVoltage
@@ -19,15 +19,22 @@ import org.team4099.lib.units.base.inAmperes
 import org.team4099.lib.units.base.inInches
 import org.team4099.lib.units.base.inches
 import org.team4099.lib.units.ctreLinearMechanismSensor
+import org.team4099.lib.units.derived.AccelerationFeedforward
 import org.team4099.lib.units.derived.DerivativeGain
 import org.team4099.lib.units.derived.ElectricalPotential
 import org.team4099.lib.units.derived.IntegralGain
 import org.team4099.lib.units.derived.ProportionalGain
+import org.team4099.lib.units.derived.StaticFeedforward
+import org.team4099.lib.units.derived.VelocityFeedforward
 import org.team4099.lib.units.derived.Volt
 import org.team4099.lib.units.derived.inVolts
+import org.team4099.lib.units.derived.inVoltsPerMeter
 import org.team4099.lib.units.derived.inVoltsPerMeterPerSecond
 import org.team4099.lib.units.derived.inVoltsPerMeterPerSecondPerSecond
+import org.team4099.lib.units.derived.inVoltsPerMeterSeconds
 import org.team4099.lib.units.derived.volts
+import org.team4099.lib.units.inMetersPerSecond
+import org.team4099.lib.units.inMetersPerSecondPerSecond
 import edu.wpi.first.units.measure.Angle as WPILibAngle
 import edu.wpi.first.units.measure.AngularVelocity as WPILibAngularVelocity
 import edu.wpi.first.units.measure.Current as WPILibCurrent
@@ -38,14 +45,14 @@ object ElevatorIOTalon : ElevatorIO {
   private val leaderTalon: TalonFX = TalonFX(Constants.Elevator.LEADER_MOTOR_ID)
   private val followerTalon: TalonFX = TalonFX(Constants.Elevator.FOLLOWER_MOTOR_ID)
 
-  private val leaderConfigs: TalonFXConfiguration = TalonFXConfiguration()
-  private val followerConfigs: TalonFXConfiguration = TalonFXConfiguration()
+  private val configs: TalonFXConfiguration = TalonFXConfiguration()
+  private var slot0Configs = configs.Slot0
+  private var slot1Configs = configs.Slot1
+  private var slot2Configs = configs.Slot2
+  private var motionMagicConfigs: MotionMagicConfigs = configs.MotionMagic
 
-  private val leaderMotionMagicConfigs = leaderConfigs.MotionMagic
-
-  val voltageControl: VoltageOut = VoltageOut(-1337.volts.inVolts)
-
-  val motionMagicControl: MotionMagicVoltage = MotionMagicVoltage(-1337.inches.inInches)
+  private val voltageControl: VoltageOut = VoltageOut(-1337.volts.inVolts)
+  private val motionMagicControl: MotionMagicVoltage = MotionMagicVoltage(-1337.inches.inInches)
 
   private val leaderSensor =
     ctreLinearMechanismSensor(
@@ -55,86 +62,78 @@ object ElevatorIOTalon : ElevatorIO {
       ElevatorConstants.VOLTAGE_COMPENSATION
     )
 
-  private val followerSensor =
-    ctreLinearMechanismSensor(
-      followerTalon,
-      ElevatorConstants.GEAR_RATIO,
-      ElevatorConstants.SPOOL_DIAMETER,
-      ElevatorConstants.VOLTAGE_COMPENSATION
-    )
+  private var leaderPositionStatusSignal: StatusSignal<WPILibAngle>
+  private var leaderVelocityStatusSignal: StatusSignal<WPILibAngularVelocity>
+  private var leaderStatorCurrentSignal: StatusSignal<WPILibCurrent>
+  private var leaderSupplyCurrentSignal: StatusSignal<WPILibCurrent>
+  private var leaderTempSignal: StatusSignal<WPILibTemperature>
+  private var leaderDutyCycle: StatusSignal<Double>
 
-  var leaderPositionStatusSignal: StatusSignal<WPILibAngle>
-  var leaderVelocityStatusSignal: StatusSignal<WPILibAngularVelocity>
-  var leaderStatorCurrentSignal: StatusSignal<WPILibCurrent>
-  var leaderSupplyCurrentSignal: StatusSignal<WPILibCurrent>
-  var leaderTempSignal: StatusSignal<WPILibTemperature>
-  var leaderDutyCycle: StatusSignal<Double>
-
-  var followerStatorCurrentSignal: StatusSignal<WPILibCurrent>
-  var followerSupplyCurrentSignal: StatusSignal<WPILibCurrent>
-  var followerTempSignal: StatusSignal<WPILibTemperature>
-  var followerDutyCycle: StatusSignal<Double>
-  var motorVoltage: StatusSignal<WPILibVoltage>
-  var motorTorque: StatusSignal<WPILibCurrent>
+  private var followerStatorCurrentSignal: StatusSignal<WPILibCurrent>
+  private var followerSupplyCurrentSignal: StatusSignal<WPILibCurrent>
+  private var followerTempSignal: StatusSignal<WPILibTemperature>
+  private var followerDutyCycle: StatusSignal<Double>
+  private var motorVoltage: StatusSignal<WPILibVoltage>
+  private var motorTorque: StatusSignal<WPILibCurrent>
 
   init {
     leaderTalon.clearStickyFaults()
     followerTalon.clearStickyFaults()
 
-    leaderTalon.configurator.apply(TalonFXConfiguration())
-    followerTalon.configurator.apply(TalonFXConfiguration())
+    slot0Configs.kP = ElevatorConstants.PID.REAL_KP.inVoltsPerMeter
+    slot0Configs.kI = ElevatorConstants.PID.REAL_KI.inVoltsPerMeterSeconds
+    slot0Configs.kD = ElevatorConstants.PID.REAL_KD.inVoltsPerMeterPerSecond
 
-    leaderTalon.clearStickyFaults()
-    followerTalon.clearStickyFaults()
+    slot1Configs.kP = slot0Configs.kP
+    slot1Configs.kI = slot0Configs.kP
+    slot1Configs.kD = slot0Configs.kD
+    slot2Configs.kP = slot0Configs.kP
+    slot2Configs.kI = slot0Configs.kP
+    slot2Configs.kD = slot0Configs.kD
 
-    leaderConfigs.Slot0.kP =
-      leaderSensor.proportionalPositionGainToRawUnits(ElevatorConstants.PID.REAL_KP)
-    leaderConfigs.Slot0.kI =
-      leaderSensor.integralPositionGainToRawUnits(ElevatorConstants.PID.REAL_KI)
-    leaderConfigs.Slot0.kD =
-      leaderSensor.derivativePositionGainToRawUnits(ElevatorConstants.PID.REAL_KD)
-    leaderConfigs.Slot0.kG = ElevatorConstants.PID.KG_FIRST_STAGE.inVolts
-    leaderConfigs.Slot0.kS = ElevatorConstants.PID.REAL_KS_FIRST_STAGE.inVolts
-    leaderConfigs.Slot0.kV = ElevatorConstants.PID.KV_FIRST_STAGE.inVoltsPerMeterPerSecond
-    leaderConfigs.Slot0.kA = ElevatorConstants.PID.KA_FIRST_STAGE.inVoltsPerMeterPerSecondPerSecond
-    leaderConfigs.Slot0.GravityType = GravityTypeValue.Elevator_Static
+    slot0Configs.kG = ElevatorConstants.PID.KG_FIRST_STAGE.inVolts
+    slot0Configs.kS = ElevatorConstants.PID.REAL_KS_FIRST_STAGE.inVolts
+    slot0Configs.kV = ElevatorConstants.PID.KV_FIRST_STAGE.inVoltsPerMeterPerSecond
+    slot0Configs.kA = ElevatorConstants.PID.KA_FIRST_STAGE.inVoltsPerMeterPerSecondPerSecond
 
-    followerConfigs.Slot0.kP =
-      followerSensor.proportionalPositionGainToRawUnits(ElevatorConstants.PID.REAL_KP)
-    followerConfigs.Slot0.kI =
-      followerSensor.integralPositionGainToRawUnits(ElevatorConstants.PID.REAL_KI)
-    followerConfigs.Slot0.kD =
-      followerSensor.derivativePositionGainToRawUnits(ElevatorConstants.PID.REAL_KD)
-    followerConfigs.Slot0.kG = ElevatorConstants.PID.KG_FIRST_STAGE.inVolts
-    followerConfigs.Slot0.kS = ElevatorConstants.PID.REAL_KS_FIRST_STAGE.inVolts
-    followerConfigs.Slot0.kV = ElevatorConstants.PID.KV_FIRST_STAGE.inVoltsPerMeterPerSecond
-    followerConfigs.Slot0.kA =
-      ElevatorConstants.PID.KA_FIRST_STAGE.inVoltsPerMeterPerSecondPerSecond
-    followerConfigs.Slot0.GravityType = GravityTypeValue.Elevator_Static
+    slot1Configs.kG = ElevatorConstants.PID.KG_SECOND_STAGE.inVolts
+    slot1Configs.kS = ElevatorConstants.PID.REAL_KS_SECOND_STAGE.inVolts
+    slot1Configs.kV = ElevatorConstants.PID.KV_SECOND_STAGE.inVoltsPerMeterPerSecond
+    slot1Configs.kA = ElevatorConstants.PID.KA_SECOND_STAGE.inVoltsPerMeterPerSecondPerSecond
 
-    leaderConfigs.CurrentLimits.SupplyCurrentLimit =
+    slot2Configs.kG = ElevatorConstants.PID.KG_THIRD_STAGE.inVolts
+    slot2Configs.kS = ElevatorConstants.PID.REAL_KS_THIRD_STAGE.inVolts
+    slot2Configs.kV = ElevatorConstants.PID.KV_THIRD_STAGE.inVoltsPerMeterPerSecond
+    slot2Configs.kA = ElevatorConstants.PID.KA_THIRD_STAGE.inVoltsPerMeterPerSecondPerSecond
+
+    slot0Configs.GravityType = GravityTypeValue.Elevator_Static
+    slot1Configs.GravityType = GravityTypeValue.Elevator_Static
+    slot2Configs.GravityType = GravityTypeValue.Elevator_Static
+
+    configs.CurrentLimits.SupplyCurrentLimit =
       ElevatorConstants.LEADER_SUPPLY_CURRENT_LIMIT.inAmperes
-    leaderConfigs.CurrentLimits.SupplyCurrentLowerLimit =
+    configs.CurrentLimits.SupplyCurrentLowerLimit =
       ElevatorConstants.LEADER_SUPPLY_CURRENT_LIMIT.inAmperes
-    leaderConfigs.CurrentLimits.StatorCurrentLimit =
+    configs.CurrentLimits.StatorCurrentLimit =
       ElevatorConstants.LEADER_STATOR_CURRENT_LIMIT.inAmperes
-    leaderConfigs.CurrentLimits.SupplyCurrentLowerTime =
+    configs.CurrentLimits.SupplyCurrentLowerTime =
       ElevatorConstants.LEADER_SUPPLY_CURRENT_LIMIT.inAmperes
-    leaderConfigs.CurrentLimits.StatorCurrentLimitEnable = true
-    leaderConfigs.CurrentLimits.SupplyCurrentLimitEnable = true
-    leaderMotionMagicConfigs.MotionMagicCruiseVelocity = 80.0
-    leaderMotionMagicConfigs.MotionMagicAcceleration = 160.0
+    configs.CurrentLimits.StatorCurrentLimitEnable = true
+    configs.CurrentLimits.SupplyCurrentLimitEnable = true
 
-    followerConfigs.CurrentLimits.SupplyCurrentLimit =
-      ElevatorConstants.FOLLOWER_SUPPLY_CURRENT_LIMIT.inAmperes
-    followerConfigs.CurrentLimits.SupplyCurrentLowerLimit =
-      ElevatorConstants.FOLLOWER_SUPPLY_CURRENT_LIMIT.inAmperes
-    followerConfigs.CurrentLimits.StatorCurrentLimit =
-      ElevatorConstants.FOLLOWER_STATOR_CURRENT_LIMIT.inAmperes
-    followerConfigs.CurrentLimits.SupplyCurrentLowerTime =
-      ElevatorConstants.FOLLOWER_SUPPLY_CURRENT_LIMIT.inAmperes
-    followerConfigs.CurrentLimits.StatorCurrentLimitEnable = true
-    followerConfigs.CurrentLimits.SupplyCurrentLimitEnable = true
+    configs.SoftwareLimitSwitch.ForwardSoftLimitEnable = true
+    configs.SoftwareLimitSwitch.ReverseSoftLimitEnable = true
+    configs.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
+      leaderSensor.positionToRawUnits(ElevatorConstants.UPWARDS_EXTENSION_LIMIT)
+    configs.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
+      leaderSensor.positionToRawUnits(ElevatorConstants.DOWNWARDS_EXTENSION_LIMIT)
+
+    motionMagicConfigs.MotionMagicCruiseVelocity = ElevatorConstants.MAX_VELOCITY.inMetersPerSecond
+    motionMagicConfigs.MotionMagicAcceleration =
+      ElevatorConstants.MAX_ACCELERATION.inMetersPerSecondPerSecond
+    motionMagicConfigs.MotionMagicExpo_kA =
+      ElevatorConstants.PID.KA_FIRST_STAGE.inVoltsPerMeterPerSecondPerSecond
+
     followerTalon.setControl(Follower(Constants.Elevator.LEADER_MOTOR_ID, false))
 
     leaderPositionStatusSignal = leaderTalon.getPosition()
@@ -151,6 +150,9 @@ object ElevatorIOTalon : ElevatorIO {
 
     motorVoltage = leaderTalon.motorVoltage
     motorTorque = leaderTalon.torqueCurrent
+
+    leaderTalon.configurator.apply(configs)
+    followerTalon.configurator.apply(configs)
   }
 
   private fun updateSignals() {
@@ -190,18 +192,77 @@ object ElevatorIOTalon : ElevatorIO {
     kI: IntegralGain<Meter, Volt>,
     kD: DerivativeGain<Meter, Volt>
   ) {
-    val pidConfiguration = Slot0Configs()
-    pidConfiguration.kP = leaderSensor.proportionalPositionGainToRawUnits(kP)
-    pidConfiguration.kI = leaderSensor.integralPositionGainToRawUnits(kI)
-    pidConfiguration.kD = leaderSensor.derivativePositionGainToRawUnits(kD)
+    slot0Configs.kP = kP.inVoltsPerMeter
+    slot0Configs.kI = kI.inVoltsPerMeterSeconds
+    slot0Configs.kD = kD.inVoltsPerMeterPerSecond
 
-    leaderTalon.configurator.apply(pidConfiguration)
+    slot1Configs.kP = slot0Configs.kP
+    slot1Configs.kI = slot0Configs.kP
+    slot1Configs.kD = slot0Configs.kD
+
+    slot2Configs.kP = slot0Configs.kP
+    slot2Configs.kI = slot0Configs.kP
+    slot2Configs.kD = slot0Configs.kD
+
+    updateConfigs()
   }
 
+  override fun configFFFirstStage(
+    kG: ElectricalPotential,
+    kS: StaticFeedforward<Volt>,
+    kV: VelocityFeedforward<Meter, Volt>,
+    kA: AccelerationFeedforward<Meter, Volt>
+  ) {
+    slot0Configs.kG = kG.inVolts
+    slot0Configs.kS = kS.inVolts
+    slot0Configs.kV = kV.inVoltsPerMeterPerSecond
+    slot0Configs.kA = kA.inVoltsPerMeterPerSecondPerSecond
+    updateConfigs()
+  }
+
+  override fun configFFSecondStage(
+    kG: ElectricalPotential,
+    kS: StaticFeedforward<Volt>,
+    kV: VelocityFeedforward<Meter, Volt>,
+    kA: AccelerationFeedforward<Meter, Volt>
+  ) {
+    slot1Configs.kG = kG.inVolts
+    slot1Configs.kS = kS.inVolts
+    slot1Configs.kV = kV.inVoltsPerMeterPerSecond
+    slot1Configs.kA = kA.inVoltsPerMeterPerSecondPerSecond
+    updateConfigs()
+  }
+
+  override fun configFFThirdStage(
+    kG: ElectricalPotential,
+    kS: StaticFeedforward<Volt>,
+    kV: VelocityFeedforward<Meter, Volt>,
+    kA: AccelerationFeedforward<Meter, Volt>
+  ) {
+    slot2Configs.kG = kG.inVolts
+    slot2Configs.kS = kS.inVolts
+    slot2Configs.kV = kV.inVoltsPerMeterPerSecond
+    slot2Configs.kA = kA.inVoltsPerMeterPerSecondPerSecond
+    updateConfigs()
+  }
 
   override fun setPosition(position: Length) {
+
+    val slot: Int =
+      if (leaderSensor.position > ElevatorConstants.SECOND_STAGE_HEIGHT) {
+        2
+      } else if (leaderSensor.position > ElevatorConstants.FIRST_STAGE_HEIGHT) {
+        1
+      } else {
+        0
+      }
+
     leaderTalon.setControl(
-      motionMagicControl.withPosition(leaderSensor.positionToRawUnits(position)).withSlot(0)
+      motionMagicControl
+        .withPosition(leaderSensor.positionToRawUnits(position))
+        .withSlot(slot)
+        .withLimitForwardMotion(true)
+        .withLimitReverseMotion(true)
     )
   }
 
@@ -212,5 +273,10 @@ object ElevatorIOTalon : ElevatorIO {
   override fun zeroEncoder() {
     leaderTalon.setPosition(0.0)
     followerTalon.setPosition(0.0)
+  }
+
+  private fun updateConfigs() {
+    leaderTalon.configurator.apply(configs)
+    followerTalon.configurator.apply(configs)
   }
 }
