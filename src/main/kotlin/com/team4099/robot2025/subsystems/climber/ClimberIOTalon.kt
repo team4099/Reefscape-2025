@@ -64,10 +64,6 @@ object ClimberIOTalon : ClimberIO {
         climberConfiguration.Slot1.kD =
             climberSensor.derivativePositionGainToRawUnits(ClimberConstants.PID.KD_UNLATCH)
 
-        climberConfiguration.Slot2.kP = climberSensor.proportionalPositionGainToRawUnits(ClimberConstants.PID.KP_LATCH)
-        climberConfiguration.Slot2.kI = climberSensor.integralPositionGainToRawUnits(ClimberConstants.PID.KI_LATCH)
-        climberConfiguration.Slot2.kD = climberSensor.derivativePositionGainToRawUnits(ClimberConstants.PID.KD_LATCH)
-
         climberConfiguration.CurrentLimits.SupplyCurrentLimit = ClimberConstants.SUPPLY_CURRENT_LIMIT.inAmperes
         climberConfiguration.CurrentLimits.SupplyCurrentLowerLimit = ClimberConstants.THRESHOLD_CURRENT_LIMIT.inAmperes
         climberConfiguration.CurrentLimits.SupplyCurrentLimitEnable = true
