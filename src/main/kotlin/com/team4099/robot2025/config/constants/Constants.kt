@@ -106,7 +106,7 @@ object Constants {
   }
 
   object Climber {
-    //TODO: Get the motor ids
+    // TODO: Get the motor ids
     const val CLIMBER_MOTOR_ID = 0
   }
 
