@@ -74,6 +74,13 @@ object ClimberIOTalon : ClimberIO {
         motionMagicConfiguration.MotionMagicAcceleration =
             ClimberConstants.MAX_ACCELERATION.inRotationsPerSecondPerSecond
 
+        climberConfiguration.SoftwareLimitSwitch.ForwardSoftLimitEnable = true
+        climberConfiguration.SoftwareLimitSwitch.ReverseSoftLimitEnable = true
+        climberConfiguration.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
+            climberSensor.positionToRawUnits(ClimberConstants.MAX_ANGLE)
+        climberConfiguration.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
+            climberSensor.positionToRawUnits(ClimberConstants.MIN_ANGLE)
+
         climberConfiguration.MotorOutput.NeutralMode = NeutralModeValue.Brake
         climberConfiguration.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive
         climberTalon.configurator.apply(climberConfiguration)
@@ -129,6 +136,8 @@ object ClimberIOTalon : ClimberIO {
             motionMagicControl
                 .withPosition(climberSensor.positionToRawUnits(position))
                 .withSlot(slot)
+                .withLimitForwardMotion(true)
+                .withLimitReverseMotion(true)
         )
     }
 
