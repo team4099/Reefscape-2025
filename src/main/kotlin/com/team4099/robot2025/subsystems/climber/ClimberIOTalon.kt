@@ -58,11 +58,11 @@ object ClimberIOTalon : ClimberIO {
             climberSensor.derivativePositionGainToRawUnits(ClimberConstants.PID.KD_UNLATCH)
 
         climberConfiguration.Slot1.kP =
-            climberSensor.proportionalPositionGainToRawUnits(ClimberConstants.PID.KP_UNLATCH)
+            climberSensor.proportionalPositionGainToRawUnits(ClimberConstants.PID.KP_LATCH)
         climberConfiguration.Slot1.kI =
-            climberSensor.integralPositionGainToRawUnits(ClimberConstants.PID.KI_UNLATCH)
+            climberSensor.integralPositionGainToRawUnits(ClimberConstants.PID.KI_LATCH)
         climberConfiguration.Slot1.kD =
-            climberSensor.derivativePositionGainToRawUnits(ClimberConstants.PID.KD_UNLATCH)
+            climberSensor.derivativePositionGainToRawUnits(ClimberConstants.PID.KD_LATCH)
 
         climberConfiguration.CurrentLimits.SupplyCurrentLimit = ClimberConstants.SUPPLY_CURRENT_LIMIT.inAmperes
         climberConfiguration.CurrentLimits.SupplyCurrentLowerLimit = ClimberConstants.THRESHOLD_CURRENT_LIMIT.inAmperes

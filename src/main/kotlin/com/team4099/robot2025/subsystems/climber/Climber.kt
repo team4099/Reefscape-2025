@@ -7,7 +7,7 @@ import com.team4099.robot2025.config.constants.Constants
 import com.team4099.robot2025.subsystems.superstructure.Request
 import com.team4099.robot2025.util.CustomLogger
 import edu.wpi.first.wpilibj.RobotBase
-import org.team4099.lib.controller.SimpleMotorFeedforward
+import org.team4099.lib.controller.ArmFeedforward
 import org.team4099.lib.controller.TrapezoidProfile
 import org.team4099.lib.units.AngularVelocity
 import org.team4099.lib.units.base.inSeconds
@@ -18,7 +18,7 @@ import org.team4099.lib.units.perSecond
 class Climber(private val io: ClimberIO) {
     val inputs: ClimberIO.ClimberInputs = ClimberIO.ClimberInputs()
     private var currentState: ClimberStates = ClimberStates.UNINITIALIZED
-    private var feedforward: SimpleMotorFeedforward<Radian, Volt>
+    private var feedforward: ArmFeedforward
 
     private val kS = LoggedTunableValue(
         "Climber/kS",
@@ -33,6 +33,11 @@ class Climber(private val io: ClimberIO) {
     private val kA = LoggedTunableValue(
         "Climber/kA",
         Pair({it.inVoltsPerDegreePerSecondPerSecond}, {it.volts.perDegreePerSecondPerSecond})
+    )
+
+    private val kG = LoggedTunableValue(
+        "Climber/kG",
+        Pair({it.inVolts}, {it.volts})
     )
 
     private val kPSlot0 = LoggedTunableValue(
@@ -128,28 +133,32 @@ class Climber(private val io: ClimberIO) {
             kISlot1.initDefault(ClimberConstants.PID.KI_LATCH)
             kDSlot1.initDefault(ClimberConstants.PID.KD_LATCH)
 
-            kS.initDefault(ClimberConstants.PID.KS)
-            kV.initDefault(ClimberConstants.PID.KV)
-            kA.initDefault(ClimberConstants.PID.KA)
+            kS.initDefault(ClimberConstants.PID.KS_REAL)
+            kG.initDefault(ClimberConstants.PID.KG_REAL)
+            kV.initDefault(ClimberConstants.PID.KV_REAL)
+            kA.initDefault(ClimberConstants.PID.KA_REAL)
 
-            feedforward = SimpleMotorFeedforward(
-                ClimberConstants.PID.KS,
-                ClimberConstants.PID.KV,
-                ClimberConstants.PID.KA
+            feedforward = ArmFeedforward(
+                ClimberConstants.PID.KS_REAL,
+                ClimberConstants.PID.KG_REAL,
+                ClimberConstants.PID.KV_REAL,
+                ClimberConstants.PID.KA_REAL
             )
         } else {
             kPSlot0.initDefault(ClimberConstants.PID.KP_SIM)
             kISlot0.initDefault(ClimberConstants.PID.KI_SIM)
             kDSlot0.initDefault(ClimberConstants.PID.KD_SIM)
 
-            kV.initDefault(ClimberConstants.PID.KV)
-            kA.initDefault(ClimberConstants.PID.KA)
+            kG.initDefault(ClimberConstants.PID.KG_SIM)
+            kV.initDefault(ClimberConstants.PID.KV_SIM)
+            kA.initDefault(ClimberConstants.PID.KA_SIM)
 
             // kS is 0 volts because no static friction in sim
-            feedforward = SimpleMotorFeedforward(
+            feedforward = ArmFeedforward(
                 0.volts,
-                ClimberConstants.PID.KV,
-                ClimberConstants.PID.KA
+                ClimberConstants.PID.KG_SIM,
+                ClimberConstants.PID.KV_SIM,
+                ClimberConstants.PID.KA_SIM
             )
         }
     }
@@ -165,8 +174,8 @@ class Climber(private val io: ClimberIO) {
             io.configPIDSlot0(kPSlot1.get(), kISlot1.get(), kDSlot1.get())
         }
 
-        if(kS.hasChanged() || kV.hasChanged() || kA.hasChanged()) {
-            feedforward = SimpleMotorFeedforward(kS.get(), kV.get(), kA.get())
+        if(kS.hasChanged() || kG.hasChanged() || kV.hasChanged() || kA.hasChanged()) {
+            feedforward = ArmFeedforward(kS.get(), kG.get(), kV.get(), kA.get())
         }
 
         CustomLogger.processInputs("Climber", inputs)
@@ -263,7 +272,7 @@ class Climber(private val io: ClimberIO) {
         val acceleration = (setpoint.velocity - lastSetpoint.velocity) / Constants.Universal.LOOP_PERIOD_TIME
         lastSetpoint = setpoint
 
-        val feedforward = feedforward.calculate(setpoint.velocity, acceleration)
+        val feedforward = feedforward.calculate(setpoint.position,setpoint.velocity, acceleration)
 
         // TODO: Make set voltage for each motor
         if (isOutOfBounds(setpoint.velocity)) {

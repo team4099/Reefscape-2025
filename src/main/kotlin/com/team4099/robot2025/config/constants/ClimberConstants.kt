@@ -36,8 +36,14 @@ object ClimberConstants {
         val KI_SIM = 0.0.volts / (1.0.degrees * 1.0.seconds)
         val KD_SIM = 0.0.volts / 1.0.degrees.perSecond
 
-        val KS = 0.0.volts
-        val KV = 0.0.volts / 1.0.degrees.perSecond
-        val KA = 0.0.volts / 1.0.degrees.perSecond.perSecond
+        val KS_REAL = 0.0.volts
+        val KV_REAL = 0.0.volts / 1.0.degrees.perSecond
+        val KA_REAL = 0.0.volts / 1.0.degrees.perSecond.perSecond
+        val KG_REAL = 0.0.volts
+
+        val KS_SIM = 0.0.volts
+        val KV_SIM = 0.0.volts / 1.0.degrees.perSecond
+        val KA_SIM = 0.0.volts / 1.0.degrees.perSecond.perSecond
+        val KG_SIM = 0.0.volts
     }
 }
