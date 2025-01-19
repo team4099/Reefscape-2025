@@ -79,6 +79,8 @@ interface ClimberIO {
 
     fun setPosition(position: Angle, feedforward: ElectricalPotential, latched: Boolean) {}
 
+    fun setBrakeMode(brake: Boolean) {}
+
     fun zeroEncoder() {}
 
     fun configPIDSlot0 (

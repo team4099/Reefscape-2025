@@ -1,6 +1,7 @@
 package com.team4099.robot2025.subsystems.climber
 import com.ctre.phoenix6.BaseStatusSignal
 import com.ctre.phoenix6.StatusSignal
+import com.ctre.phoenix6.configs.MotorOutputConfigs
 import com.ctre.phoenix6.configs.Slot0Configs
 import com.ctre.phoenix6.configs.Slot1Configs
 import com.ctre.phoenix6.configs.TalonFXConfiguration
@@ -131,6 +132,18 @@ object ClimberIOTalon : ClimberIO {
                 .withPosition(climberSensor.positionToRawUnits(position))
                 .withSlot(slot)
         )
+    }
+
+    override fun setBrakeMode(brake: Boolean) {
+        val motorOutputConfig = MotorOutputConfigs()
+
+        if (brake) {
+            motorOutputConfig.NeutralMode = NeutralModeValue.Brake
+        } else {
+            motorOutputConfig.NeutralMode = NeutralModeValue.Coast
+        }
+
+        climberTalon.configurator.apply(motorOutputConfig)
     }
 
     private fun updateSignals() {
