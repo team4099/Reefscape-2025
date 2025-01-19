@@ -77,7 +77,7 @@ interface ClimberIO {
 
     fun setVoltage(voltage: ElectricalPotential) {}
 
-    fun setPosition(position: Angle, feedforward: ElectricalPotential, latched: Boolean) {}
+    fun setPosition(position: Angle, latched: Boolean) {}
 
     fun setBrakeMode(brake: Boolean) {}
 

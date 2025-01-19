@@ -121,10 +121,8 @@ object ClimberIOTalon : ClimberIO {
         climberTalon.setControl(VoltageOut(voltage.inVolts))
     }
     
-    override fun setPosition(position: Angle, feedforward: ElectricalPotential, latched: Boolean) {
+    override fun setPosition(position: Angle, latched: Boolean) {
         val slot = if (latched) 0 else 1
-
-        CustomLogger.recordOutput("Climber/feedForwardApplied", feedforward.inVolts)
         CustomLogger.recordOutput("Climber/slotBeingUsed", slot)
 
         climberTalon.setControl(
