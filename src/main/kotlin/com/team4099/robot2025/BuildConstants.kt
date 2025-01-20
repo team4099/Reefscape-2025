@@ -6,10 +6,10 @@ package com.team4099.robot2025
 const val MAVEN_GROUP = ""
 const val MAVEN_NAME = "Reefscape-2025"
 const val VERSION = "unspecified"
-const val GIT_REVISION = 12
-const val GIT_SHA = "3f3a2fafccf7ae09a8c0294a47c8b8723e8ace7c"
-const val GIT_DATE = "2025-01-06T13:34:40Z"
-const val GIT_BRANCH = "main"
-const val BUILD_DATE = "2025-01-06T14:27:41Z"
-const val BUILD_UNIX_TIME = 1736191661903L
+const val GIT_REVISION = 22
+const val GIT_SHA = "6c34e77cd52c4e02e1307662835c5ab7c6ddcc13"
+const val GIT_DATE = "2025-01-10T21:45:15Z"
+const val GIT_BRANCH = "elevator"
+const val BUILD_DATE = "2025-01-11T21:49:15Z"
+const val BUILD_UNIX_TIME = 1736650155288L
 const val DIRTY = 1
