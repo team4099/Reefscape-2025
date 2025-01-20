@@ -17,6 +17,8 @@ class Arm(val io: ArmIO) {
   var armTargetVoltage: ElectricalPotential = 0.0.volts
   var armTargetPosition: Angle = 0.0.degrees
 
+  var isZeroed = false
+
   var currentState = ArmState.UNINITIALIZED
   var currentRequest: Request.ArmRequest = Request.ArmRequest.Zero()
     set(value) {
@@ -67,6 +69,7 @@ class Arm(val io: ArmIO) {
       ArmState.ZERO -> {
         io.zeroEncoder()
         currentRequest = Request.ArmRequest.OpenLoop(0.volts)
+        isZeroed = true
         nextState = fromRequestToState(currentRequest)
       }
     }

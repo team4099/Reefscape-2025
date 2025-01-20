@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj.RobotBase
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import org.team4099.lib.units.base.inInches
 import org.team4099.lib.units.base.inches
-import org.team4099.lib.units.base.seconds
 import org.team4099.lib.units.derived.ElectricalPotential
 import org.team4099.lib.units.derived.inVolts
 import org.team4099.lib.units.derived.volts

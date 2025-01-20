@@ -4,6 +4,7 @@ import com.team4099.robot2025.config.constants.ArmConstants
 import edu.wpi.first.math.kinematics.ChassisSpeeds
 import org.team4099.lib.units.AngularVelocity
 import org.team4099.lib.units.LinearVelocity
+import org.team4099.lib.units.base.Length
 import org.team4099.lib.units.derived.Angle
 import org.team4099.lib.units.derived.ElectricalPotential
 import org.team4099.lib.units.derived.degrees
@@ -39,6 +40,8 @@ sealed interface Request {
 
     class ClimbExtend() : SuperstructureRequest
     class ClimbRetract() : SuperstructureRequest
+
+    class Tuning() : SuperstructureRequest
   }
 
   sealed interface DrivetrainRequest : Request {
@@ -80,6 +83,12 @@ sealed interface Request {
     class OpenLoop(val RollersVoltage: ElectricalPotential) : RollersRequest
     class Zero(): RollersRequest
 
+  }
+
+  sealed interface ElevatorRequest : Request {
+    class ClosedLoop(val position: Length) : ElevatorRequest
+    class OpenLoop(val voltage: ElectricalPotential) : ElevatorRequest
+    class Home() : ElevatorRequest
   }
 }
 
