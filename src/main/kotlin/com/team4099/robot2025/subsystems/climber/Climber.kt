@@ -1,7 +1,6 @@
 package com.team4099.robot2025.subsystems.climber
 
 import com.team4099.lib.hal.Clock
-import com.team4099.lib.logging.LoggedTunableValue
 import com.team4099.robot2025.config.constants.ClimberConstants
 import com.team4099.robot2025.subsystems.superstructure.Request
 import com.team4099.robot2025.util.CustomLogger
@@ -11,63 +10,12 @@ import org.team4099.lib.units.derived.Angle
 import org.team4099.lib.units.derived.ElectricalPotential
 import org.team4099.lib.units.derived.degrees
 import org.team4099.lib.units.derived.inDegrees
-import org.team4099.lib.units.derived.inVolts
-import org.team4099.lib.units.derived.inVoltsPerDegree
-import org.team4099.lib.units.derived.inVoltsPerDegreePerSecond
-import org.team4099.lib.units.derived.inVoltsPerDegreePerSecondPerSecond
-import org.team4099.lib.units.derived.inVoltsPerDegreeSeconds
-import org.team4099.lib.units.derived.perDegree
-import org.team4099.lib.units.derived.perDegreePerSecond
-import org.team4099.lib.units.derived.perDegreePerSecondPerSecond
-import org.team4099.lib.units.derived.perDegreeSeconds
 import org.team4099.lib.units.derived.volts
 
 class Climber(private val io: ClimberIO) {
   val inputs: ClimberIO.ClimberInputs = ClimberIO.ClimberInputs()
   private var currentState: ClimberState = ClimberState.UNINITIALIZED
   private var feedforward: ArmFeedforward
-
-  private val kS = LoggedTunableValue("Climber/kS", Pair({ it.inVolts }, { it.volts }))
-
-  private val kV =
-    LoggedTunableValue(
-      "Climber/kV", Pair({ it.inVoltsPerDegreePerSecond }, { it.volts.perDegreePerSecond })
-    )
-
-  private val kA =
-    LoggedTunableValue(
-      "Climber/kA",
-      Pair({ it.inVoltsPerDegreePerSecondPerSecond }, { it.volts.perDegreePerSecondPerSecond })
-    )
-
-  private val kG = LoggedTunableValue("Climber/kG", Pair({ it.inVolts }, { it.volts }))
-
-  private val kPSlot0 =
-    LoggedTunableValue("Climber/kP", Pair({ it.inVoltsPerDegree }, { it.volts.perDegree }))
-
-  private val kISlot0 =
-    LoggedTunableValue(
-      "Climber/kI", Pair({ it.inVoltsPerDegreeSeconds }, { it.volts.perDegreeSeconds })
-    )
-
-  private val kDSlot0 =
-    LoggedTunableValue(
-      "Climber/kD", Pair({ it.inVoltsPerDegreePerSecond }, { it.volts.perDegreePerSecond })
-    )
-
-  private val kPSlot1 =
-    LoggedTunableValue("Climber/kPSlot1", Pair({ it.inVoltsPerDegree }, { it.volts.perDegree }))
-
-  private val kISlot1 =
-    LoggedTunableValue(
-      "Climber/kISlot1", Pair({ it.inVoltsPerDegreeSeconds }, { it.volts.perDegreeSeconds })
-    )
-
-  private val kDSlot1 =
-    LoggedTunableValue(
-      "Climber/kDSlot1",
-      Pair({ it.inVoltsPerDegreePerSecond }, { it.volts.perDegreePerSecond })
-    )
 
   private val maxAngleReached: Boolean
     get() = inputs.climberPosition >= ClimberConstants.MAX_ANGLE
@@ -108,18 +56,18 @@ class Climber(private val io: ClimberIO) {
 
   init {
     if (RobotBase.isReal()) {
-      kPSlot0.initDefault(ClimberConstants.PID.KP_UNLATCH)
-      kISlot0.initDefault(ClimberConstants.PID.KI_UNLATCH)
-      kDSlot0.initDefault(ClimberConstants.PID.KD_UNLATCH)
+      ClimberTunableValues.kPSlot0.initDefault(ClimberConstants.PID.KP_UNLATCH)
+      ClimberTunableValues.kISlot0.initDefault(ClimberConstants.PID.KI_UNLATCH)
+      ClimberTunableValues.kDSlot0.initDefault(ClimberConstants.PID.KD_UNLATCH)
 
-      kPSlot1.initDefault(ClimberConstants.PID.KP_LATCH)
-      kISlot1.initDefault(ClimberConstants.PID.KI_LATCH)
-      kDSlot1.initDefault(ClimberConstants.PID.KD_LATCH)
+      ClimberTunableValues.kPSlot1.initDefault(ClimberConstants.PID.KP_LATCH)
+      ClimberTunableValues.kISlot1.initDefault(ClimberConstants.PID.KI_LATCH)
+      ClimberTunableValues.kDSlot1.initDefault(ClimberConstants.PID.KD_LATCH)
 
-      kS.initDefault(ClimberConstants.PID.KS_REAL)
-      kG.initDefault(ClimberConstants.PID.KG_REAL)
-      kV.initDefault(ClimberConstants.PID.KV_REAL)
-      kA.initDefault(ClimberConstants.PID.KA_REAL)
+      ClimberTunableValues.kS.initDefault(ClimberConstants.PID.KS_REAL)
+      ClimberTunableValues.kG.initDefault(ClimberConstants.PID.KG_REAL)
+      ClimberTunableValues.kV.initDefault(ClimberConstants.PID.KV_REAL)
+      ClimberTunableValues.kA.initDefault(ClimberConstants.PID.KA_REAL)
 
       feedforward =
         ArmFeedforward(
@@ -129,15 +77,15 @@ class Climber(private val io: ClimberIO) {
           ClimberConstants.PID.KA_REAL
         )
     } else {
-      kPSlot0.initDefault(ClimberConstants.PID.KP_SIM)
-      kISlot0.initDefault(ClimberConstants.PID.KI_SIM)
-      kDSlot0.initDefault(ClimberConstants.PID.KD_SIM)
+      ClimberTunableValues.kPSlot0.initDefault(ClimberConstants.PID.KP_SIM)
+      ClimberTunableValues.kISlot0.initDefault(ClimberConstants.PID.KI_SIM)
+      ClimberTunableValues.kDSlot0.initDefault(ClimberConstants.PID.KD_SIM)
 
-      kG.initDefault(ClimberConstants.PID.KG_SIM)
-      kV.initDefault(ClimberConstants.PID.KV_SIM)
-      kA.initDefault(ClimberConstants.PID.KA_SIM)
+      ClimberTunableValues.kG.initDefault(ClimberConstants.PID.KG_SIM)
+      ClimberTunableValues.kV.initDefault(ClimberConstants.PID.KV_SIM)
+      ClimberTunableValues.kA.initDefault(ClimberConstants.PID.KA_SIM)
 
-      // kS is 0 volts because no static friction in sim
+      // ClimberTunableValues.kS is 0 volts because no static friction in sim
       feedforward =
         ArmFeedforward(
           0.volts,
@@ -151,16 +99,40 @@ class Climber(private val io: ClimberIO) {
   fun periodic() {
     io.updateInputs(inputs)
 
-    if (kPSlot0.hasChanged() || kISlot0.hasChanged() || kDSlot0.hasChanged()) {
-      io.configPIDSlot0(kPSlot0.get(), kISlot0.get(), kDSlot0.get())
+    if (ClimberTunableValues.kPSlot0.hasChanged() ||
+      ClimberTunableValues.kISlot0.hasChanged() ||
+      ClimberTunableValues.kDSlot0.hasChanged()
+    ) {
+      io.configPIDSlot0(
+        ClimberTunableValues.kPSlot0.get(),
+        ClimberTunableValues.kISlot0.get(),
+        ClimberTunableValues.kDSlot0.get()
+      )
     }
 
-    if (kPSlot1.hasChanged() || kISlot1.hasChanged() || kDSlot1.hasChanged()) {
-      io.configPIDSlot0(kPSlot1.get(), kISlot1.get(), kDSlot1.get())
+    if (ClimberTunableValues.kPSlot1.hasChanged() ||
+      ClimberTunableValues.kISlot1.hasChanged() ||
+      ClimberTunableValues.kDSlot1.hasChanged()
+    ) {
+      io.configPIDSlot0(
+        ClimberTunableValues.kPSlot1.get(),
+        ClimberTunableValues.kISlot1.get(),
+        ClimberTunableValues.kDSlot1.get()
+      )
     }
 
-    if (kS.hasChanged() || kG.hasChanged() || kV.hasChanged() || kA.hasChanged()) {
-      feedforward = ArmFeedforward(kS.get(), kG.get(), kV.get(), kA.get())
+    if (ClimberTunableValues.kS.hasChanged() ||
+      ClimberTunableValues.kG.hasChanged() ||
+      ClimberTunableValues.kV.hasChanged() ||
+      ClimberTunableValues.kA.hasChanged()
+    ) {
+      feedforward =
+        ArmFeedforward(
+          ClimberTunableValues.kS.get(),
+          ClimberTunableValues.kG.get(),
+          ClimberTunableValues.kV.get(),
+          ClimberTunableValues.kA.get()
+        )
     }
 
     CustomLogger.processInputs("Climber", inputs)
