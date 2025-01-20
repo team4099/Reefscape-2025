@@ -5,92 +5,89 @@ import com.ctre.phoenix6.StatusSignal
 import com.ctre.phoenix6.configs.TalonFXConfiguration
 import com.ctre.phoenix6.controls.VoltageOut
 import com.ctre.phoenix6.hardware.TalonFX
+import com.ctre.phoenix6.signals.InvertedValue
 import com.ctre.phoenix6.signals.NeutralModeValue
-import com.team4099.robot2025.config.constants.RollersConstant
-import com.team4099.robot2025.subsystems.rollers.RollersIO.RollersIOInputs
 import com.team4099.robot2025.config.constants.Constants
-import edu.wpi.first.units.measure.Voltage
+import com.team4099.robot2025.config.constants.RollersConstants
+import com.team4099.robot2025.subsystems.rollers.RollersIO.RollersIOInputs
 import org.team4099.lib.units.base.amps
 import org.team4099.lib.units.base.celsius
 import org.team4099.lib.units.base.inAmperes
-import org.team4099.lib.units.derived.*
-import org.team4099.lib.units.perMinute
-import org.team4099.lib.units.perSecond
-import edu.wpi.first.units.measure.AngularVelocity as AngularVelocity
+import org.team4099.lib.units.ctreAngularMechanismSensor
+import org.team4099.lib.units.derived.ElectricalPotential
+import org.team4099.lib.units.derived.inVolts
+import org.team4099.lib.units.derived.volts
+import edu.wpi.first.units.measure.Current as WPILibCurrent
 import edu.wpi.first.units.measure.Temperature as WPILibTemperature
-import edu.wpi.first.units.measure.Current as  WPILibCurrent
 import edu.wpi.first.units.measure.Voltage as WPILibVoltage
 
-object RollersIOTalonFX: RollersIO {
+object RollersIOTalonFX : RollersIO {
 
-    private val rollersTalon: TalonFX = TalonFX(Constants.Rollers.ROLLERS_MOTOR_ID)
-    private val rollersConfiguration: TalonFXConfiguration = TalonFXConfiguration()
+  private val rollersTalon: TalonFX = TalonFX(Constants.Rollers.ROLLERS_MOTOR_ID)
+  private val rollersConfiguration: TalonFXConfiguration = TalonFXConfiguration()
 
-    lateinit var rollerVelocityStatusSignal: StatusSignal<AngularVelocity>
-    lateinit var rollerAppliedVoltageStatusSignal: StatusSignal<WPILibVoltage>
-    lateinit var rollerStatorCurrentStatusSignal: StatusSignal<WPILibCurrent>
-    lateinit var rollerSupplyCurrentStatusSignal: StatusSignal<WPILibCurrent>
-    lateinit var rollerTempStatusSignal: StatusSignal<WPILibTemperature>
+  private val rollerSensor =
+    ctreAngularMechanismSensor(
+      rollersTalon, RollersConstants.GEAR_RATIO, RollersConstants.VOLTAGE_COMPENSATION
+    )
 
-    val voltageControl: VoltageOut = VoltageOut(-1337.volts.inVolts)
+  var rollerAppliedVoltageStatusSignal: StatusSignal<WPILibVoltage>
+  var rollerStatorCurrentStatusSignal: StatusSignal<WPILibCurrent>
+  var rollerSupplyCurrentStatusSignal: StatusSignal<WPILibCurrent>
+  var rollerTempStatusSignal: StatusSignal<WPILibTemperature>
 
-    init{
+  val voltageControl: VoltageOut = VoltageOut(0.volts.inVolts)
 
-        // current limits
-        rollersConfiguration.CurrentLimits.StatorCurrentLimit = RollersConstant.STATOR_CURRENT_LIMIT.inAmperes
-        rollersConfiguration.CurrentLimits.SupplyCurrentLimit = RollersConstant.SUPPLY_CURRENT_LIMIT.inAmperes
-        rollersConfiguration.CurrentLimits.StatorCurrentLimitEnable = true
-        rollersConfiguration.CurrentLimits.SupplyCurrentLimitEnable = true
+  init {
 
+    // configurations
+    rollersConfiguration.CurrentLimits.StatorCurrentLimit =
+      RollersConstants.STATOR_CURRENT_LIMIT.inAmperes
+    rollersConfiguration.CurrentLimits.SupplyCurrentLimit =
+      RollersConstants.SUPPLY_CURRENT_LIMIT.inAmperes
+    rollersConfiguration.CurrentLimits.StatorCurrentLimitEnable = true
+    rollersConfiguration.CurrentLimits.SupplyCurrentLimitEnable = true
+    rollersConfiguration.MotorOutput.Inverted = InvertedValue.Clockwise_Positive
+    rollersConfiguration.MotorOutput.NeutralMode = NeutralModeValue.Coast
 
+    rollersTalon.configurator.apply(rollersConfiguration)
 
+    // sensor data
+    rollerAppliedVoltageStatusSignal = rollersTalon.motorVoltage
+    rollerStatorCurrentStatusSignal = rollersTalon.statorCurrent
+    rollerSupplyCurrentStatusSignal = rollersTalon.supplyCurrent
+    rollerTempStatusSignal = rollersTalon.deviceTemp
+  }
 
+  fun refreshStatusSignals() {
+    BaseStatusSignal.refreshAll(
+      rollerAppliedVoltageStatusSignal,
+      rollerStatorCurrentStatusSignal,
+      rollerSupplyCurrentStatusSignal,
+      rollerTempStatusSignal
+    )
+  }
 
+  override fun updateInputs(inputs: RollersIOInputs) {
+    refreshStatusSignals()
+    inputs.rollerVelocity = rollerSensor.velocity
+    inputs.rollerAppliedVoltage = rollerAppliedVoltageStatusSignal.valueAsDouble.volts
+    inputs.rollerStatorCurrent = rollerStatorCurrentStatusSignal.valueAsDouble.amps
+    inputs.rollerSupplyCurrent = rollerSupplyCurrentStatusSignal.valueAsDouble.amps
+    inputs.rollerTemp = rollerTempStatusSignal.valueAsDouble.celsius
+  }
 
+  override fun setRollerVoltage(voltage: ElectricalPotential) {
+    rollersTalon.setControl(voltageControl.withOutput(voltage.inVolts))
+  }
 
-        // Motor input Data
-        rollerVelocityStatusSignal = rollersTalon.velocity
-        rollerAppliedVoltageStatusSignal = rollersTalon.motorVoltage
-        rollerStatorCurrentStatusSignal = rollersTalon.statorCurrent
-        rollerSupplyCurrentStatusSignal = rollersTalon.supplyCurrent
-        rollerTempStatusSignal = rollersTalon.deviceTemp
-
-
+  override fun setRollerBrakeMode(brake: Boolean) {
+    if (brake) {
+      rollersConfiguration.MotorOutput.NeutralMode = NeutralModeValue.Brake
+    } else {
+      rollersConfiguration.MotorOutput.NeutralMode = NeutralModeValue.Coast
     }
 
-    fun refreshStatusSignals() {
-        BaseStatusSignal.refreshAll(
-            rollerVelocityStatusSignal,
-            rollerAppliedVoltageStatusSignal,
-            rollerStatorCurrentStatusSignal,
-            rollerSupplyCurrentStatusSignal,
-            rollerTempStatusSignal
-        )
-    }
-
-    override fun updateInputs(inputs: RollersIOInputs) {
-        refreshStatusSignals()
-        inputs.rollerVelocity = rollerVelocityStatusSignal.valueAsDouble.degrees.perSecond
-        inputs.rollerAppliedVoltage  = rollerAppliedVoltageStatusSignal.valueAsDouble.volts
-        inputs.rollerStatorCurrent = rollerStatorCurrentStatusSignal.valueAsDouble.amps
-        inputs.rollerSupplyCurrent = rollerSupplyCurrentStatusSignal.valueAsDouble.amps
-        inputs.rollerTemp = rollerTempStatusSignal.valueAsDouble.celsius
-    }
-
-
-    override fun setRollerVoltage(voltage: ElectricalPotential) {
-        rollersTalon.setControl(
-            voltageControl.withOutput(voltage.inVolts))
-    }
-
-    override fun setRollerBrakeMode(brake: Boolean) {
-        if (brake) {
-            rollersConfiguration.MotorOutput.NeutralMode = NeutralModeValue.Brake
-        }
-        else {
-            rollersConfiguration.MotorOutput.NeutralMode = NeutralModeValue.Coast
-        }
-
-        rollersTalon.configurator.apply(rollersConfiguration)
-    }
+    rollersTalon.configurator.apply(rollersConfiguration)
+  }
 }
