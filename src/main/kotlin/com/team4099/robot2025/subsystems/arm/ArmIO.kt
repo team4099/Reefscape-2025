@@ -1,87 +1,98 @@
 package com.team4099.robot2025.subsystems.arm
 
-import edu.wpi.first.math.geometry.Rotation2d
-import edu.wpi.first.units.measure.Voltage
 import org.littletonrobotics.junction.LogTable
 import org.littletonrobotics.junction.inputs.LoggableInputs
-import org.team4099.lib.units.*
-import org.team4099.lib.units.base.*
-import org.team4099.lib.units.derived.*
+import org.team4099.lib.units.base.amps
+import org.team4099.lib.units.base.celsius
+import org.team4099.lib.units.base.inAmperes
+import org.team4099.lib.units.base.inCelsius
+import org.team4099.lib.units.derived.AccelerationFeedforward
+import org.team4099.lib.units.derived.Angle
+import org.team4099.lib.units.derived.DerivativeGain
+import org.team4099.lib.units.derived.ElectricalPotential
+import org.team4099.lib.units.derived.IntegralGain
+import org.team4099.lib.units.derived.ProportionalGain
+import org.team4099.lib.units.derived.Radian
+import org.team4099.lib.units.derived.VelocityFeedforward
+import org.team4099.lib.units.derived.Volt
+import org.team4099.lib.units.derived.degrees
+import org.team4099.lib.units.derived.inDegrees
+import org.team4099.lib.units.derived.inVolts
+import org.team4099.lib.units.derived.volts
+import org.team4099.lib.units.inDegreesPerSecond
+import org.team4099.lib.units.inDegreesPerSecondPerSecond
+import org.team4099.lib.units.perSecond
 
 interface ArmIO {
 
-    class ArmIOInputs : LoggableInputs {
-        // Arm Inputs
-        var armPosition = 0.0.degrees
-        var armVelocity = 0.0.degrees.perSecond
-        var armAcceleration = 0.0.degrees.perSecond.perSecond
-        var armAppliedVoltage = 0.0.volts
-        var armStatorCurrent = 0.0.amps
-        var armSupplyCurrent = 0.0.amps
-        var armTemp = 0.0.celsius
+  class ArmIOInputs : LoggableInputs {
+    // Arm Inputs
+    var armPosition = 0.0.degrees
+    var armVelocity = 0.0.degrees.perSecond
+    var armAcceleration = 0.0.degrees.perSecond.perSecond
+    var armAppliedVoltage = 0.0.volts
+    var armStatorCurrent = 0.0.amps
+    var armSupplyCurrent = 0.0.amps
+    var armTemp = 0.0.celsius
 
-        var isSimulating = false
+    var isSimulating = false
 
-
-        override fun toLog(table: LogTable?) {
-            table?.put("armPositionDegrees", armPosition.inDegrees)
-            table?.put("armVelocity", armVelocity.inDegreesPerSecond)
-            table?.put("armAcceleration", armAcceleration.inDegreesPerSecondPerSecond)
-            table?.put("armAppliedVoltage", armAppliedVoltage.inVolts)
-            table?.put("armStatorCurrentAmps", armStatorCurrent.inAmperes)
-            table?.put("armSupplyCurrentAmps", armSupplyCurrent.inAmperes)
-            table?.put("armTempCelsius", armTemp.inCelsius)
-        }
-
-        override fun fromLog(table: LogTable?) {
-
-            table?.get("armPositionDegrees", armPosition.inDegrees)?.let {
-                armPosition = it.degrees
-            }
-            table?.get("armVelocity", armVelocity.inDegreesPerSecond)?.let {
-                armVelocity = it.rotations.perMinute
-            }
-            table?.get("armAcceleration", armAcceleration.inDegreesPerSecondPerSecond)?.let {
-                armAcceleration = it.degrees.perSecond.perSecond
-            }
-            table?.get("armAppliedVoltage", armAppliedVoltage.inVolts)?.let {
-                armAppliedVoltage = it.volts
-            }
-            table?.get("armStatorCurrentAmps", armStatorCurrent.inAmperes)?.let {
-                armStatorCurrent = it.amps
-            }
-            table?.get("armSupplyCurrentAmps", armSupplyCurrent.inAmperes)?.let {
-                armSupplyCurrent = it.amps
-            }
-            table?.get("armTempCelcius", armTemp.inCelsius)?.let {
-               armTemp = it.celsius }
-        }
-
+    override fun toLog(table: LogTable?) {
+      table?.put("armPositionDegrees", armPosition.inDegrees)
+      table?.put("armVelocityDegreesPerSecond", armVelocity.inDegreesPerSecond)
+      table?.put(
+        "armAccelerationDegreesPerSecondPerSecond", armAcceleration.inDegreesPerSecondPerSecond
+      )
+      table?.put("armAppliedVoltage", armAppliedVoltage.inVolts)
+      table?.put("armStatorCurrentAmps", armStatorCurrent.inAmperes)
+      table?.put("armSupplyCurrentAmps", armSupplyCurrent.inAmperes)
+      table?.put("armTempCelsius", armTemp.inCelsius)
     }
 
-    fun updateInputs(inputs: ArmIOInputs) {}
+    override fun fromLog(table: LogTable?) {
 
-    fun setArmVoltage(voltage: ElectricalPotential) {}
+      table?.get("armPositionDegrees", armPosition.inDegrees)?.let { armPosition = it.degrees }
+      table?.get("armVelocityDegreesPerSecond", armVelocity.inDegreesPerSecond)?.let {
+        armVelocity = it.degrees.perSecond
+      }
+      table?.get(
+        "armAccelerationDegreesPerSecondPerSecond",
+        armAcceleration.inDegreesPerSecondPerSecond
+      )
+        ?.let { armAcceleration = it.degrees.perSecond.perSecond }
+      table?.get("armAppliedVoltage", armAppliedVoltage.inVolts)?.let {
+        armAppliedVoltage = it.volts
+      }
+      table?.get("armStatorCurrentAmps", armStatorCurrent.inAmperes)?.let {
+        armStatorCurrent = it.amps
+      }
+      table?.get("armSupplyCurrentAmps", armSupplyCurrent.inAmperes)?.let {
+        armSupplyCurrent = it.amps
+      }
+      table?.get("armTempCelsius", armTemp.inCelsius)?.let { armTemp = it.celsius }
+    }
+  }
 
-    fun setArmPosition(position: Angle) {}
+  fun updateInputs(inputs: ArmIOInputs) {}
 
-    fun zeroEncoder() {}
+  fun setArmVoltage(voltage: ElectricalPotential) {}
 
-    fun setArmBrakeMode(brake: Boolean) {}
+  fun setArmPosition(position: Angle) {}
 
-    fun configurePID(
-        kP: ProportionalGain<Radian, Volt>,
-        kI: IntegralGain<Radian, Volt>,
-        kD: DerivativeGain<Radian, Volt>
-    ) {}
+  fun zeroEncoder() {}
 
-    fun configureFeedforward(
-        kG: ElectricalPotential,
-        kS: ElectricalPotential,
-        kA: AccelerationFeedforward<Radian, Volt>,
-        kV: VelocityFeedforward<Radian, Volt>
-    )
+  fun setArmBrakeMode(brake: Boolean) {}
 
+  fun configurePID(
+    kP: ProportionalGain<Radian, Volt>,
+    kI: IntegralGain<Radian, Volt>,
+    kD: DerivativeGain<Radian, Volt>
+  ) {}
 
-
+  fun configureFF(
+    kG: ElectricalPotential,
+    kS: ElectricalPotential,
+    kA: AccelerationFeedforward<Radian, Volt>,
+    kV: VelocityFeedforward<Radian, Volt>
+  )
 }
