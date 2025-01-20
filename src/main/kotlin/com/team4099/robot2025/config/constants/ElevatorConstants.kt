@@ -18,13 +18,13 @@ object ElevatorConstants {
   val HOMING_APPLIED_VOLTAGE = 0.0.volts
   val HOMING_STALL_CURRENT = 0.0.amps
   val HOMING_STALL_TIME_THRESHOLD = 0.0.seconds
-  val UPWARDS_EXTENSION_LIMIT = 50.0.inches
+  val UPWARDS_EXTENSION_LIMIT = 90.0.inches
   val DOWNWARDS_EXTENSION_LIMIT = 0.0.inches
 
   val SPOOL_DIAMETER = 1.5038.inches
   val VOLTAGE_COMPENSATION = 12.0.volts
 
-  val ELEVATOR_TOLERANCE = 0.5.inches
+  val ELEVATOR_TOLERANCE = 0.25.inches
 
   val LEADER_STATOR_CURRENT_LIMIT = 0.0.amps
   val LEADER_SUPPLY_CURRENT_LIMIT = 0.0.amps
@@ -68,22 +68,13 @@ object ElevatorConstants {
     val SIM_KI = 0.0.volts / (1.inches * 1.seconds)
     val SIM_KD = 0.25.volts / (1.inches.perSecond)
 
-    val SIM_KS_SECOND_STAGE = 0.0.volts
-    val REAL_KS_SECOND_STAGE = 0.54.volts
-    val KG_SECOND_STAGE = 1.0.volts
-    val KV_SECOND_STAGE = 0.037.volts / 1.0.inches.perSecond
-    val KA_SECOND_STAGE = 0.0025.volts / 1.0.inches.perSecond.perSecond
+    val KS = 0.54.volts
+    val KV = 0.037.volts / 1.0.inches.perSecond
+    val KA = 0.0025.volts / 1.0.inches.perSecond.perSecond
 
-    val SIM_KS_FIRST_STAGE = 0.0.volts
-    val REAL_KS_FIRST_STAGE = 0.54.volts
+    val KG_DEFAULT = 0.0.volts
     val KG_FIRST_STAGE = 0.25.volts
-    val KV_FIRST_STAGE = 0.037.volts / 1.0.inches.perSecond
-    val KA_FIRST_STAGE = 0.0025.volts / 1.0.inches.perSecond.perSecond
-
-    val SIM_KS_THIRD_STAGE = 0.0.volts
-    val REAL_KS_THIRD_STAGE = 0.54.volts
+    val KG_SECOND_STAGE = 1.0.volts
     val KG_THIRD_STAGE = 0.25.volts
-    val KV_THIRD_STAGE = 0.037.volts / 1.0.inches.perSecond
-    val KA_THIRD_STAGE = 0.0025.volts / 1.0.inches.perSecond.perSecond
   }
 }

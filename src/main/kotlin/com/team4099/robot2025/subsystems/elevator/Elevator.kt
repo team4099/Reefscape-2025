@@ -20,8 +20,6 @@ class Elevator(val io: ElevatorIO) : SubsystemBase() {
 
   var targetVoltage: ElectricalPotential = 0.0.volts
 
-  var homingCurrentSpikeStartTime = 0.0.seconds
-
   val upperLimitReached: Boolean
     get() = inputs.elevatorPosition >= ElevatorConstants.UPWARDS_EXTENSION_LIMIT
 
@@ -50,10 +48,6 @@ class Elevator(val io: ElevatorIO) : SubsystemBase() {
   var elevatorVoltageTarget = 0.0.volts
     private set
 
-  private var lastRequestedPosition = (-9999).inches
-  private var lastRequestedVelocity = -9999.inches.perSecond
-  private var lastRequestedVoltage = (-9999).volts
-
   private var lastHomingStatorCurrentTripTime = Clock.fpgaTime
 
   private val isAtTargetedPosition: Boolean
@@ -74,52 +68,33 @@ class Elevator(val io: ElevatorIO) : SubsystemBase() {
       ElevatorTunableValues.kP.initDefault(ElevatorConstants.PID.REAL_KP)
       ElevatorTunableValues.kI.initDefault(ElevatorConstants.PID.REAL_KI)
       ElevatorTunableValues.kD.initDefault(ElevatorConstants.PID.REAL_KD)
-      ElevatorTunableValues.kSFirst.initDefault(ElevatorConstants.PID.REAL_KS_FIRST_STAGE)
-      ElevatorTunableValues.kSSecond.initDefault(ElevatorConstants.PID.REAL_KS_SECOND_STAGE)
-      ElevatorTunableValues.kSThird.initDefault(ElevatorConstants.PID.REAL_KS_THIRD_STAGE)
     } else {
       isHomed = true
 
       ElevatorTunableValues.kP.initDefault(ElevatorConstants.PID.SIM_KP)
       ElevatorTunableValues.kI.initDefault(ElevatorConstants.PID.SIM_KI)
       ElevatorTunableValues.kD.initDefault(ElevatorConstants.PID.SIM_KD)
-      ElevatorTunableValues.kSFirst.initDefault(ElevatorConstants.PID.SIM_KS_FIRST_STAGE)
-      ElevatorTunableValues.kSSecond.initDefault(ElevatorConstants.PID.SIM_KS_SECOND_STAGE)
-      ElevatorTunableValues.kSThird.initDefault(ElevatorConstants.PID.SIM_KS_THIRD_STAGE)
     }
 
+    ElevatorTunableValues.kS.initDefault(ElevatorConstants.PID.KS)
+    ElevatorTunableValues.kV.initDefault(ElevatorConstants.PID.KV)
+    ElevatorTunableValues.kA.initDefault(ElevatorConstants.PID.KA)
+    ElevatorTunableValues.kGDefault.initDefault(ElevatorConstants.PID.KG_DEFAULT)
     ElevatorTunableValues.kGFirst.initDefault(ElevatorConstants.PID.KG_FIRST_STAGE)
-    ElevatorTunableValues.kVFirst.initDefault(ElevatorConstants.PID.KV_FIRST_STAGE)
-    ElevatorTunableValues.kAFirst.initDefault(ElevatorConstants.PID.KA_FIRST_STAGE)
     ElevatorTunableValues.kGSecond.initDefault(ElevatorConstants.PID.KG_SECOND_STAGE)
-    ElevatorTunableValues.kVSecond.initDefault(ElevatorConstants.PID.KV_SECOND_STAGE)
-    ElevatorTunableValues.kASecond.initDefault(ElevatorConstants.PID.KA_SECOND_STAGE)
     ElevatorTunableValues.kGThird.initDefault(ElevatorConstants.PID.KG_THIRD_STAGE)
-    ElevatorTunableValues.kVThird.initDefault(ElevatorConstants.PID.KV_THIRD_STAGE)
-    ElevatorTunableValues.kAThird.initDefault(ElevatorConstants.PID.KA_THIRD_STAGE)
 
     io.configPID(
       ElevatorTunableValues.kP.get(),
       ElevatorTunableValues.kI.get(),
       ElevatorTunableValues.kD.get()
     )
-    io.configFFFirstStage(
-      ElevatorTunableValues.kGFirst.get(),
-      ElevatorTunableValues.kSFirst.get(),
-      ElevatorTunableValues.kVFirst.get(),
-      ElevatorTunableValues.kAFirst.get()
-    )
-    io.configFFSecondStage(
-      ElevatorTunableValues.kGSecond.get(),
-      ElevatorTunableValues.kSSecond.get(),
-      ElevatorTunableValues.kVSecond.get(),
-      ElevatorTunableValues.kASecond.get()
-    )
-    io.configFFThirdStage(
-      ElevatorTunableValues.kGThird.get(),
-      ElevatorTunableValues.kSThird.get(),
-      ElevatorTunableValues.kVThird.get(),
-      ElevatorTunableValues.kAThird.get()
+
+    io.configFF(
+      ElevatorTunableValues.kGDefault.get(),
+      ElevatorTunableValues.kS.get(),
+      ElevatorTunableValues.kV.get(),
+      ElevatorTunableValues.kA.get()
     )
   }
 
@@ -137,42 +112,16 @@ class Elevator(val io: ElevatorIO) : SubsystemBase() {
       )
     }
 
-    if (ElevatorTunableValues.kGFirst.hasChanged() ||
-      ElevatorTunableValues.kSFirst.hasChanged() ||
-      ElevatorTunableValues.kVFirst.hasChanged() ||
-      ElevatorTunableValues.kAFirst.hasChanged()
+    if (ElevatorTunableValues.kGDefault.hasChanged() ||
+      ElevatorTunableValues.kS.hasChanged() ||
+      ElevatorTunableValues.kV.hasChanged() ||
+      ElevatorTunableValues.kA.hasChanged()
     ) {
-      io.configFFFirstStage(
-        ElevatorTunableValues.kGFirst.get(),
-        ElevatorTunableValues.kSFirst.get(),
-        ElevatorTunableValues.kVFirst.get(),
-        ElevatorTunableValues.kAFirst.get()
-      )
-    }
-
-    if (ElevatorTunableValues.kGSecond.hasChanged() ||
-      ElevatorTunableValues.kSSecond.hasChanged() ||
-      ElevatorTunableValues.kVSecond.hasChanged() ||
-      ElevatorTunableValues.kASecond.hasChanged()
-    ) {
-      io.configFFSecondStage(
-        ElevatorTunableValues.kGSecond.get(),
-        ElevatorTunableValues.kSSecond.get(),
-        ElevatorTunableValues.kVSecond.get(),
-        ElevatorTunableValues.kASecond.get()
-      )
-    }
-
-    if (ElevatorTunableValues.kGThird.hasChanged() ||
-      ElevatorTunableValues.kSThird.hasChanged() ||
-      ElevatorTunableValues.kVThird.hasChanged() ||
-      ElevatorTunableValues.kAThird.hasChanged()
-    ) {
-      io.configFFThirdStage(
-        ElevatorTunableValues.kGThird.get(),
-        ElevatorTunableValues.kSThird.get(),
-        ElevatorTunableValues.kVThird.get(),
-        ElevatorTunableValues.kAThird.get()
+      io.configFF(
+        ElevatorTunableValues.kGDefault.get(),
+        ElevatorTunableValues.kS.get(),
+        ElevatorTunableValues.kV.get(),
+        ElevatorTunableValues.kA.get()
       )
     }
 
@@ -186,27 +135,17 @@ class Elevator(val io: ElevatorIO) : SubsystemBase() {
     CustomLogger.recordOutput("Elevator/currentState", currentState.name)
     CustomLogger.recordOutput("Elevator/currentRequest", currentRequest.javaClass.simpleName)
 
-    CustomLogger.recordDebugOutput("Elevator/isHomed", isHomed)
+    CustomLogger.recordOutput("Elevator/isHomed", isHomed)
 
-    CustomLogger.recordDebugOutput("Elevator/isAtTargetPosition", isAtTargetedPosition)
+    CustomLogger.recordOutput("Elevator/isAtTargetPosition", isAtTargetedPosition)
 
-    CustomLogger.recordDebugOutput(
+    CustomLogger.recordOutput(
       "Elevator/elevatorPositionTarget", elevatorPositionTarget.inInches
     )
-    CustomLogger.recordDebugOutput(
+    CustomLogger.recordOutput(
       "Elevator/elevatorVelocityTarget", elevatorVelocityTarget.inInchesPerSecond
     )
-    CustomLogger.recordDebugOutput("Elevator/elevatorVoltageTarget", elevatorVoltageTarget.inVolts)
-
-    CustomLogger.recordDebugOutput(
-      "Elevator/lastElevatorPositionTarget", lastRequestedPosition.inInches
-    )
-    CustomLogger.recordDebugOutput(
-      "Elevator/lastElevatorVelocityTarget", lastRequestedVelocity.inInchesPerSecond
-    )
-    CustomLogger.recordDebugOutput(
-      "Elevator/lastElevatorVoltageTarget", lastRequestedVoltage.inVolts
-    )
+    CustomLogger.recordOutput("Elevator/elevatorVoltageTarget", elevatorVoltageTarget.inVolts)
 
     CustomLogger.recordDebugOutput("Elevator/upperLimitReached", upperLimitReached)
     CustomLogger.recordDebugOutput("Elevator/lowerLimitReached", lowerLimitReached)
@@ -246,22 +185,11 @@ class Elevator(val io: ElevatorIO) : SubsystemBase() {
         nextState = fromElevatorRequestToState(currentRequest)
       }
       ElevatorState.CLOSED_LOOP -> {
-        if (elevatorPositionTarget != lastRequestedPosition ||
-          elevatorVelocityTarget != lastRequestedVelocity
-        ) {
-
-          lastRequestedPosition = elevatorPositionTarget
-          lastRequestedVelocity = elevatorVelocityTarget
-        }
 
         io.setPosition(elevatorPositionTarget)
 
         nextState = fromElevatorRequestToState(currentRequest)
 
-        if (!(currentState.equivalentToRequest(currentRequest))) {
-          lastRequestedPosition = (-1337).inches
-          lastRequestedVelocity = -1337.inches.perSecond
-        }
       }
     }
     currentState = nextState

@@ -91,7 +91,6 @@ object ElevatorIOSim : ElevatorIO {
 
   override fun setPosition(position: Length) {
     elevatorPIDController.setGoal(position)
-
     val pidOutput = elevatorPIDController.calculate(elevatorSim.positionMeters.meters)
     setVoltage(pidOutput)
   }
@@ -114,22 +113,11 @@ object ElevatorIOSim : ElevatorIO {
   }
 
   /** no ff in sim */
-  override fun configFFFirstStage(
+  override fun configFF(
     kG: ElectricalPotential,
     kS: StaticFeedforward<Volt>,
     kV: VelocityFeedforward<Meter, Volt>,
     kA: AccelerationFeedforward<Meter, Volt>
-  ) {}
-  override fun configFFSecondStage(
-    kG: ElectricalPotential,
-    kS: StaticFeedforward<Volt>,
-    kV: VelocityFeedforward<Meter, Volt>,
-    kA: AccelerationFeedforward<Meter, Volt>
-  ) {}
-  override fun configFFThirdStage(
-    kG: ElectricalPotential,
-    kS: StaticFeedforward<Volt>,
-    kV: VelocityFeedforward<Meter, Volt>,
-    kA: AccelerationFeedforward<Meter, Volt>
-  ) {}
+  ) {
+  }
 }

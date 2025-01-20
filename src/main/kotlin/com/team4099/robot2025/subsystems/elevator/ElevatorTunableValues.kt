@@ -31,39 +31,25 @@ object ElevatorTunableValues {
     LoggedTunableValue(
       "Elevator/kD", Pair({ it.inVoltsPerInchPerSecond }, { it.volts / 1.0.inches.perSecond })
     )
-  val kGFirst = LoggedTunableValue("Elevator/kG", Pair({ it.inVolts }, { it.volts }))
-  val kSFirst = LoggedTunableValue("Elevator/kS", Pair({ it.inVolts }, { it.volts }))
-  val kVFirst =
+
+  val kS = LoggedTunableValue("Elevator/kS", Pair({ it.inVolts }, { it.volts }))
+
+  val kV =
     LoggedTunableValue(
       "Elevator/kV", Pair({ it.inVoltsPerInchPerSecond }, { it.volts / 1.0.inches.perSecond })
     )
-  val kAFirst =
+
+  val kA =
     LoggedTunableValue(
       "Elevator/kA",
       Pair({ it.inVoltsPerMeterPerSecondPerSecond }, { it.volts.perMeterPerSecondPerSecond })
     )
-  val kGSecond = LoggedTunableValue("Elevator/kG", Pair({ it.inVolts }, { it.volts }))
-  val kSSecond = LoggedTunableValue("Elevator/kS", Pair({ it.inVolts }, { it.volts }))
-  val kVSecond =
-    LoggedTunableValue(
-      "Elevator/kV", Pair({ it.inVoltsPerInchPerSecond }, { it.volts / 1.0.inches.perSecond })
-    )
-  val kASecond =
-    LoggedTunableValue(
-      "Elevator/kA",
-      Pair({ it.inVoltsPerMeterPerSecondPerSecond }, { it.volts.perMeterPerSecondPerSecond })
-    )
-  val kGThird = LoggedTunableValue("Elevator/kG", Pair({ it.inVolts }, { it.volts }))
-  val kSThird = LoggedTunableValue("Elevator/kS", Pair({ it.inVolts }, { it.volts }))
-  val kVThird =
-    LoggedTunableValue(
-      "Elevator/kV", Pair({ it.inVoltsPerInchPerSecond }, { it.volts / 1.0.inches.perSecond })
-    )
-  val kAThird =
-    LoggedTunableValue(
-      "Elevator/kA",
-      Pair({ it.inVoltsPerMeterPerSecondPerSecond }, { it.volts.perMeterPerSecondPerSecond })
-    )
+
+  val kGDefault = LoggedTunableValue("Elevator/kGDefault", Pair({ it.inVolts }, { it.volts }))
+  val kGFirst = LoggedTunableValue("Elevator/kGFirstStage", Pair({ it.inVolts }, { it.volts }))
+  val kGSecond = LoggedTunableValue("Elevator/kGSecondStage", Pair({ it.inVolts }, { it.volts }))
+  val kGThird = LoggedTunableValue("Elevator/kGThirdStage", Pair({ it.inVolts }, { it.volts }))
+
 
   object TunableElevatorHeights {
     val minPosition =

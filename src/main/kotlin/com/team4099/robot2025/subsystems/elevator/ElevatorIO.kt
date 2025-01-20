@@ -98,19 +98,7 @@ interface ElevatorIO {
     kI: IntegralGain<Meter, Volt>,
     kD: DerivativeGain<Meter, Volt>
   ) {}
-  fun configFFFirstStage(
-    kG: ElectricalPotential,
-    kS: StaticFeedforward<Volt>,
-    kV: VelocityFeedforward<Meter, Volt>,
-    kA: AccelerationFeedforward<Meter, Volt>
-  ) {}
-  fun configFFSecondStage(
-    kG: ElectricalPotential,
-    kS: StaticFeedforward<Volt>,
-    kV: VelocityFeedforward<Meter, Volt>,
-    kA: AccelerationFeedforward<Meter, Volt>
-  ) {}
-  fun configFFThirdStage(
+  fun configFF(
     kG: ElectricalPotential,
     kS: StaticFeedforward<Volt>,
     kV: VelocityFeedforward<Meter, Volt>,
