@@ -5,7 +5,6 @@ import com.team4099.robot2025.config.constants.ClimberConstants
 import com.team4099.robot2025.subsystems.superstructure.Request
 import com.team4099.robot2025.util.CustomLogger
 import edu.wpi.first.wpilibj.RobotBase
-import org.team4099.lib.controller.ArmFeedforward
 import org.team4099.lib.units.derived.Angle
 import org.team4099.lib.units.derived.ElectricalPotential
 import org.team4099.lib.units.derived.degrees
@@ -15,7 +14,6 @@ import org.team4099.lib.units.derived.volts
 class Climber(private val io: ClimberIO) {
   val inputs: ClimberIO.ClimberInputs = ClimberIO.ClimberInputs()
   private var currentState: ClimberState = ClimberState.UNINITIALIZED
-  private var feedforward: ArmFeedforward
 
   private val maxAngleReached: Boolean
     get() = inputs.climberPosition >= ClimberConstants.MAX_ANGLE
@@ -25,13 +23,10 @@ class Climber(private val io: ClimberIO) {
 
   private var targetPosition: Angle = 0.degrees
   private var targetVoltage: ElectricalPotential = 0.volts
-  private var lastTargetPosition: Angle = (-1337).degrees
-  private var lastVoltage = (-1337).volts
 
   private var isHomed: Boolean = false
   private var lastHomingCurrentSpikeTime = Clock.fpgaTime
   private var climberTolerance: Angle = ClimberConstants.TOLERANCE
-  private var latched: Boolean = false
 
   private val isAtTargetedPosition: Boolean
     get() =
@@ -56,83 +51,41 @@ class Climber(private val io: ClimberIO) {
 
   init {
     if (RobotBase.isReal()) {
-      ClimberTunableValues.kPSlot0.initDefault(ClimberConstants.PID.KP_UNLATCH)
-      ClimberTunableValues.kISlot0.initDefault(ClimberConstants.PID.KI_UNLATCH)
-      ClimberTunableValues.kDSlot0.initDefault(ClimberConstants.PID.KD_UNLATCH)
-
-      ClimberTunableValues.kPSlot1.initDefault(ClimberConstants.PID.KP_LATCH)
-      ClimberTunableValues.kISlot1.initDefault(ClimberConstants.PID.KI_LATCH)
-      ClimberTunableValues.kDSlot1.initDefault(ClimberConstants.PID.KD_LATCH)
-
-      ClimberTunableValues.kS.initDefault(ClimberConstants.PID.KS_REAL)
-      ClimberTunableValues.kG.initDefault(ClimberConstants.PID.KG_REAL)
-      ClimberTunableValues.kV.initDefault(ClimberConstants.PID.KV_REAL)
-      ClimberTunableValues.kA.initDefault(ClimberConstants.PID.KA_REAL)
-
-      feedforward =
-        ArmFeedforward(
-          ClimberConstants.PID.KS_REAL,
-          ClimberConstants.PID.KG_REAL,
-          ClimberConstants.PID.KV_REAL,
-          ClimberConstants.PID.KA_REAL
-        )
+      ClimberTunableValues.kP.initDefault(ClimberConstants.PID.KP_REAL)
+      ClimberTunableValues.kI.initDefault(ClimberConstants.PID.KI_REAL)
+      ClimberTunableValues.kD.initDefault(ClimberConstants.PID.KD_REAL)
     } else {
-      ClimberTunableValues.kPSlot0.initDefault(ClimberConstants.PID.KP_SIM)
-      ClimberTunableValues.kISlot0.initDefault(ClimberConstants.PID.KI_SIM)
-      ClimberTunableValues.kDSlot0.initDefault(ClimberConstants.PID.KD_SIM)
-
-      ClimberTunableValues.kG.initDefault(ClimberConstants.PID.KG_SIM)
-      ClimberTunableValues.kV.initDefault(ClimberConstants.PID.KV_SIM)
-      ClimberTunableValues.kA.initDefault(ClimberConstants.PID.KA_SIM)
-
-      // ClimberTunableValues.kS is 0 volts because no static friction in sim
-      feedforward =
-        ArmFeedforward(
-          0.volts,
-          ClimberConstants.PID.KG_SIM,
-          ClimberConstants.PID.KV_SIM,
-          ClimberConstants.PID.KA_SIM
-        )
+      ClimberTunableValues.kP.initDefault(ClimberConstants.PID.KP_SIM)
+      ClimberTunableValues.kI.initDefault(ClimberConstants.PID.KI_SIM)
+      ClimberTunableValues.kD.initDefault(ClimberConstants.PID.KD_SIM)
     }
   }
 
   fun periodic() {
     io.updateInputs(inputs)
 
-    if (ClimberTunableValues.kPSlot0.hasChanged() ||
-      ClimberTunableValues.kISlot0.hasChanged() ||
-      ClimberTunableValues.kDSlot0.hasChanged()
+    if (ClimberTunableValues.kP.hasChanged() ||
+      ClimberTunableValues.kI.hasChanged() ||
+      ClimberTunableValues.kD.hasChanged()
     ) {
-      io.configPIDSlot0(
-        ClimberTunableValues.kPSlot0.get(),
-        ClimberTunableValues.kISlot0.get(),
-        ClimberTunableValues.kDSlot0.get()
-      )
-    }
-
-    if (ClimberTunableValues.kPSlot1.hasChanged() ||
-      ClimberTunableValues.kISlot1.hasChanged() ||
-      ClimberTunableValues.kDSlot1.hasChanged()
-    ) {
-      io.configPIDSlot0(
-        ClimberTunableValues.kPSlot1.get(),
-        ClimberTunableValues.kISlot1.get(),
-        ClimberTunableValues.kDSlot1.get()
+      io.configPID(
+        ClimberTunableValues.kP.get(),
+        ClimberTunableValues.kI.get(),
+        ClimberTunableValues.kD.get()
       )
     }
 
     if (ClimberTunableValues.kS.hasChanged() ||
-      ClimberTunableValues.kG.hasChanged() ||
+      ClimberTunableValues.kGDefault.hasChanged() ||
       ClimberTunableValues.kV.hasChanged() ||
       ClimberTunableValues.kA.hasChanged()
     ) {
-      feedforward =
-        ArmFeedforward(
-          ClimberTunableValues.kS.get(),
-          ClimberTunableValues.kG.get(),
-          ClimberTunableValues.kV.get(),
-          ClimberTunableValues.kA.get()
-        )
+      io.configFF(
+        ClimberTunableValues.kGDefault.get(),
+        ClimberTunableValues.kS.get(),
+        ClimberTunableValues.kV.get(),
+        ClimberTunableValues.kA.get()
+      )
     }
 
     CustomLogger.processInputs("Climber", inputs)
@@ -152,17 +105,13 @@ class Climber(private val io: ClimberIO) {
         nextState = fromRequestToState(currentRequest)
       }
       ClimberState.CLOSED_LOOP -> {
-        if (targetPosition != lastTargetPosition) {
-          lastTargetPosition = targetPosition
-        }
+        val latched = targetPosition > inputs.climberPosition
+        val feedforward =
+          if (latched) ClimberTunableValues.kGLatched.get()
+          else ClimberTunableValues.kGUnLatched.get()
 
-        io.setPosition(targetPosition, latched)
+        io.setPosition(targetPosition, feedforward)
         nextState = fromRequestToState(currentRequest)
-
-        if (!currentState.equivalentToRequest(currentRequest)) {
-          lastTargetPosition = (-1337).degrees
-          lastVoltage = (-1337).volts
-        }
       }
       ClimberState.HOME -> {
         if (inputs.climberStatorCurrent < ClimberConstants.HOMING_STALL_CURRENT) {

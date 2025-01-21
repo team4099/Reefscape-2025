@@ -10,12 +10,15 @@ import org.team4099.lib.units.base.amps
 import org.team4099.lib.units.base.celsius
 import org.team4099.lib.units.base.inMeters
 import org.team4099.lib.units.base.inSeconds
+import org.team4099.lib.units.derived.AccelerationFeedforward
 import org.team4099.lib.units.derived.Angle
 import org.team4099.lib.units.derived.DerivativeGain
 import org.team4099.lib.units.derived.ElectricalPotential
 import org.team4099.lib.units.derived.IntegralGain
 import org.team4099.lib.units.derived.ProportionalGain
 import org.team4099.lib.units.derived.Radian
+import org.team4099.lib.units.derived.StaticFeedforward
+import org.team4099.lib.units.derived.VelocityFeedforward
 import org.team4099.lib.units.derived.Volt
 import org.team4099.lib.units.derived.degrees
 import org.team4099.lib.units.derived.inKilogramsMeterSquared
@@ -57,7 +60,7 @@ object ClimberIOSim : ClimberIO {
    * @param kI accounts for integral error
    * @param kD accounts for derivative error
    */
-  override fun configPIDSlot0(
+  override fun configPID(
     kP: ProportionalGain<Radian, Volt>,
     kI: IntegralGain<Radian, Volt>,
     kD: DerivativeGain<Radian, Volt>
@@ -65,21 +68,12 @@ object ClimberIOSim : ClimberIO {
     climberController.setPID(kP, kI, kD)
   }
 
-  /**
-   * Updates the PID slot1 constants using the implementation controller, uses arm sensor to convert
-   * from PID constants to motor controller units
-   *
-   * @param kP accounts for linear error
-   * @param kI accounts for integral error
-   * @param kD accounts for derivative error
-   */
-  override fun configPIDSlot1(
-    kP: ProportionalGain<Radian, Volt>,
-    kI: IntegralGain<Radian, Volt>,
-    kD: DerivativeGain<Radian, Volt>
-  ) {
-    climberController.setPID(kP, kI, kD)
-  }
+  override fun configFF(
+    kG: ElectricalPotential,
+    kS: StaticFeedforward<Volt>,
+    kV: VelocityFeedforward<Radian, Volt>,
+    kA: AccelerationFeedforward<Radian, Volt>
+  ) {}
 
   /**
    * Sets the climber motor voltage and ensures the voltage is limited to battery voltage
@@ -97,7 +91,7 @@ object ClimberIOSim : ClimberIO {
     appliedVoltage = clampedVoltage
   }
 
-  override fun setPosition(position: Angle, latched: Boolean) {
+  override fun setPosition(position: Angle, feedforward: ElectricalPotential) {
     targetPosition = position
     setVoltage(climberController.calculate(climberSim.angleRads.radians, position))
   }

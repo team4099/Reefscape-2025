@@ -6,12 +6,15 @@ import org.team4099.lib.units.base.amps
 import org.team4099.lib.units.base.celsius
 import org.team4099.lib.units.base.inAmperes
 import org.team4099.lib.units.base.inCelsius
+import org.team4099.lib.units.derived.AccelerationFeedforward
 import org.team4099.lib.units.derived.Angle
 import org.team4099.lib.units.derived.DerivativeGain
 import org.team4099.lib.units.derived.ElectricalPotential
 import org.team4099.lib.units.derived.IntegralGain
 import org.team4099.lib.units.derived.ProportionalGain
 import org.team4099.lib.units.derived.Radian
+import org.team4099.lib.units.derived.StaticFeedforward
+import org.team4099.lib.units.derived.VelocityFeedforward
 import org.team4099.lib.units.derived.Volt
 import org.team4099.lib.units.derived.degrees
 import org.team4099.lib.units.derived.inDegrees
@@ -95,21 +98,22 @@ interface ClimberIO {
 
   fun setVoltage(voltage: ElectricalPotential) {}
 
-  fun setPosition(position: Angle, latched: Boolean) {}
+  fun setPosition(position: Angle, feedforward: ElectricalPotential) {}
 
   fun setBrakeMode(brake: Boolean) {}
 
   fun zeroEncoder() {}
 
-  fun configPIDSlot0(
+  fun configPID(
     kP: ProportionalGain<Radian, Volt>,
     kI: IntegralGain<Radian, Volt>,
     kD: DerivativeGain<Radian, Volt>
   ) {}
 
-  fun configPIDSlot1(
-    kP: ProportionalGain<Radian, Volt>,
-    kI: IntegralGain<Radian, Volt>,
-    kD: DerivativeGain<Radian, Volt>
+  fun configFF(
+    kG: ElectricalPotential,
+    kS: StaticFeedforward<Volt>,
+    kV: VelocityFeedforward<Radian, Volt>,
+    kA: AccelerationFeedforward<Radian, Volt>
   ) {}
 }

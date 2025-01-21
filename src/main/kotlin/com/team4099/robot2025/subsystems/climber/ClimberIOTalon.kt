@@ -4,7 +4,6 @@ import com.ctre.phoenix6.BaseStatusSignal
 import com.ctre.phoenix6.StatusSignal
 import com.ctre.phoenix6.configs.MotorOutputConfigs
 import com.ctre.phoenix6.configs.Slot0Configs
-import com.ctre.phoenix6.configs.Slot1Configs
 import com.ctre.phoenix6.configs.TalonFXConfiguration
 import com.ctre.phoenix6.controls.MotionMagicVoltage
 import com.ctre.phoenix6.controls.VoltageOut
@@ -14,7 +13,6 @@ import com.ctre.phoenix6.signals.InvertedValue
 import com.ctre.phoenix6.signals.NeutralModeValue
 import com.team4099.robot2025.config.constants.ClimberConstants
 import com.team4099.robot2025.config.constants.Constants
-import com.team4099.robot2025.util.CustomLogger
 import edu.wpi.first.units.measure.AngularAcceleration
 import edu.wpi.first.units.measure.AngularVelocity
 import edu.wpi.first.units.measure.Current
@@ -24,12 +22,15 @@ import org.team4099.lib.units.base.amps
 import org.team4099.lib.units.base.celsius
 import org.team4099.lib.units.base.inAmperes
 import org.team4099.lib.units.ctreAngularMechanismSensor
+import org.team4099.lib.units.derived.AccelerationFeedforward
 import org.team4099.lib.units.derived.Angle
 import org.team4099.lib.units.derived.DerivativeGain
 import org.team4099.lib.units.derived.ElectricalPotential
 import org.team4099.lib.units.derived.IntegralGain
 import org.team4099.lib.units.derived.ProportionalGain
 import org.team4099.lib.units.derived.Radian
+import org.team4099.lib.units.derived.StaticFeedforward
+import org.team4099.lib.units.derived.VelocityFeedforward
 import org.team4099.lib.units.derived.Volt
 import org.team4099.lib.units.derived.degrees
 import org.team4099.lib.units.derived.inDegrees
@@ -49,6 +50,7 @@ object ClimberIOTalon : ClimberIO {
 
   private val motionMagicConfiguration = climberConfiguration.MotionMagic
   private val motionMagicControl: MotionMagicVoltage = MotionMagicVoltage((-1337).degrees.inDegrees)
+  private var slot0Configs = climberConfiguration.Slot0
 
   private var statorCurrentSignal: StatusSignal<Current>
   private var supplyCurrentSignal: StatusSignal<Current>
@@ -65,20 +67,12 @@ object ClimberIOTalon : ClimberIO {
     climberTalon.clearStickyFaults()
 
     climberConfiguration.Slot0.kP =
-      climberSensor.proportionalPositionGainToRawUnits(ClimberConstants.PID.KP_UNLATCH)
+      climberSensor.proportionalPositionGainToRawUnits(ClimberConstants.PID.KP_REAL)
     climberConfiguration.Slot0.kI =
-      climberSensor.integralPositionGainToRawUnits(ClimberConstants.PID.KI_UNLATCH)
+      climberSensor.integralPositionGainToRawUnits(ClimberConstants.PID.KI_REAL)
     climberConfiguration.Slot0.kD =
-      climberSensor.derivativePositionGainToRawUnits(ClimberConstants.PID.KD_UNLATCH)
+      climberSensor.derivativePositionGainToRawUnits(ClimberConstants.PID.KD_REAL)
     climberConfiguration.Slot0.GravityType = GravityTypeValue.Arm_Cosine
-
-    climberConfiguration.Slot1.kP =
-      climberSensor.proportionalPositionGainToRawUnits(ClimberConstants.PID.KP_LATCH)
-    climberConfiguration.Slot1.kI =
-      climberSensor.integralPositionGainToRawUnits(ClimberConstants.PID.KI_LATCH)
-    climberConfiguration.Slot1.kD =
-      climberSensor.derivativePositionGainToRawUnits(ClimberConstants.PID.KD_LATCH)
-    climberConfiguration.Slot1.GravityType = GravityTypeValue.Arm_Cosine
 
     climberConfiguration.CurrentLimits.SupplyCurrentLimit =
       ClimberConstants.SUPPLY_CURRENT_LIMIT.inAmperes
@@ -115,11 +109,32 @@ object ClimberIOTalon : ClimberIO {
     motorAcceleration = climberTalon.acceleration
   }
 
+  override fun updateInputs(inputs: ClimberIO.ClimberInputs) {
+    updateSignals()
+
+    climberTalon.rotorPosition.refresh()
+    climberTalon.position.refresh()
+
+    inputs.climberPosition = climberSensor.position
+    inputs.climberVelocity = climberSensor.velocity
+    inputs.climberAcceleration = motorAcceleration.valueAsDouble.degrees.perSecond.perSecond
+    inputs.climberTorque = motorTorque.valueAsDouble.newtons
+    inputs.climberAppliedVoltage = motorVoltage.valueAsDouble.volts
+    inputs.climberDutyCycle = dutyCycle.valueAsDouble.volts
+    inputs.climberStatorCurrent = statorCurrentSignal.valueAsDouble.amps
+    inputs.climberSupplyCurrent = supplyCurrentSignal.valueAsDouble.amps
+    inputs.climberTemperature = tempSignal.valueAsDouble.celsius
+
+    if (inputs.climberPosition < ClimberConstants.MIN_ANGLE) {
+      zeroEncoder()
+    }
+  }
+
   override fun zeroEncoder() {
     climberTalon.setPosition(0.0)
   }
 
-  override fun configPIDSlot0(
+  override fun configPID(
     kP: ProportionalGain<Radian, Volt>,
     kI: IntegralGain<Radian, Volt>,
     kD: DerivativeGain<Radian, Volt>
@@ -131,30 +146,31 @@ object ClimberIOTalon : ClimberIO {
     climberTalon.configurator.apply(climberPIDConfig)
   }
 
-  override fun configPIDSlot1(
-    kP: ProportionalGain<Radian, Volt>,
-    kI: IntegralGain<Radian, Volt>,
-    kD: DerivativeGain<Radian, Volt>
-  ) {
-    val climberPIDConfig = Slot1Configs()
-    climberPIDConfig.kP = climberSensor.proportionalPositionGainToRawUnits(kP)
-    climberPIDConfig.kI = climberSensor.integralPositionGainToRawUnits(kI)
-    climberPIDConfig.kD = climberSensor.derivativePositionGainToRawUnits(kD)
-    climberTalon.configurator.apply(climberPIDConfig)
-  }
-
   override fun setVoltage(voltage: ElectricalPotential) {
     climberTalon.setControl(VoltageOut(voltage.inVolts))
   }
 
-  override fun setPosition(position: Angle, latched: Boolean) {
-    val slot = if (latched) 0 else 1
-    CustomLogger.recordOutput("Climber/slotBeingUsed", slot)
+  override fun configFF(
+    kG: ElectricalPotential,
+    kS: StaticFeedforward<Volt>,
+    kV: VelocityFeedforward<Radian, Volt>,
+    kA: AccelerationFeedforward<Radian, Volt>
+  ) {
+    slot0Configs.kG = kG.inVolts
+    slot0Configs.kS = kS.inVolts
+    slot0Configs.kV = climberSensor.velocityFeedforwardToRawUnits(kV)
+    slot0Configs.kA = climberSensor.accelerationFeedforwardToRawUnits(kA)
+    slot0Configs.GravityType = GravityTypeValue.Elevator_Static
+
+    climberTalon.configurator.apply(slot0Configs)
+  }
+
+  override fun setPosition(position: Angle, feedforward: ElectricalPotential) {
 
     climberTalon.setControl(
       motionMagicControl
         .withPosition(climberSensor.positionToRawUnits(position))
-        .withSlot(slot)
+        .withFeedForward(feedforward.inVolts)
         .withLimitForwardMotion(true)
         .withLimitReverseMotion(true)
     )
@@ -184,26 +200,5 @@ object ClimberIOTalon : ClimberIO {
       supplyCurrentSignal,
       tempSignal,
     )
-  }
-
-  override fun updateInputs(inputs: ClimberIO.ClimberInputs) {
-    updateSignals()
-
-    climberTalon.rotorPosition.refresh()
-    climberTalon.position.refresh()
-
-    inputs.climberPosition = climberSensor.position
-    inputs.climberVelocity = climberSensor.velocity
-    inputs.climberAcceleration = motorAcceleration.valueAsDouble.degrees.perSecond.perSecond
-    inputs.climberTorque = motorTorque.valueAsDouble.newtons
-    inputs.climberAppliedVoltage = motorVoltage.valueAsDouble.volts
-    inputs.climberDutyCycle = dutyCycle.valueAsDouble.volts
-    inputs.climberStatorCurrent = statorCurrentSignal.valueAsDouble.amps
-    inputs.climberSupplyCurrent = supplyCurrentSignal.valueAsDouble.amps
-    inputs.climberTemperature = tempSignal.valueAsDouble.celsius
-
-    if (inputs.climberPosition < ClimberConstants.MIN_ANGLE) {
-      zeroEncoder()
-    }
   }
 }
