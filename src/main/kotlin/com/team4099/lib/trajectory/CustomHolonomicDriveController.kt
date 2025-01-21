@@ -1,11 +1,13 @@
 package com.team4099.lib.trajectory
 
+import choreo.trajectory.SwerveSample
 import edu.wpi.first.math.controller.PIDController
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.math.trajectory.Trajectory
 import org.team4099.lib.units.derived.radians
+import kotlin.math.pow
 
 /**
  * This holonomic drive controller can be used to follow trajectories using a holonomic drivetrain
@@ -127,6 +129,27 @@ class CustomHolonomicDriveController(
       holonomicRotationState.velocityRadiansPerSec
     )
   }
+
+  /**
+   * Returns the next output of the holonomic drive controller.
+   *
+   * @param currentPose The current pose.
+   * @param trajectoryState The desired trajectory state with both drive and rotation from Choreo.
+   * @return The next output of the holonomic drive controller.
+   */
+  fun calculate(
+    currentPose: Pose2d,
+    trajectoryState: SwerveSample
+  ): ChassisSpeeds {
+    return calculate(
+      currentPose,
+      trajectoryState.pose,
+      (trajectoryState.vx.pow(2) + trajectoryState.vy.pow(2)).pow(0.5),
+      trajectoryState.pose.rotation,
+      trajectoryState.omega
+    )
+  }
+
 
   /**
    * Enables and disables the controller for troubleshooting problems. When calculate() is called on

@@ -9,27 +9,20 @@ import com.team4099.lib.trajectory.FieldWaypoint
 import com.team4099.lib.trajectory.OdometryWaypoint
 import com.team4099.lib.trajectory.Waypoint
 import com.team4099.robot2025.config.constants.DrivetrainConstants
-import com.team4099.robot2025.subsystems.drivetrain.drive.Drivetrain
-import com.team4099.robot2025.util.AllianceFlipUtil
 import com.team4099.robot2025.util.CustomLogger
+import com.team4099.robot2025.util.CustomTrajectory
+import com.team4099.robot2025.subsystems.drivetrain.drive.Drivetrain
 import com.team4099.robot2025.util.FrameType
+import com.team4099.robot2025.util.TrajectoryTypes
 import com.team4099.robot2025.util.Velocity2d
-import edu.wpi.first.math.kinematics.ChassisSpeeds
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics
-import edu.wpi.first.math.trajectory.TrajectoryParameterizer.TrajectoryGenerationException
-import edu.wpi.first.math.trajectory.constraint.CentripetalAccelerationConstraint
-import edu.wpi.first.math.trajectory.constraint.TrajectoryConstraint
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.RobotBase
 import edu.wpi.first.wpilibj2.command.Command
-import org.littletonrobotics.junction.Logger
 import org.team4099.lib.controller.PIDController
 import org.team4099.lib.geometry.Pose2d
-import org.team4099.lib.geometry.Pose2dWPILIB
 import org.team4099.lib.geometry.Transform2d
 import org.team4099.lib.geometry.Translation2d
 import org.team4099.lib.hal.Clock
-import org.team4099.lib.kinematics.ChassisAccels
 import org.team4099.lib.units.Velocity
 import org.team4099.lib.units.base.Meter
 import org.team4099.lib.units.base.inMeters
@@ -38,7 +31,6 @@ import org.team4099.lib.units.base.inches
 import org.team4099.lib.units.base.meters
 import org.team4099.lib.units.base.seconds
 import org.team4099.lib.units.derived.Radian
-import org.team4099.lib.units.derived.cos
 import org.team4099.lib.units.derived.degrees
 import org.team4099.lib.units.derived.inMetersPerSecondPerMeter
 import org.team4099.lib.units.derived.inMetersPerSecondPerMeterSeconds
@@ -67,7 +59,7 @@ import com.team4099.robot2025.subsystems.superstructure.Request.DrivetrainReques
 class DrivePathCommand<T : Waypoint>
 private constructor(
   val drivetrain: Drivetrain,
-  private val waypoints: Supplier<List<T>>,
+  private val trajectory: TrajectoryTypes,
   val resetPose: Boolean = false,
   val useLowerTolerance: Boolean = false,
   val flipForAlliances: Boolean = true,
@@ -76,8 +68,8 @@ private constructor(
   val endVelocity: Velocity2d = Velocity2d(),
   var stateFrame: FrameType = FrameType.ODOMETRY,
   var pathFrame: FrameType = FrameType.FIELD,
+  val trajectoryGenerator: CustomTrajectoryGenerator = CustomTrajectoryGenerator()
 ) : Command() {
-
   private val xPID: PIDController<Meter, Velocity<Meter>>
   private val yPID: PIDController<Meter, Velocity<Meter>>
 
@@ -88,9 +80,9 @@ private constructor(
   private var trajCurTime = 0.0.seconds
   private var trajStartTime = 0.0.seconds
 
-  private var changeStartTimeOnExecute = true
+  private var generatedTrajectory: CustomTrajectory
 
-  var trajectoryGenerator = CustomTrajectoryGenerator()
+  private var changeStartTimeOnExecute = true
 
   val thetakP =
     LoggedTunableValue(
@@ -147,37 +139,6 @@ private constructor(
 
   private var errorString = ""
 
-  private fun generate(
-    waypoints: List<Waypoint>,
-    constraints: List<TrajectoryConstraint> = listOf()
-  ) {
-    // Set up trajectory configuration
-    val config =
-      edu.wpi.first.math.trajectory.TrajectoryConfig(
-        DrivetrainConstants.MAX_AUTO_VEL.inMetersPerSecond,
-        DrivetrainConstants.MAX_AUTO_ACCEL.inMetersPerSecondPerSecond
-      )
-        .setKinematics(
-          SwerveDriveKinematics(
-            *(drivetrain.moduleTranslations.map { it.translation2d }).toTypedArray()
-          )
-        )
-        .setStartVelocity(drivetrain.fieldVelocity.magnitude.inMetersPerSecond)
-        .setEndVelocity(endVelocity.magnitude.inMetersPerSecond)
-        .addConstraint(
-          CentripetalAccelerationConstraint(
-            DrivetrainConstants.STEERING_ACCEL_MAX.inRadiansPerSecondPerSecond
-          )
-        )
-        .addConstraints(constraints)
-
-    try {
-      trajectoryGenerator.generate(config, waypoints)
-    } catch (exception: TrajectoryGenerationException) {
-      DriverStation.reportError("Failed to generate trajectory.", true)
-    }
-  }
-
   init {
     addRequirements(drivetrain)
     if (RobotBase.isReal()) {
@@ -216,73 +177,58 @@ private constructor(
       swerveDriveController.setTolerance(Pose2d(6.inches, 6.inches, 6.degrees).pose2d)
     }
 
-    // trajectory generation!
-    generate(waypoints.get())
+    // drop this all into the custom trajectory
+    generatedTrajectory = CustomTrajectory(
+      drivetrain,
+      drivePoseSupplier,
+      trajectory,
+      trajectoryGenerator,
+      swerveDriveController,
+      stateFrame
+    )
   }
 
   override fun initialize() {
-    val trajectory = trajectoryGenerator.driveTrajectory
-
-    if (trajectory.states.size <= 1) {
+    if (generatedTrajectory.totalStates <= 1) {
       return
     }
 
     odoTField = drivetrain.odomTField
-    pathTransform =
-      Transform2d(
-        Translation2d(waypoints.get()[0].translation),
-        waypoints.get()[0].holonomicRotation?.radians?.radians ?: drivePoseSupplier().rotation
-      )
 
     //    if (resetPose) {
     //      drivetrain.odometryPose = AllianceFlipUtil.apply(Pose2d(trajectory.initialPose))
     //    }
-    trajStartTime = Clock.fpgaTime + trajectory.states[0].timeSeconds.seconds
+    trajStartTime = Clock.fpgaTime + generatedTrajectory.timeAtFirstState
     thetaPID.reset()
     xPID.reset()
     yPID.reset()
   }
 
   override fun execute() {
-    val trajectory = trajectoryGenerator.driveTrajectory
-
-    if (trajectory.states.size <= 1) {
+    if (generatedTrajectory.totalStates <= 1) {
       return
     }
 
     if (changeStartTimeOnExecute) {
-      trajStartTime = Clock.fpgaTime + trajectory.states[0].timeSeconds.seconds
+      trajStartTime = Clock.fpgaTime + generatedTrajectory.timeAtFirstState
       changeStartTimeOnExecute = false
     }
 
     trajCurTime = Clock.fpgaTime - trajStartTime
-    var desiredState = trajectory.sample(trajCurTime.inSeconds)
-
-    var desiredRotation =
-      trajectoryGenerator.holonomicRotationSequence.sample(trajCurTime.inSeconds)
-
-    val targetHolonomicPose =
-      AllianceFlipUtil.apply(
-        Pose2d(
-          desiredState.poseMeters.x.meters,
-          desiredState.poseMeters.y.meters,
-          desiredRotation.position.radians.radians
-        )
-      )
+    val (nextDriveRequest, targetPose) = generatedTrajectory.sample(trajCurTime)
 
     var robotPoseInSelectedFrame: Pose2d = drivePoseSupplier()
     if (pathFrame == stateFrame) {
-      lastSampledPose = targetHolonomicPose
+      lastSampledPose = targetPose
       when (stateFrame) {
         FrameType.FIELD -> {
-          Logger.recordOutput("Pathfollow/fieldTRobotTargetVisualized", targetHolonomicPose.pose2d)
-
-          Logger.recordOutput("Pathfollow/fieldTRobot", robotPoseInSelectedFrame.pose2d)
+          CustomLogger.recordOutput("Pathfollow/fieldTRobotTargetVisualized", targetPose.pose2d)
+          CustomLogger.recordOutput("Pathfollow/fieldTRobot", robotPoseInSelectedFrame.pose2d)
         }
-        FrameType.ODOMETRY -> {
-          Logger.recordOutput("Pathfollow/odomTRobotTargetVisualized", targetHolonomicPose.pose2d)
 
-          Logger.recordOutput("Pathfollow/odomTRobot", robotPoseInSelectedFrame.pose2d)
+        FrameType.ODOMETRY -> {
+          CustomLogger.recordOutput("Pathfollow/odomTRobotTargetVisualized", targetPose.pose2d)
+          CustomLogger.recordOutput("Pathfollow/odomTRobot", robotPoseInSelectedFrame.pose2d)
         }
       }
 
@@ -292,57 +238,21 @@ private constructor(
         FrameType.ODOMETRY -> {
           // TODO (saraansh) we disallow this, not possible to get to. remove or find use case
           lastSampledPose =
-            odoTField.inverse().asPose2d().transformBy(targetHolonomicPose.asTransform2d())
+            odoTField.inverse().asPose2d().transformBy(targetPose.asTransform2d())
         }
+
         FrameType.FIELD -> {
           // robotPose is currently odomTrobot we want fieldTRobot. we obtain that via fieldTodo x
           // odoTRobot
           robotPoseInSelectedFrame =
             odoTField.inverse().asPose2d().transformBy(robotPoseInSelectedFrame.asTransform2d())
-          lastSampledPose = odoTField.asPose2d().transformBy(targetHolonomicPose.asTransform2d())
+          lastSampledPose = odoTField.asPose2d().transformBy(targetPose.asTransform2d())
 
-          Logger.recordOutput("Pathfollow/fieldTRobotTargetVisualized", targetHolonomicPose.pose2d)
-
-          Logger.recordOutput("Pathfollow/fieldTRobot", robotPoseInSelectedFrame.pose2d)
+          CustomLogger.recordOutput("Pathfollow/fieldTRobotTargetVisualized", targetPose.pose2d)
+          CustomLogger.recordOutput("Pathfollow/fieldTRobot", robotPoseInSelectedFrame.pose2d)
         }
       }
     }
-    // flip
-    lastSampledPose = AllianceFlipUtil.apply(lastSampledPose)
-
-    Logger.recordOutput("Pathfollow/targetPoseInStateFrame", lastSampledPose.pose2d)
-
-    if (flipForAlliances) {
-      desiredState = AllianceFlipUtil.apply(desiredState)
-      desiredRotation = AllianceFlipUtil.apply(desiredRotation)
-    }
-
-    val xAccel =
-      desiredState.accelerationMetersPerSecondSq.meters.perSecond.perSecond *
-        desiredState.curvatureRadPerMeter.radians.cos
-    var yAccel =
-      desiredState.accelerationMetersPerSecondSq.meters.perSecond.perSecond *
-        desiredState.curvatureRadPerMeter.radians.sin
-
-    var nextDriveState =
-      swerveDriveController.calculate(
-        robotPoseInSelectedFrame.pose2d, desiredState, desiredRotation
-      )
-
-    if (leaveOutYAdjustment) {
-      nextDriveState =
-        ChassisSpeeds(nextDriveState.vxMetersPerSecond, 0.0, nextDriveState.omegaRadiansPerSecond)
-      yAccel = 0.0.meters.perSecond.perSecond
-    }
-
-    drivetrain.targetPose =
-      Pose2d(Pose2dWPILIB(desiredState.poseMeters.translation, desiredRotation.position))
-
-    Logger.recordOutput(
-      "Pathfollow/target",
-      Pose2dWPILIB.struct,
-      Pose2dWPILIB(desiredState.poseMeters.translation, desiredRotation.position)
-    )
 
     /*
     drivetrain.setOpenLoop(
@@ -355,34 +265,31 @@ private constructor(
      */
 
     drivetrain.currentRequest =
-      DrivetrainRequest.ClosedLoop(
-        nextDriveState,
-        ChassisAccels(xAccel, yAccel, 0.0.radians.perSecond.perSecond).chassisAccelsWPILIB
-      )
+      nextDriveRequest
 
-    Logger.recordOutput("Pathfollow/thetaPIDPositionErrorRadians", thetaPID.error.inRadians)
+    CustomLogger.recordDebugOutput("Pathfollow/thetaPIDPositionErrorRadians", thetaPID.error.inRadians)
 
-    Logger.recordOutput("Pathfollow/xPIDPositionErrorMeters", xPID.error.inMeters)
-    Logger.recordOutput("Pathfollow/yPIDPositionErrorMeters", yPID.error.inMeters)
-    Logger.recordOutput(
+    CustomLogger.recordDebugOutput("Pathfollow/xPIDPositionErrorMeters", xPID.error.inMeters)
+    CustomLogger.recordDebugOutput("Pathfollow/yPIDPositionErrorMeters", yPID.error.inMeters)
+    CustomLogger.recordDebugOutput(
       "Pathfollow/thetaPIDVelocityErrorRadians", thetaPID.errorDerivative.inRadiansPerSecond
     )
 
-    Logger.recordOutput(
-      "Pathfollow/xAccelMetersPerSecondPerSecond", xAccel.inMetersPerSecondPerSecond
+    CustomLogger.recordDebugOutput(
+      "Pathfollow/xAccelMetersPerSecondPerSecond", nextDriveRequest.chassisAccels.vxMetersPerSecond
     )
-    Logger.recordOutput(
-      "Pathfollow/yAccelMetersPerSecondPerSecond", yAccel.inMetersPerSecondPerSecond
-    )
-
-    Logger.recordOutput("Pathfollow/Start Time", trajStartTime.inSeconds)
-    Logger.recordOutput("Pathfollow/Current Time", trajCurTime.inSeconds)
-    Logger.recordOutput(
-      "Pathfollow/Desired Angle in Degrees", desiredState.poseMeters.rotation.degrees
+    CustomLogger.recordDebugOutput(
+      "Pathfollow/yAccelMetersPerSecondPerSecond", nextDriveRequest.chassisAccels.vyMetersPerSecond
     )
 
-    Logger.recordOutput("Pathfollow/isAtReference", swerveDriveController.atReference())
-    Logger.recordOutput("Pathfollow/trajectoryTimeSeconds", trajectory.totalTimeSeconds)
+    CustomLogger.recordDebugOutput("Pathfollow/Start Time", trajStartTime.inSeconds)
+    CustomLogger.recordDebugOutput("Pathfollow/Current Time", trajCurTime.inSeconds)
+    CustomLogger.recordDebugOutput(
+      "Pathfollow/Desired Angle in Degrees", targetPose.pose2d.rotation.degrees
+    )
+
+    CustomLogger.recordDebugOutput("Pathfollow/isAtReference", swerveDriveController.atReference())
+    CustomLogger.recordDebugOutput("Pathfollow/trajectoryTimeSeconds", generatedTrajectory.totalTime.inSeconds)
 
     CustomLogger.recordDebugOutput("ActiveCommands/DrivePathCommand", true)
 
@@ -407,10 +314,10 @@ private constructor(
   override fun isFinished(): Boolean {
     trajCurTime = Clock.fpgaTime - trajStartTime
     return endPathOnceAtReference &&
-      (
-        (swerveDriveController.atReference()) &&
-          trajCurTime > trajectoryGenerator.driveTrajectory.totalTimeSeconds.seconds
-        )
+            (
+                    (swerveDriveController.atReference()) &&
+                            trajCurTime > generatedTrajectory.totalTime
+                    )
   }
 
   override fun end(interrupted: Boolean) {
@@ -434,12 +341,9 @@ private constructor(
   }
 
   companion object {
-    operator fun invoke() {
-      return
-    }
     fun createPathInOdometryFrame(
       drivetrain: Drivetrain,
-      waypoints: Supplier<List<OdometryWaypoint>>,
+      trajectory: TrajectoryTypes,
       resetPose: Boolean = false,
       useLowerTolerance: Boolean = false,
       flipForAlliances: Boolean = true,
@@ -450,7 +354,7 @@ private constructor(
     ): DrivePathCommand<OdometryWaypoint> =
       DrivePathCommand(
         drivetrain,
-        waypoints,
+        trajectory,
         resetPose,
         useLowerTolerance,
         flipForAlliances,
@@ -461,9 +365,9 @@ private constructor(
         FrameType.ODOMETRY
       )
 
-    fun createPathInFieldFrame(
+    fun createPathInOdometryFrame(
       drivetrain: Drivetrain,
-      waypoints: Supplier<List<FieldWaypoint>>,
+      trajectoryGenerator: CustomTrajectoryGenerator,
       resetPose: Boolean = false,
       useLowerTolerance: Boolean = false,
       flipForAlliances: Boolean = true,
@@ -474,7 +378,32 @@ private constructor(
     ): DrivePathCommand<FieldWaypoint> =
       DrivePathCommand(
         drivetrain,
-        waypoints,
+        TrajectoryTypes.WPILib(trajectoryGenerator.driveTrajectory),
+        resetPose,
+        useLowerTolerance,
+        flipForAlliances,
+        endPathOnceAtReference,
+        leaveOutYAdjustment,
+        endVelocity,
+        stateFrame,
+        FrameType.ODOMETRY,
+        trajectoryGenerator
+      )
+
+    fun createPathInFieldFrame(
+      drivetrain: Drivetrain,
+      trajectory: TrajectoryTypes,
+      resetPose: Boolean = false,
+      useLowerTolerance: Boolean = false,
+      flipForAlliances: Boolean = true,
+      endPathOnceAtReference: Boolean = true,
+      leaveOutYAdjustment: Boolean = false,
+      endVelocity: Velocity2d = Velocity2d(),
+      stateFrame: FrameType = FrameType.ODOMETRY,
+    ): DrivePathCommand<FieldWaypoint> =
+      DrivePathCommand(
+        drivetrain,
+        trajectory,
         resetPose,
         useLowerTolerance,
         flipForAlliances,
@@ -483,6 +412,31 @@ private constructor(
         endVelocity,
         stateFrame,
         FrameType.FIELD
+      )
+
+    fun createPathInFieldFrame(
+      drivetrain: Drivetrain,
+      trajectoryGenerator: CustomTrajectoryGenerator,
+      resetPose: Boolean = false,
+      useLowerTolerance: Boolean = false,
+      flipForAlliances: Boolean = true,
+      endPathOnceAtReference: Boolean = true,
+      leaveOutYAdjustment: Boolean = false,
+      endVelocity: Velocity2d = Velocity2d(),
+      stateFrame: FrameType = FrameType.ODOMETRY,
+    ): DrivePathCommand<FieldWaypoint> =
+      DrivePathCommand(
+        drivetrain,
+        TrajectoryTypes.WPILib(trajectoryGenerator.driveTrajectory),
+        resetPose,
+        useLowerTolerance,
+        flipForAlliances,
+        endPathOnceAtReference,
+        leaveOutYAdjustment,
+        endVelocity,
+        stateFrame,
+        FrameType.FIELD,
+        trajectoryGenerator
       )
   }
 }
