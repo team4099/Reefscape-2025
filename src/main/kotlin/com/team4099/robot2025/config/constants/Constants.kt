@@ -7,9 +7,9 @@ import org.team4099.lib.units.perSecond
 
 typealias GamePiece = Constants.Universal.GamePiece
 
-typealias Substation = Constants.Universal.Substation
+typealias CoralLevel = Constants.Universal.CoralLevel
 
-typealias NodeTier = Constants.Universal.NodeTier
+typealias AlgaeLevel = Constants.Universal.AlgaeLevel
 
 object Constants {
   object Universal {
@@ -28,23 +28,24 @@ object Constants {
     val POWER_DISTRIBUTION_HUB_ID = 1
 
     enum class GamePiece {
-      CUBE,
-      CONE,
+      CORAL,
+      ALGAE,
       NONE
     }
 
-    enum class NodeTier {
-      HYBRID,
-      MID,
-      HIGH,
-      NONE
-    }
-
-    enum class Substation {
-      DOUBLE_SUBSTATION_LEFT,
-      DOUBLE_SUBSTATION_RIGHT,
-      SINGLE_SUBSTATION,
+    enum class CoralLevel {
       NONE,
+      L1,
+      L2,
+      L3,
+      L4
+    }
+
+    enum class AlgaeLevel {
+      NONE,
+      GROUND,
+      L2,
+      L3
     }
   }
 
@@ -122,23 +123,17 @@ object Constants {
     const val FLYWHEEL_RIGHT_MOTOR_ID = 52
   }
 
-  object WRIST {
-    const val WRIST_MOTOR_ID = 41
+  object Arm {
+    const val ARM_MOTOR_ID = 41
     const val CANCODER_ID = 42
+  }
+
+  object Rollers {
+    const val ROLLERS_MOTOR_ID = 43
   }
 
   object Alert {
     val TABS = arrayOf("Pre-match", "In-match")
-  }
-
-  object Intake {
-    const val ROLLER_MOTOR_ID = 31
-    const val CENTER_MOTOR_ID = 32
-    const val REV_ENCODER_PORT = 7
-  }
-
-  object Feeder {
-    const val FEEDER_MOTOR_ID = 61
   }
 
   object LED {
