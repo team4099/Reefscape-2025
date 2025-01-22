@@ -86,6 +86,13 @@ object ElevatorTunableValues {
         Pair({ it.inInches }, { it.inches })
       )
 
+    val passThroughHeight =
+      LoggedTunableValue(
+        "Elevator/passThroughHeight",
+        ElevatorConstants.PASS_THROUGH_HEIGHT,
+        Pair({ it.inInches }, { it.inches })
+      )
+
     val intakeAlgaeGroundHeight =
       LoggedTunableValue(
         "Elevator/intakeAlgaeGroundHeight",

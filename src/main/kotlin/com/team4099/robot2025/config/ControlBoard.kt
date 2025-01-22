@@ -55,6 +55,14 @@ object ControlBoard {
   // val score = Trigger {driver.leftTriggerAxis > 0.5}
   // val intake = Trigger { driver.rightShoulderButton}
 
+  // test command (they bring the BOOM!)
+  val testElevatorBind = Trigger { driver.aButton }
+  val testClimberBind = Trigger { driver.bButton }
+  val testRollersBind = Trigger { driver.xButton }
+  val testArmBind = Trigger { driver.yButton }
+
+  /* (last years commands)
+
   val targetAmp = Trigger { driver.aButton }
   val prepAmp = Trigger { operator.aButton }
   val prepLow = Trigger { operator.xButton }
@@ -83,4 +91,5 @@ object ControlBoard {
   val lockWheels = Trigger { driver.startButton }
 
   // week0 controls
+  */
 }

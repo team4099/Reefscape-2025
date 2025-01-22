@@ -40,6 +40,7 @@ object RollersIOSim : RollersIO {
     inputs.rollerStatorCurrent = rollerSim.currentDrawAmps.amps
     inputs.rollerSupplyCurrent = 0.0.amps
     inputs.rollerTemp = 25.0.celsius
+    inputs.isSimulating = true
   }
 
   override fun setRollerVoltage(voltage: ElectricalPotential) {

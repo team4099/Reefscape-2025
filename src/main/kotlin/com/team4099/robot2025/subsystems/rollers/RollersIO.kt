@@ -21,6 +21,8 @@ interface RollersIO {
     var rollerStatorCurrent = 0.0.amps
     var rollerSupplyCurrent = 0.0.amps
     var rollerTemp = 0.0.celsius
+    var isSimulating = false
+
     override fun toLog(table: LogTable?) {
       table?.put("rollerVelocityRPM", rollerVelocity.inRotationsPerMinute)
       table?.put("rollerAppliedVoltage", rollerAppliedVoltage.inVolts)

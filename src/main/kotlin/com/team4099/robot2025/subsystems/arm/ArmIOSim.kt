@@ -27,7 +27,7 @@ import org.team4099.lib.units.derived.radians
 import org.team4099.lib.units.derived.volts
 import org.team4099.lib.units.perSecond
 
-class ArmIOSim : ArmIO {
+object ArmIOSim : ArmIO {
 
   val armSim: SingleJointedArmSim =
     SingleJointedArmSim(

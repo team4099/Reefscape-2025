@@ -108,6 +108,11 @@ object Constants {
     val BACK_RIGHT_MODULE_NAME = "Back Right Wheel"
   }
 
+  // TODO: change motor IDS (URGENT!)
+  object Climber {
+    const val CLIMBER_MOTOR_ID = 31
+  }
+
   // leader is right motor and follower is left
   object Elevator {
     const val LEADER_MOTOR_ID = 42
@@ -124,12 +129,12 @@ object Constants {
   }
 
   object Arm {
-    const val ARM_MOTOR_ID = 41
-    const val CANCODER_ID = 42
+    const val ARM_MOTOR_ID = 61
+    const val CANCODER_ID = 62
   }
 
   object Rollers {
-    const val ROLLERS_MOTOR_ID = 43
+    const val ROLLERS_MOTOR_ID = 71
   }
 
   object Alert {

@@ -61,6 +61,14 @@ sealed interface Request {
     class Zero() : ArmRequest
   }
 
+  sealed interface ClimberRequest : Request {
+    class OpenLoop(val voltage: ElectricalPotential) : ClimberRequest
+
+    class ClosedLoop(val position: Angle) : ClimberRequest
+
+    class Home() : ClimberRequest
+  }
+
   sealed interface RollersRequest : Request {
     class OpenLoop(val RollersVoltage: ElectricalPotential) : RollersRequest
     class Zero() : RollersRequest

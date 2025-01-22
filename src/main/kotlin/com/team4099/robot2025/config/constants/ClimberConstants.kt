@@ -32,6 +32,11 @@ object ClimberConstants {
   val SUPPLY_CURRENT_LIMIT = 40.0.amps
   val THRESHOLD_CURRENT_LIMIT = 0.0.amps
 
+  // make few constants[[-;[
+
+  val CLIMBER_EXTEND_ANGLE = 0.0.degrees
+  val CLIMBER_RETRACT_ANGLE = 0.0.degrees
+
   val LENGTH = 0.0.inches
   val INERTIA = 0.0.kilo.grams * 0.0.meters.squared
   val GEAR_RATIO = 1.0
