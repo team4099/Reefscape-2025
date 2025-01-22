@@ -29,6 +29,10 @@ object RollersConstants {
   val CORAL_DETECTION_TIME_THRESHOLD = 0.0.seconds
   val ALGAE_DETECTION_TIME_THRESHOLD = 0.0.seconds
 
+  val CORAL_SPIT_TIME = 0.0.seconds
+  val ALGAE_PROCESSOR_SPIT_TIME = 0.0.seconds
+  val ALGAE_BARGE_SPIT_TIME = 0.0.seconds
+
   val INVERSION_VALUE: InvertedValue = InvertedValue.Clockwise_Positive
   val NEUTRAL_MODE_VALUE: NeutralModeValue = NeutralModeValue.Coast
 

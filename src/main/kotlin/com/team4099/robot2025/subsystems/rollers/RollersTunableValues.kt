@@ -2,6 +2,8 @@ package com.team4099.robot2025.subsystems.rollers
 
 import com.team4099.lib.logging.LoggedTunableValue
 import com.team4099.robot2025.config.constants.RollersConstants
+import org.team4099.lib.units.base.inSeconds
+import org.team4099.lib.units.base.seconds
 import org.team4099.lib.units.derived.inVolts
 import org.team4099.lib.units.derived.volts
 
@@ -39,5 +41,26 @@ object RollersTunableValues {
       "Rollers/scoreCoralVoltage",
       RollersConstants.SCORE_CORAL_VOLTAGE,
       Pair({ it.inVolts }, { it.volts })
+    )
+
+  val coralSpitTime =
+    LoggedTunableValue(
+      "Rollers/coralSpitTime",
+      RollersConstants.CORAL_SPIT_TIME,
+      Pair({ it.inSeconds }, { it.seconds })
+    )
+
+  val algaeProcessorSpitTime =
+    LoggedTunableValue(
+      "Rollers/algaeProcessorSpitTime",
+      RollersConstants.ALGAE_PROCESSOR_SPIT_TIME,
+      Pair({ it.inSeconds }, { it.seconds })
+    )
+
+  val algaeBargeSpitTime =
+    LoggedTunableValue(
+      "Rollers/algaeBargeSpitTime",
+      RollersConstants.ALGAE_BARGE_SPIT_TIME,
+      Pair({ it.inSeconds }, { it.seconds })
     )
 }

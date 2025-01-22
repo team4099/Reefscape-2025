@@ -28,7 +28,7 @@ class Climber(private val io: ClimberIO) {
   private var lastHomingCurrentSpikeTime = Clock.fpgaTime
   private var climberTolerance: Angle = ClimberConstants.TOLERANCE
 
-  private val isAtTargetedPosition: Boolean
+  val isAtTargetedPosition: Boolean
     get() =
       currentState == ClimberState.CLOSED_LOOP &&
         (inputs.climberPosition - targetPosition).absoluteValue <= climberTolerance ||
