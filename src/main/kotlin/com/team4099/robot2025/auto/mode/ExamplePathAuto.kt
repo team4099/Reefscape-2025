@@ -1,8 +1,11 @@
 package com.team4099.robot2025.auto.mode
 
+import choreo.Choreo
+import choreo.trajectory.SwerveSample
 import com.team4099.lib.trajectory.FieldWaypoint
 import com.team4099.robot2025.commands.drivetrain.DrivePathCommand
 import com.team4099.robot2025.subsystems.drivetrain.drive.Drivetrain
+import com.team4099.robot2025.util.TrajectoryTypes
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import org.team4099.lib.geometry.Pose2d
 import org.team4099.lib.geometry.Translation2d
@@ -17,20 +20,9 @@ class ExamplePathAuto(val drivetrain: Drivetrain) : SequentialCommandGroup() {
     addCommands(
       DrivePathCommand.createPathInFieldFrame(
         drivetrain,
-        {
-          listOf(
-            FieldWaypoint(
-              startingPose.translation.translation2d,
-              null,
-              startingPose.rotation.inRotation2ds
-            ),
-            FieldWaypoint(
-              startingPose.translation.translation2d,
-              null,
-              startingPose.rotation.inRotation2ds
-            )
-          )
-        }
+        TrajectoryTypes.Choreo(
+          Choreo.loadTrajectory<SwerveSample>("exampleTraj").get()
+        )
       )
     )
   }
