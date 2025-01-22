@@ -30,8 +30,8 @@ import org.team4099.lib.units.derived.degrees
  * Width refers to the *y* direction (as described by wpilib)
  */
 object FieldConstants {
-  var fieldLength = 651.223.inches
-  var fieldWidth = 323.277.inches
+  var fieldLength = 690.876.inches
+  var fieldWidth = 317.inches
 
   val aprilTags: List<AprilTag> = listOf()
   val homeAprilTags: List<AprilTag> = listOf()
