@@ -6,8 +6,6 @@ import com.team4099.robot2025.config.constants.Constants.Universal.CoralLevel
 import com.team4099.robot2025.config.constants.Constants.Universal.GamePiece
 import com.team4099.robot2025.subsystems.arm.Arm
 import com.team4099.robot2025.subsystems.arm.ArmTunableValues
-import com.team4099.robot2025.subsystems.climber.Climber
-import com.team4099.robot2025.subsystems.climber.ClimberTunableValues
 import com.team4099.robot2025.subsystems.drivetrain.drive.Drivetrain
 import com.team4099.robot2025.subsystems.elevator.Elevator
 import com.team4099.robot2025.subsystems.elevator.ElevatorTunableValues
@@ -28,7 +26,7 @@ class Superstructure(
   private val elevator: Elevator,
   private val rollers: Rollers,
   private val arm: Arm,
-  private val climber: Climber,
+  // private val climber: Climber,
   private val limelight: LimelightVision
 ) : SubsystemBase() {
 
@@ -67,12 +65,12 @@ class Superstructure(
       (Clock.realTimestamp - armLoopStartTime).inMilliseconds
     )
 
-    val climberLoopStartTime = Clock.realTimestamp
-    climber.periodic()
-    CustomLogger.recordOutput(
-      "LoggedRobot/Subsystems/ClimberLoopTimeMS",
-      (Clock.realTimestamp - climberLoopStartTime).inMilliseconds
-    )
+    //    val climberLoopStartTime = Clock.realTimestamp
+    //    climber.periodic()
+    //    CustomLogger.recordOutput(
+    //      "LoggedRobot/Subsystems/ClimberLoopTimeMS",
+    //      (Clock.realTimestamp - climberLoopStartTime).inMilliseconds
+    //    )
 
     val elevatorLoopStartTime = Clock.realTimestamp
     elevator.periodic()
@@ -466,27 +464,45 @@ class Superstructure(
           nextState = SuperstructureStates.SCORE_CLEANUP
         }
       }
-      SuperstructureStates.CLIMB_EXTEND -> {
-        climber.currentRequest =
-          Request.ClimberRequest.ClosedLoop(ClimberTunableValues.climbExtendAngle.get())
+      SuperstructureStates.PREP_EJECT_GAMEPIECE -> {
+        elevator.currentRequest =
+          Request.ElevatorRequest.ClosedLoop(
+            ElevatorTunableValues.ElevatorHeights.ejectHeight.get()
+          )
 
-        if (climber.isAtTargetedPosition &&
-          currentRequest is Request.SuperstructureRequest.ClimbRetract
-        ) {
-          currentState = SuperstructureStates.CLIMB_RETRACT
-        }
-        if (currentRequest is Request.SuperstructureRequest.Idle) {
-          currentState = SuperstructureStates.IDLE
-        }
+        if (elevator.isAtTargetedPosition)
+          arm.currentRequest =
+            Request.ArmRequest.ClosedLoop(ArmTunableValues.ArmAngles.ejectAngle.get())
       }
-      SuperstructureStates.CLIMB_RETRACT -> {
-        climber.currentRequest =
-          Request.ClimberRequest.ClosedLoop(ClimberTunableValues.climbRetractAngle.get())
-
-        if (currentRequest is Request.SuperstructureRequest.Idle) {
-          currentState = SuperstructureStates.IDLE
-        }
+      SuperstructureStates.EJECT_GAMEPIECE -> {
+        rollers.currentRequest =
+          Request.RollersRequest.OpenLoop(RollersTunableValues.ejectVoltage.get())
       }
+      SuperstructureStates.CLEANUP_EJECT_GAMEPIECE -> {
+        arm.currentRequest =
+          Request.ArmRequest.ClosedLoop(ArmTunableValues.ArmAngles.idleAngle.get())
+      }
+      //      SuperstructureStates.CLIMB_EXTEND -> {
+      //        climber.currentRequest =
+      //          Request.ClimberRequest.ClosedLoop(ClimberTunableValues.climbExtendAngle.get())
+      //
+      //        if (climber.isAtTargetedPosition &&
+      //          currentRequest is Request.SuperstructureRequest.ClimbRetract
+      //        ) {
+      //          currentState = SuperstructureStates.CLIMB_RETRACT
+      //        }
+      //        if (currentRequest is Request.SuperstructureRequest.Idle) {
+      //          currentState = SuperstructureStates.IDLE
+      //        }
+      //      }
+      //      SuperstructureStates.CLIMB_RETRACT -> {
+      //        climber.currentRequest =
+      //          Request.ClimberRequest.ClosedLoop(ClimberTunableValues.climbRetractAngle.get())
+      //
+      //        if (currentRequest is Request.SuperstructureRequest.Idle) {
+      //          currentState = SuperstructureStates.IDLE
+      //        }
+      //      }
     }
 
     if (nextState != currentState) {
@@ -542,7 +558,7 @@ class Superstructure(
   }
 
   fun testArmCommand(): Command {
-    val returnCommand = runOnce {
+    val returnCommand = run {
       currentRequest = Request.SuperstructureRequest.Tuning()
       arm.currentRequest =
         Request.ArmRequest.ClosedLoop(ArmTunableValues.ArmAngles.intakeCoralAngle.get())
@@ -552,7 +568,7 @@ class Superstructure(
   }
 
   fun testRollersCommand(): Command {
-    val returnCommand = runOnce {
+    val returnCommand = run {
       currentRequest = Request.SuperstructureRequest.Tuning()
       rollers.currentRequest =
         Request.RollersRequest.OpenLoop(RollersTunableValues.intakeCoralVoltage.get())
@@ -562,7 +578,7 @@ class Superstructure(
   }
 
   fun testElevatorCommand(): Command {
-    val returnCommand = runOnce {
+    val returnCommand = run {
       currentRequest = Request.SuperstructureRequest.Tuning()
       elevator.currentRequest =
         Request.ElevatorRequest.ClosedLoop(
@@ -573,15 +589,15 @@ class Superstructure(
     return returnCommand
   }
 
-  fun testClimberCommand(): Command {
-    val returnCommand = runOnce {
-      currentRequest = Request.SuperstructureRequest.Tuning()
-      climber.currentRequest =
-        Request.ClimberRequest.ClosedLoop(ClimberTunableValues.climbRetractAngle.get())
-    }
-    returnCommand.name = "TestClimberCommand"
-    return returnCommand
-  }
+  //  fun testClimberCommand(): Command {
+  //    val returnCommand = run {
+  //      currentRequest = Request.SuperstructureRequest.Tuning()
+  //      climber.currentRequest =
+  //        Request.ClimberRequest.ClosedLoop(ClimberTunableValues.climbRetractAngle.get())
+  //    }
+  //    returnCommand.name = "TestClimberCommand"
+  //    return returnCommand
+  //  }
 
   companion object {
     enum class SuperstructureStates {
@@ -607,6 +623,8 @@ class Superstructure(
       CLIMB_EXTEND,
       CLIMB_RETRACT,
       PREP_EJECT_GAMEPIECE,
+      EJECT_GAMEPIECE,
+      CLEANUP_EJECT_GAMEPIECE,
       PREP_SCORE_ALGAE_BARGE,
       SCORE_ALGAE_BARGE,
     }

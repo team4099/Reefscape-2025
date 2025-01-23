@@ -20,6 +20,7 @@ object RollersConstants {
   val SCORE_BARGE_ALGAE_VOLTAGE = 0.0.volts
   val SCORE_PROCESSOR_ALGAE_VOLTAGE = 0.0.volts
   val SCORE_CORAL_VOLTAGE = 0.0.volts
+  val EJECT_VOLTAGE = 0.0.volts
 
   val CORAL_VELOCITY_THRESHOLD = 0.0.rotations.perSecond
   val CORAL_CURRENT_THRESHOLD = 0.0.amps

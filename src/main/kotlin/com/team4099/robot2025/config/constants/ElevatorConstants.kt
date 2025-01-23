@@ -64,11 +64,12 @@ object ElevatorConstants {
   val ALGAE_HIGH_HEIGHT = L3_HEIGHT
 
   val INTAKE_HEIGHT = (36.0 + 1.0 + 1.0 / 2.0).inches
+  val EJECT_HEIGHT = 0.0.inches
 
   val ELEVATOR_GROUND_OFFSET = 3.829.inches
 
   // TODO: make real maxes
-  val MAX_VELOCITY = 36.0.inches.perSecond
+  val MAX_VELOCITY = 140.0.inches.perSecond
   val MAX_ACCELERATION = 24.0.inches.perSecond.perSecond
 
   object PID {

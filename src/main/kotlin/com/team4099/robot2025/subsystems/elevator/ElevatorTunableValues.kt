@@ -181,5 +181,12 @@ object ElevatorTunableValues {
         ElevatorConstants.ALGAE_LOW_HEIGHT,
         Pair({ it.inInches }, { it.inches })
       )
+
+    val ejectHeight =
+      LoggedTunableValue(
+        "Elevator/ejectHeight",
+        ElevatorConstants.EJECT_HEIGHT,
+        Pair({ it.inInches }, { it.inches })
+      )
   }
 }

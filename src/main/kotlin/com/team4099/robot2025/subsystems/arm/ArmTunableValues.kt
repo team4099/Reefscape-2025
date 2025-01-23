@@ -129,5 +129,10 @@ object ArmTunableValues {
         ArmConstants.SCORE_ALGAE_BARGE_ANGLE,
         Pair({ it.inDegrees }, { it.degrees })
       )
+
+    val ejectAngle =
+      LoggedTunableValue(
+        "Arm/ejectAngle", ArmConstants.EJECT_ANGLE, Pair({ it.inDegrees }, { it.degrees })
+      )
   }
 }

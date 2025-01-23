@@ -63,4 +63,11 @@ object RollersTunableValues {
       RollersConstants.ALGAE_BARGE_SPIT_TIME,
       Pair({ it.inSeconds }, { it.seconds })
     )
+
+  val ejectVoltage =
+    LoggedTunableValue(
+      "Rollers/ejectVoltage",
+      RollersConstants.EJECT_VOLTAGE,
+      Pair({ it.inVolts }, { it.volts })
+    )
 }

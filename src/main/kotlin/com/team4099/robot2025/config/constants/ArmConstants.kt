@@ -43,6 +43,8 @@ object ArmConstants {
   val SCORE_CORAL_L3_ANGLE = 0.0.degrees
   val SCORE_CORAL_L4_ANGLE = 0.0.degrees
 
+  val EJECT_ANGLE = 0.0.degrees
+
   val SCORE_ALGAE_PROCESSOR_ANGLE = 0.0.degrees
   val SCORE_ALGAE_BARGE_ANGLE = 0.0.degrees
 
