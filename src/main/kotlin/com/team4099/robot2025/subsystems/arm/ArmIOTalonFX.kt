@@ -70,9 +70,12 @@ object ArmIOTalonFX : ArmIO {
   init {
 
     // Configure PID Values
-    armConfiguration.Slot0.kP = armSensor.proportionalPositionGainToRawUnits(ArmConstants.ARM_KP)
-    armConfiguration.Slot0.kI = armSensor.integralPositionGainToRawUnits(ArmConstants.ARM_KI)
-    armConfiguration.Slot0.kD = armSensor.derivativePositionGainToRawUnits(ArmConstants.ARM_KD)
+    armConfiguration.Slot0.kP =
+      armSensor.proportionalPositionGainToRawUnits(ArmConstants.PID.REAL_ARM_KP)
+    armConfiguration.Slot0.kI =
+      armSensor.integralPositionGainToRawUnits(ArmConstants.PID.REAL_ARM_KI)
+    armConfiguration.Slot0.kD =
+      armSensor.derivativePositionGainToRawUnits(ArmConstants.PID.REAL_ARM_KD)
     armConfiguration.Slot0.GravityType = GravityTypeValue.Arm_Cosine
 
     // Configure Feedforward Values

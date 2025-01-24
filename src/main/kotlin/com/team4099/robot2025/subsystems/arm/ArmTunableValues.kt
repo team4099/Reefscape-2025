@@ -27,9 +27,9 @@ object ArmTunableValues {
 
   object ArmAngles {
 
-    val idleAngle =
+    val zeroAngle =
       LoggedTunableValue(
-        "Arm/idleAngle", ArmConstants.IDLE_ANGLE, Pair({ it.inDegrees }, { it.degrees })
+        "Arm/zeroAngle", ArmConstants.ZERO_ANGLE, Pair({ it.inDegrees }, { it.degrees })
       )
 
     val idleCoralAngle =
@@ -133,6 +133,11 @@ object ArmTunableValues {
     val ejectAngle =
       LoggedTunableValue(
         "Arm/ejectAngle", ArmConstants.EJECT_ANGLE, Pair({ it.inDegrees }, { it.degrees })
+      )
+
+    val testAngle =
+      LoggedTunableValue(
+        "Arm/testAngle", ArmConstants.TEST_ANGLE, Pair({ it.inDegrees }, { it.degrees })
       )
   }
 }

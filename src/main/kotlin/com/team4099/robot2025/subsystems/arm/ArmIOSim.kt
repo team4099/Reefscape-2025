@@ -6,7 +6,8 @@ import com.team4099.robot2025.config.constants.Constants
 import com.team4099.robot2025.subsystems.arm.ArmIO.ArmIOInputs
 import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim
-import org.team4099.lib.controller.PIDController
+import org.team4099.lib.controller.ProfiledPIDController
+import org.team4099.lib.controller.TrapezoidProfile
 import org.team4099.lib.units.base.amps
 import org.team4099.lib.units.base.celsius
 import org.team4099.lib.units.base.inMeters
@@ -29,7 +30,7 @@ import org.team4099.lib.units.perSecond
 
 object ArmIOSim : ArmIO {
 
-  val armSim: SingleJointedArmSim =
+  private val armSim: SingleJointedArmSim =
     SingleJointedArmSim(
       DCMotor.getKrakenX60(1),
       ArmConstants.ARM_GEAR_RATIO,
@@ -41,8 +42,15 @@ object ArmIOSim : ArmIO {
       0.0
     )
 
-  val armPIDController: PIDController<Radian, Volt> =
-    PIDController(ArmConstants.ARM_KP, ArmConstants.ARM_KI, ArmConstants.ARM_KD)
+  private val armPIDController =
+    ProfiledPIDController(
+      ArmConstants.PID.SIM_ARM_KP,
+      ArmConstants.PID.SIM_ARM_KI,
+      ArmConstants.PID.SIM_ARM_KD,
+      TrapezoidProfile.Constraints(
+        ArmConstants.MOTION_MAGIC_CRUISE_VELOCITY, ArmConstants.MOTION_MAGIC_ACCELERATION
+      )
+    )
 
   private var armTargetPosition = ArmConstants.ARM_MIN_ANGLE
   private var appliedVoltage = 0.0.volts
@@ -68,8 +76,8 @@ object ArmIOSim : ArmIO {
   }
 
   override fun setArmPosition(position: Angle) {
-    armTargetPosition = position
-    val feedback = armPIDController.calculate(armSim.angleRads.radians, position)
+    armPIDController.setGoal(position)
+    val feedback = armPIDController.calculate(armSim.angleRads.radians)
     setArmVoltage(feedback)
   }
 

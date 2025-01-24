@@ -24,7 +24,7 @@ object ElevatorConstants {
   val SPOOL_DIAMETER = 1.5038.inches
   val VOLTAGE_COMPENSATION = 12.0.volts
 
-  val ELEVATOR_TOLERANCE = 0.25.inches
+  val ELEVATOR_TOLERANCE = 0.5.inches
 
   val LEADER_STATOR_CURRENT_LIMIT = 0.0.amps
   val LEADER_SUPPLY_CURRENT_LIMIT = 0.0.amps

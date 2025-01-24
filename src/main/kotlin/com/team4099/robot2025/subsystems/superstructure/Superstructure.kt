@@ -20,6 +20,7 @@ import org.team4099.lib.units.base.inMilliseconds
 import org.team4099.lib.units.base.inches
 import org.team4099.lib.units.derived.Angle
 import org.team4099.lib.units.derived.degrees
+import org.team4099.lib.units.derived.volts
 
 class Superstructure(
   private val drivetrain: Drivetrain,
@@ -96,7 +97,7 @@ class Superstructure(
         nextState = SuperstructureStates.HOME_PREP
       }
       SuperstructureStates.HOME_PREP -> {
-        arm.currentRequest = Request.ArmRequest.Zero()
+        arm.currentRequest = Request.ArmRequest.Idle()
 
         if (arm.isZeroed) {
           nextState = SuperstructureStates.HOME
@@ -150,7 +151,7 @@ class Superstructure(
           }
           GamePiece.NONE -> {
             arm.currentRequest =
-              Request.ArmRequest.ClosedLoop(ArmTunableValues.ArmAngles.idleAngle.get())
+              Request.ArmRequest.ClosedLoop(ArmTunableValues.ArmAngles.zeroAngle.get())
             rollers.currentRequest =
               Request.RollersRequest.OpenLoop(RollersTunableValues.idleVoltage.get())
 
@@ -480,7 +481,7 @@ class Superstructure(
       }
       SuperstructureStates.CLEANUP_EJECT_GAMEPIECE -> {
         arm.currentRequest =
-          Request.ArmRequest.ClosedLoop(ArmTunableValues.ArmAngles.idleAngle.get())
+          Request.ArmRequest.ClosedLoop(ArmTunableValues.ArmAngles.zeroAngle.get())
       }
       //      SuperstructureStates.CLIMB_EXTEND -> {
       //        climber.currentRequest =
@@ -560,8 +561,7 @@ class Superstructure(
   fun testArmCommand(): Command {
     val returnCommand = run {
       currentRequest = Request.SuperstructureRequest.Tuning()
-      arm.currentRequest =
-        Request.ArmRequest.ClosedLoop(ArmTunableValues.ArmAngles.intakeCoralAngle.get())
+      arm.currentRequest = Request.ArmRequest.OpenLoop(12.0.volts)
     }
     returnCommand.name = "TestArmCommand"
     return returnCommand
@@ -584,6 +584,10 @@ class Superstructure(
         Request.ElevatorRequest.ClosedLoop(
           ElevatorTunableValues.ElevatorHeights.testPosition.get()
         )
+
+      if (elevator.isAtTargetedPosition) {
+        currentRequest = Request.SuperstructureRequest.Idle()
+      }
     }
     returnCommand.name = "TestElevatorCommand"
     return returnCommand

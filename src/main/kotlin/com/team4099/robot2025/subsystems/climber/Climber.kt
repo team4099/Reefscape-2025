@@ -9,6 +9,7 @@ import org.team4099.lib.units.derived.Angle
 import org.team4099.lib.units.derived.ElectricalPotential
 import org.team4099.lib.units.derived.degrees
 import org.team4099.lib.units.derived.inDegrees
+import org.team4099.lib.units.derived.inVolts
 import org.team4099.lib.units.derived.volts
 
 class Climber(private val io: ClimberIO) {
@@ -92,7 +93,10 @@ class Climber(private val io: ClimberIO) {
     CustomLogger.recordOutput("Climber/currentState", currentState.name)
     CustomLogger.recordOutput("Climber/requestedState", currentRequest.javaClass.simpleName)
     CustomLogger.recordOutput("Climber/isAtTargetedPosition", isAtTargetedPosition)
-    CustomLogger.recordOutput("Climber/requestedPosition", targetPosition.inDegrees)
+    CustomLogger.recordOutput("Climber/targetPosition", targetPosition.inDegrees)
+    CustomLogger.recordOutput("Climber/targetVoltage", targetVoltage.inVolts)
+    CustomLogger.recordOutput("Climber/minAngleReached", minAngleReached)
+    CustomLogger.recordOutput("Climber/maxAngleReached", maxAngleReached)
 
     var nextState = currentState
 

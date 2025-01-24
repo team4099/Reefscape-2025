@@ -6,21 +6,24 @@ import com.team4099.robot2025.subsystems.arm.ArmTunableValues.armKI
 import com.team4099.robot2025.subsystems.arm.ArmTunableValues.armKP
 import com.team4099.robot2025.subsystems.superstructure.Request
 import com.team4099.robot2025.util.CustomLogger
+import edu.wpi.first.wpilibj.RobotBase
 import org.team4099.lib.units.derived.Angle
 import org.team4099.lib.units.derived.ElectricalPotential
 import org.team4099.lib.units.derived.degrees
+import org.team4099.lib.units.derived.inDegrees
+import org.team4099.lib.units.derived.inVolts
 import org.team4099.lib.units.derived.volts
 
-class Arm(val io: ArmIO) {
+class Arm(private val io: ArmIO) {
   val inputs = ArmIO.ArmIOInputs()
 
-  var armTargetVoltage: ElectricalPotential = 0.0.volts
-  var armTargetPosition: Angle = 0.0.degrees
+  private var armTargetVoltage: ElectricalPotential = 0.0.volts
+  private var armTargetPosition: Angle = 0.0.degrees
 
   var isZeroed = false
 
-  var currentState = ArmState.UNINITIALIZED
-  var currentRequest: Request.ArmRequest = Request.ArmRequest.Zero()
+  private var currentState = ArmState.UNINITIALIZED
+  var currentRequest: Request.ArmRequest = Request.ArmRequest.Idle()
     set(value) {
       when (value) {
         is Request.ArmRequest.OpenLoop -> {
@@ -39,14 +42,19 @@ class Arm(val io: ArmIO) {
       (
         currentState == ArmState.CLOSED_LOOP &&
           (inputs.armPosition - armTargetPosition).absoluteValue <= ArmConstants.ARM_TOLERANCE
-        ) ||
-        inputs.isSimulating
+        )
 
   init {
     // Initialize Arm Tunable Values
-    armKP.initDefault(ArmConstants.ARM_KP)
-    armKI.initDefault(ArmConstants.ARM_KI)
-    armKD.initDefault(ArmConstants.ARM_KD)
+    if (RobotBase.isReal()) {
+      armKP.initDefault(ArmConstants.PID.SIM_ARM_KP)
+      armKI.initDefault(ArmConstants.PID.SIM_ARM_KI)
+      armKD.initDefault(ArmConstants.PID.SIM_ARM_KD)
+    } else {
+      armKP.initDefault(ArmConstants.PID.REAL_ARM_KP)
+      armKI.initDefault(ArmConstants.PID.REAL_ARM_KI)
+      armKD.initDefault(ArmConstants.PID.REAL_ARM_KD)
+    }
   }
 
   fun periodic() {
@@ -61,6 +69,10 @@ class Arm(val io: ArmIO) {
 
     var nextState = currentState
     CustomLogger.recordOutput("Arm/nextState", nextState.toString())
+    CustomLogger.recordOutput("Arm/armTargetPosition", armTargetPosition.inDegrees)
+    CustomLogger.recordOutput("Arm/armTargetVoltage", armTargetVoltage.inVolts)
+    CustomLogger.recordOutput("Arm/isAtTargetedPosition", isAtTargetedPosition)
+    CustomLogger.recordOutput("Arm/isZeroed", isZeroed)
 
     when (currentState) {
       ArmState.UNINITIALIZED -> {
@@ -74,10 +86,8 @@ class Arm(val io: ArmIO) {
         io.setArmPosition(armTargetPosition)
         nextState = fromRequestToState(currentRequest)
       }
-      ArmState.ZERO -> {
-        io.zeroEncoder()
-        currentRequest = Request.ArmRequest.OpenLoop(0.volts)
-        isZeroed = true
+      ArmState.IDLE -> {
+        currentRequest = Request.ArmRequest.OpenLoop(12.0.volts)
         nextState = fromRequestToState(currentRequest)
       }
     }
@@ -90,7 +100,7 @@ class Arm(val io: ArmIO) {
       UNINITIALIZED,
       OPEN_LOOP,
       CLOSED_LOOP,
-      ZERO,
+      IDLE,
     }
 
     // Translates Current Request to a State
@@ -98,7 +108,7 @@ class Arm(val io: ArmIO) {
       return when (request) {
         is Request.ArmRequest.OpenLoop -> ArmState.OPEN_LOOP
         is Request.ArmRequest.ClosedLoop -> ArmState.CLOSED_LOOP
-        is Request.ArmRequest.Zero -> ArmState.ZERO
+        is Request.ArmRequest.Idle -> ArmState.IDLE
       }
     }
   }
