@@ -87,7 +87,7 @@ class Arm(private val io: ArmIO) {
         nextState = fromRequestToState(currentRequest)
       }
       ArmState.IDLE -> {
-        currentRequest = Request.ArmRequest.OpenLoop(12.0.volts)
+        currentRequest = Request.ArmRequest.OpenLoop(0.volts)
         nextState = fromRequestToState(currentRequest)
       }
     }

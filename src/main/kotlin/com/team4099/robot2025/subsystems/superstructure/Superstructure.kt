@@ -561,7 +561,12 @@ class Superstructure(
   fun testArmCommand(): Command {
     val returnCommand = run {
       currentRequest = Request.SuperstructureRequest.Tuning()
-      arm.currentRequest = Request.ArmRequest.OpenLoop(12.0.volts)
+      arm.currentRequest = Request.ArmRequest.OpenLoop(12.volts)
+//      arm.currentRequest = Request.ArmRequest.ClosedLoop(30.degrees)
+//
+//      if (arm.isAtTargetedPosition) {
+//        currentRequest = Request.SuperstructureRequest.Idle()
+//      }
     }
     returnCommand.name = "TestArmCommand"
     return returnCommand

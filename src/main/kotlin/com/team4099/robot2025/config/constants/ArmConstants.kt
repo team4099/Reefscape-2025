@@ -68,9 +68,9 @@ object ArmConstants {
   val ENCODER_DIRECTION_VALUE: SensorDirectionValue = SensorDirectionValue.Clockwise_Positive
   val ENCODER_OFFSET = 0.0.degrees
 
-  val ARM_INERTIA = 10.0.kilo.grams * 1.0.meters.squared
+  val ARM_INERTIA = 0.7181257183.kilo.grams * 1.0.meters.squared
   val ARM_LENGTH = 9.678.inches
-  val ARM_MAX_ANGLE = 235.0.degrees
+  val ARM_MAX_ANGLE = 90.0.degrees
   val ARM_MIN_ANGLE = (-90.0).degrees // change back to -70.0.degrees
   val ARM_TOLERANCE = 5.0.degrees
 
@@ -78,9 +78,9 @@ object ArmConstants {
 
   object PID {
     // PID Constants
-    val SIM_ARM_KP: ProportionalGain<Radian, Volt> = 20.0.volts / 1.0.degrees
+    val SIM_ARM_KP: ProportionalGain<Radian, Volt> = 10.0.volts / 1.0.degrees
     val SIM_ARM_KI: IntegralGain<Radian, Volt> = 0.0.volts / (1.0.degrees * 1.0.seconds)
-    val SIM_ARM_KD: DerivativeGain<Radian, Volt> = 0.5.volts / 1.0.degrees.perSecond
+    val SIM_ARM_KD: DerivativeGain<Radian, Volt> = 00.0175.volts / 1.0.degrees.perSecond
 
     val REAL_ARM_KP: ProportionalGain<Radian, Volt> = 20.0.volts / 1.0.degrees
     val REAL_ARM_KI: IntegralGain<Radian, Volt> = 0.0.volts / (1.0.degrees * 1.0.seconds)

@@ -6,26 +6,12 @@ import com.team4099.robot2025.config.constants.Constants
 import com.team4099.robot2025.subsystems.arm.ArmIO.ArmIOInputs
 import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim
-import org.team4099.lib.controller.ProfiledPIDController
-import org.team4099.lib.controller.TrapezoidProfile
+import org.team4099.lib.controller.PIDController
 import org.team4099.lib.units.base.amps
 import org.team4099.lib.units.base.celsius
 import org.team4099.lib.units.base.inMeters
 import org.team4099.lib.units.base.inSeconds
-import org.team4099.lib.units.derived.AccelerationFeedforward
-import org.team4099.lib.units.derived.Angle
-import org.team4099.lib.units.derived.DerivativeGain
-import org.team4099.lib.units.derived.ElectricalPotential
-import org.team4099.lib.units.derived.IntegralGain
-import org.team4099.lib.units.derived.ProportionalGain
-import org.team4099.lib.units.derived.Radian
-import org.team4099.lib.units.derived.VelocityFeedforward
-import org.team4099.lib.units.derived.Volt
-import org.team4099.lib.units.derived.inKilogramsMeterSquared
-import org.team4099.lib.units.derived.inRadians
-import org.team4099.lib.units.derived.inVolts
-import org.team4099.lib.units.derived.radians
-import org.team4099.lib.units.derived.volts
+import org.team4099.lib.units.derived.*
 import org.team4099.lib.units.perSecond
 
 object ArmIOSim : ArmIO {
@@ -39,21 +25,22 @@ object ArmIOSim : ArmIO {
       ArmConstants.ARM_MIN_ANGLE.inRadians,
       ArmConstants.ARM_MAX_ANGLE.inRadians,
       true,
-      0.0
+      -3.0
     )
 
   private val armPIDController =
-    ProfiledPIDController(
+    PIDController(
       ArmConstants.PID.SIM_ARM_KP,
       ArmConstants.PID.SIM_ARM_KI,
       ArmConstants.PID.SIM_ARM_KD,
-      TrapezoidProfile.Constraints(
-        ArmConstants.MOTION_MAGIC_CRUISE_VELOCITY, ArmConstants.MOTION_MAGIC_ACCELERATION
-      )
     )
 
-  private var armTargetPosition = ArmConstants.ARM_MIN_ANGLE
   private var appliedVoltage = 0.0.volts
+
+  init {
+      armSim.setState(0.0, 0.0)
+      println(armSim.angleRads.radians.inDegrees)
+  }
 
   override fun updateInputs(inputs: ArmIOInputs) {
     armSim.update(Constants.Universal.LOOP_PERIOD_TIME.inSeconds)
@@ -76,8 +63,7 @@ object ArmIOSim : ArmIO {
   }
 
   override fun setArmPosition(position: Angle) {
-    armPIDController.setGoal(position)
-    val feedback = armPIDController.calculate(armSim.angleRads.radians)
+    val feedback = armPIDController.calculate(armSim.angleRads.radians, position)
     setArmVoltage(feedback)
   }
 
