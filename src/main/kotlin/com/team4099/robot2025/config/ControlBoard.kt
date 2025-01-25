@@ -55,7 +55,6 @@ object ControlBoard {
   // val score = Trigger {driver.leftTriggerAxis > 0.5}
   // val intake = Trigger { driver.rightShoulderButton}
 
-  // test command (they bring the BOOM!)//KIRABO
   val testElevatorBind = Trigger { driver.aButton }
   val testClimberBind = Trigger { driver.bButton }
   val testRollersBind = Trigger { driver.xButton }

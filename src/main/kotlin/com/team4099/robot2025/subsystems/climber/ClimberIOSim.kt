@@ -1,11 +1,14 @@
 package com.team4099.robot2025.subsystems.climber
 
 import com.team4099.lib.math.clamp
+import com.team4099.robot2025.config.constants.ArmConstants
 import com.team4099.robot2025.config.constants.ClimberConstants
 import com.team4099.robot2025.config.constants.Constants
 import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim
 import org.team4099.lib.controller.PIDController
+import org.team4099.lib.controller.ProfiledPIDController
+import org.team4099.lib.controller.TrapezoidProfile
 import org.team4099.lib.units.base.amps
 import org.team4099.lib.units.base.celsius
 import org.team4099.lib.units.base.inMeters
@@ -41,9 +44,13 @@ object ClimberIOSim : ClimberIO {
       0.0
     )
 
+
   private var climberController =
-    PIDController(
-      ClimberConstants.PID.KP_SIM, ClimberConstants.PID.KI_SIM, ClimberConstants.PID.KD_SIM
+    ProfiledPIDController(
+      ClimberConstants.PID.KP_SIM, ClimberConstants.PID.KI_SIM, ClimberConstants.PID.KD_SIM ,
+      TrapezoidProfile.Constraints(
+              ClimberConstants.MAX_VELOCITY, ClimberConstants.MAX_ACCELERATION
+    )
     )
 
   private var targetPosition = 0.degrees
@@ -98,7 +105,7 @@ object ClimberIOSim : ClimberIO {
 
   override fun updateInputs(inputs: ClimberIO.ClimberInputs) {
     climberSim.update(Constants.Universal.LOOP_PERIOD_TIME.inSeconds)
-    inputs.climberPosition = targetPosition
+    inputs.climberPosition = climberSim.angleRads.radians
     inputs.climberVelocity = climberSim.velocityRadPerSec.radians.perSecond
     inputs.climberAppliedVoltage = appliedVoltage
     inputs.climberStatorCurrent = climberSim.currentDrawAmps.amps

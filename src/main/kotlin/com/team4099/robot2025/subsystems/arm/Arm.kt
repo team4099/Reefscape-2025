@@ -23,7 +23,7 @@ class Arm(private val io: ArmIO) {
   var isZeroed = false
 
   private var currentState = ArmState.UNINITIALIZED
-  var currentRequest: Request.ArmRequest = Request.ArmRequest.Idle()
+  var currentRequest: Request.ArmRequest = Request.ArmRequest.OpenLoop(0.volts)
     set(value) {
       when (value) {
         is Request.ArmRequest.OpenLoop -> {
@@ -86,8 +86,10 @@ class Arm(private val io: ArmIO) {
         io.setArmPosition(armTargetPosition)
         nextState = fromRequestToState(currentRequest)
       }
-      ArmState.IDLE -> {
+      ArmState.ZERO -> {
+        io.zeroEncoder()
         currentRequest = Request.ArmRequest.OpenLoop(0.volts)
+        isZeroed = true
         nextState = fromRequestToState(currentRequest)
       }
     }
@@ -100,7 +102,7 @@ class Arm(private val io: ArmIO) {
       UNINITIALIZED,
       OPEN_LOOP,
       CLOSED_LOOP,
-      IDLE,
+      ZERO,
     }
 
     // Translates Current Request to a State
@@ -108,7 +110,7 @@ class Arm(private val io: ArmIO) {
       return when (request) {
         is Request.ArmRequest.OpenLoop -> ArmState.OPEN_LOOP
         is Request.ArmRequest.ClosedLoop -> ArmState.CLOSED_LOOP
-        is Request.ArmRequest.Idle -> ArmState.IDLE
+        is Request.ArmRequest.Zero -> ArmState.ZERO
       }
     }
   }

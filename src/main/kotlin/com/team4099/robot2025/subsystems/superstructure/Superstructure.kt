@@ -6,6 +6,8 @@ import com.team4099.robot2025.config.constants.Constants.Universal.CoralLevel
 import com.team4099.robot2025.config.constants.Constants.Universal.GamePiece
 import com.team4099.robot2025.subsystems.arm.Arm
 import com.team4099.robot2025.subsystems.arm.ArmTunableValues
+import com.team4099.robot2025.subsystems.climber.Climber
+import com.team4099.robot2025.subsystems.climber.ClimberTunableValues
 import com.team4099.robot2025.subsystems.drivetrain.drive.Drivetrain
 import com.team4099.robot2025.subsystems.elevator.Elevator
 import com.team4099.robot2025.subsystems.elevator.ElevatorTunableValues
@@ -20,13 +22,13 @@ import org.team4099.lib.units.base.inMilliseconds
 import org.team4099.lib.units.base.inches
 import org.team4099.lib.units.derived.Angle
 import org.team4099.lib.units.derived.degrees
-import org.team4099.lib.units.derived.volts
 
 class Superstructure(
   private val drivetrain: Drivetrain,
   private val elevator: Elevator,
   private val rollers: Rollers,
   private val arm: Arm,
+  private val climber: Climber,
   // private val climber: Climber,
   private val limelight: LimelightVision
 ) : SubsystemBase() {
@@ -70,12 +72,11 @@ class Superstructure(
       (Clock.realTimestamp - armLoopStartTime).inMilliseconds
     )
 
-    //    val climberLoopStartTime = Clock.realTimestamp
-    //    climber.periodic()
-    //    CustomLogger.recordOutput(
-    //      "LoggedRobot/Subsystems/ClimberLoopTimeMS",
-    //      (Clock.realTimestamp - climberLoopStartTime).inMilliseconds
-    //    )
+    val climberLoopStartTime = Clock.realTimestamp
+    climber.periodic()
+    CustomLogger.recordOutput(
+    "LoggedRobot/Subsystems/ClimberLoopTimeMS",
+    (Clock.realTimestamp - climberLoopStartTime).inMilliseconds)
 
     val elevatorLoopStartTime = Clock.realTimestamp
     elevator.periodic()
@@ -101,14 +102,10 @@ class Superstructure(
         nextState = SuperstructureStates.HOME_PREP
       }
       SuperstructureStates.HOME_PREP -> {
-        arm.currentRequest = Request.ArmRequest.Idle()
+        arm.currentRequest = Request.ArmRequest.Zero()
 
         if (arm.isZeroed) {
           nextState = SuperstructureStates.HOME
-        }
-
-        if (currentRequest is Request.SuperstructureRequest.Tuning) {
-          nextState = SuperstructureStates.TUNING
         }
       }
       SuperstructureStates.HOME -> {
@@ -185,6 +182,7 @@ class Superstructure(
               SuperstructureStates.PREP_EJECT_GAMEPIECE
             is Request.SuperstructureRequest.ClimbExtend -> SuperstructureStates.CLIMB_EXTEND
             is Request.SuperstructureRequest.ClimbRetract -> SuperstructureStates.CLIMB_RETRACT
+            is Request.SuperstructureRequest.Tuning -> SuperstructureStates.TUNING
             else -> currentState
           }
       }
@@ -283,8 +281,10 @@ class Superstructure(
       }
       SuperstructureStates.PREP_SCORE_CORAL -> {
 
-        //handle request different height
-        if (currentRequest is Request.SuperstructureRequest.ScorePrepCoral && coralScoringLevel != lastCoralScoringLevel) {
+        // handle request different height
+        if (currentRequest is Request.SuperstructureRequest.ScorePrepCoral &&
+          coralScoringLevel != lastCoralScoringLevel
+        ) {
           nextState = SuperstructureStates.PREP_ELEVATOR_MOVEMENT
         } else {
 
@@ -317,7 +317,7 @@ class Superstructure(
           }
         }
 
-        //handle request idle
+        // handle request idle
         if (currentRequest is Request.SuperstructureRequest.Idle) {
           nextState = SuperstructureStates.SCORE_CLEANUP
         }
@@ -351,8 +351,10 @@ class Superstructure(
       }
       SuperstructureStates.PREP_INTAKE_ALGAE -> {
 
-        //handle request different height
-        if (currentRequest is Request.SuperstructureRequest.ScorePrepCoral && algaeIntakeLevel != lastAlgaeIntakeLevel) {
+        // handle request different height
+        if (currentRequest is Request.SuperstructureRequest.ScorePrepCoral &&
+          algaeIntakeLevel != lastAlgaeIntakeLevel
+        ) {
           nextState = SuperstructureStates.PREP_ELEVATOR_MOVEMENT
         } else {
 
@@ -360,7 +362,6 @@ class Superstructure(
             when (algaeIntakeLevel) {
               AlgaeLevel.GROUND ->
                 ElevatorTunableValues.ElevatorHeights.intakeAlgaeGroundHeight.get()
-
               AlgaeLevel.L2 -> ElevatorTunableValues.ElevatorHeights.intakeAlgaeL2Height.get()
               AlgaeLevel.L3 -> ElevatorTunableValues.ElevatorHeights.intakeAlgaeL3Height.get()
               else -> 0.0.inches
@@ -619,15 +620,15 @@ class Superstructure(
     return returnCommand
   }
 
-  //  fun testClimberCommand(): Command {
-  //    val returnCommand = run {
-  //      currentRequest = Request.SuperstructureRequest.Tuning()
-  //      climber.currentRequest =
-  //        Request.ClimberRequest.ClosedLoop(ClimberTunableValues.climbRetractAngle.get())
-  //    }
-  //    returnCommand.name = "TestClimberCommand"
-  //    return returnCommand
-  //  }
+  fun testClimberCommand(): Command {
+      val returnCommand = run {
+        currentRequest = Request.SuperstructureRequest.Tuning()
+        climber.currentRequest =
+          Request.ClimberRequest.ClosedLoop(ClimberTunableValues.climbRetractAngle.get())
+      }
+      returnCommand.name = "TestClimberCommand"
+      return returnCommand
+    }
 
   companion object {
     enum class SuperstructureStates {

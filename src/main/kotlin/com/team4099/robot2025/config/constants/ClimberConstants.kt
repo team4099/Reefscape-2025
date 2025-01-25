@@ -4,6 +4,7 @@ import org.team4099.lib.units.base.amps
 import org.team4099.lib.units.base.grams
 import org.team4099.lib.units.base.inches
 import org.team4099.lib.units.base.meters
+import org.team4099.lib.units.base.pounds
 import org.team4099.lib.units.base.seconds
 import org.team4099.lib.units.derived.DerivativeGain
 import org.team4099.lib.units.derived.IntegralGain
@@ -17,9 +18,9 @@ import org.team4099.lib.units.perSecond
 
 object ClimberConstants {
   // TODO: Change the constant values
-  val MAX_VELOCITY = 0.0.degrees.perSecond
-  val MAX_ACCELERATION = 0.0.degrees.perSecond.perSecond
-  val MAX_ANGLE = 0.0.degrees
+  val MAX_VELOCITY = 100.0.degrees.perSecond
+  val MAX_ACCELERATION = 50.0.degrees.perSecond.perSecond
+  val MAX_ANGLE = 180.0.degrees
   val MIN_ANGLE = 0.0.degrees
   val TOLERANCE = 0.0.degrees
 
@@ -37,8 +38,10 @@ object ClimberConstants {
   val CLIMBER_EXTEND_ANGLE = 0.0.degrees
   val CLIMBER_RETRACT_ANGLE = 0.0.degrees
 
-  val LENGTH = 0.0.inches
-  val INERTIA = 0.0.kilo.grams * 0.0.meters.squared
+  val CLIMBER_TEST_ANGLE = 0.0.degrees
+
+  val LENGTH = 13.408.inches
+  val INERTIA = 16.767866.pounds * 1.0.inches.squared
   val GEAR_RATIO = 1.0
 
   // TODO: Tune the PID values
@@ -47,9 +50,9 @@ object ClimberConstants {
     val KI_REAL: IntegralGain<Radian, Volt> = 0.0.volts / (1.0.degrees * 1.0.seconds)
     val KD_REAL: DerivativeGain<Radian, Volt> = 0.0.volts / 1.0.degrees.perSecond
 
-    val KP_SIM = 0.0.volts / 1.0.degrees
+    val KP_SIM = 0.2.volts / 1.0.degrees
     val KI_SIM = 0.0.volts / (1.0.degrees * 1.0.seconds)
-    val KD_SIM = 0.0.volts / 1.0.degrees.perSecond
+    val KD_SIM = 0.005.volts / 1.0.degrees.perSecond
 
     val KS = 0.0.volts
     val KV = 0.0.volts / 1.0.degrees.perSecond

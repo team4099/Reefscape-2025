@@ -54,7 +54,7 @@ object Constants {
   }
 
   object Tuning {
-    const val TUNING_MODE = false
+    const val TUNING_MODE = true
     const val DEBUGING_MODE = false
     const val SIMULATE_DRIFT = false
     const val DRIFT_CONSTANT = 0.001
@@ -108,7 +108,6 @@ object Constants {
     val BACK_RIGHT_MODULE_NAME = "Back Right Wheel"
   }
 
-  // TODO: change motor IDS (URGENT!)
   object Climber {
     const val CLIMBER_MOTOR_ID = 31
   }

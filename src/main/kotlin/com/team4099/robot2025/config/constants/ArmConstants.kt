@@ -60,8 +60,8 @@ object ArmConstants {
   val INVERSION_VALUE: InvertedValue = InvertedValue.Clockwise_Positive
   val NEUTRAL_MODE_VALUE: NeutralModeValue = NeutralModeValue.Brake
 
-  val MOTION_MAGIC_ACCELERATION = 10.0.degrees.perSecond.perSecond
-  val MOTION_MAGIC_CRUISE_VELOCITY = 10.0.degrees.perSecond
+  val MOTION_MAGIC_ACCELERATION = 50.0.degrees.perSecond.perSecond
+  val MOTION_MAGIC_CRUISE_VELOCITY = 100.0.degrees.perSecond
 
   val ENCODER_DIRECTION_VALUE: SensorDirectionValue = SensorDirectionValue.Clockwise_Positive
   val ENCODER_OFFSET = 0.0.degrees
@@ -70,15 +70,15 @@ object ArmConstants {
   val ARM_LENGTH = 13.408.inches
   val ARM_MAX_ANGLE = 235.0.degrees
   val ARM_MIN_ANGLE = (-70.0).degrees
-  val ARM_TOLERANCE = 5.0.degrees
+  val ARM_TOLERANCE = 2.0.degrees
 
   val VOLTAGE_COMPENSATION = 12.0.volts
 
   object PID {
     // PID Constants
-    val SIM_ARM_KP: ProportionalGain<Radian, Volt> = 0.2.volts / 1.0.degrees
-    val SIM_ARM_KI: IntegralGain<Radian, Volt> = 0.0.volts / (1.0.degrees * 1.0.seconds)
-    val SIM_ARM_KD: DerivativeGain<Radian, Volt> = 0.02.volts / 1.0.degrees.perSecond
+    val SIM_ARM_KP: ProportionalGain<Radian, Volt> = 0.15.volts / 1.0.degrees
+    val SIM_ARM_KI: IntegralGain<Radian, Volt> = 0.01.volts / (1.0.degrees * 1.0.seconds)
+    val SIM_ARM_KD: DerivativeGain<Radian, Volt> = 0.004.volts / 1.0.degrees.perSecond
 
     val REAL_ARM_KP: ProportionalGain<Radian, Volt> = 20.0.volts / 1.0.degrees
     val REAL_ARM_KI: IntegralGain<Radian, Volt> = 0.0.volts / (1.0.degrees * 1.0.seconds)

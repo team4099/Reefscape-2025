@@ -75,4 +75,11 @@ object ClimberTunableValues {
       ClimberConstants.CLIMBER_RETRACT_ANGLE,
       Pair({ it.inDegrees }, { it.degrees })
     )
+
+  val climberTestAngle =
+    LoggedTunableValue(
+      "Climber/testAngle",
+      ClimberConstants.CLIMBER_TEST_ANGLE,
+      Pair({ it.inDegrees }, { it.degrees })
+    )
 }
