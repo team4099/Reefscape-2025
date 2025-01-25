@@ -32,7 +32,11 @@ class Superstructure(
 ) : SubsystemBase() {
 
   private var theoreticalGamePiece: GamePiece = GamePiece.NONE
+
+  private var lastCoralScoringLevel: CoralLevel = CoralLevel.NONE
   private var coralScoringLevel: CoralLevel = CoralLevel.NONE
+
+  private var lastAlgaeIntakeLevel: AlgaeLevel = AlgaeLevel.NONE
   private var algaeIntakeLevel: AlgaeLevel = AlgaeLevel.NONE
 
   var currentRequest: Request.SuperstructureRequest = Request.SuperstructureRequest.Idle()
@@ -271,42 +275,49 @@ class Superstructure(
             is Request.SuperstructureRequest.ScorePrepAlgaeBarge -> {
               nextState = SuperstructureStates.PREP_SCORE_ALGAE_BARGE
             }
+            is Request.SuperstructureRequest.Idle -> {
+              nextState = SuperstructureStates.IDLE
+            }
           }
-        }
-
-        if (currentRequest is Request.SuperstructureRequest.Idle) {
-          nextState = SuperstructureStates.IDLE
         }
       }
       SuperstructureStates.PREP_SCORE_CORAL -> {
-        val reefLevelElevatorHeight: Length =
-          when (coralScoringLevel) {
-            CoralLevel.L1 -> ElevatorTunableValues.ElevatorHeights.L1Height.get()
-            CoralLevel.L2 -> ElevatorTunableValues.ElevatorHeights.L2Height.get()
-            CoralLevel.L3 -> ElevatorTunableValues.ElevatorHeights.L3Height.get()
-            CoralLevel.L4 -> ElevatorTunableValues.ElevatorHeights.L4Height.get()
-            else -> 0.0.inches
-          }
 
-        val reefLevelArmAngle: Angle =
-          when (coralScoringLevel) {
-            CoralLevel.L1 -> ArmTunableValues.ArmAngles.scoreCoralL1Angle.get()
-            CoralLevel.L2 -> ArmTunableValues.ArmAngles.scoreCoralL2Angle.get()
-            CoralLevel.L3 -> ArmTunableValues.ArmAngles.scoreCoralL3Angle.get()
-            CoralLevel.L4 -> ArmTunableValues.ArmAngles.scoreCoralL4Angle.get()
-            else -> {
-              0.0.degrees
+        //handle request different height
+        if (currentRequest is Request.SuperstructureRequest.ScorePrepCoral && coralScoringLevel != lastCoralScoringLevel) {
+          nextState = SuperstructureStates.PREP_ELEVATOR_MOVEMENT
+        } else {
+
+          val reefLevelElevatorHeight: Length =
+            when (coralScoringLevel) {
+              CoralLevel.L1 -> ElevatorTunableValues.ElevatorHeights.L1Height.get()
+              CoralLevel.L2 -> ElevatorTunableValues.ElevatorHeights.L2Height.get()
+              CoralLevel.L3 -> ElevatorTunableValues.ElevatorHeights.L3Height.get()
+              CoralLevel.L4 -> ElevatorTunableValues.ElevatorHeights.L4Height.get()
+              else -> 0.0.inches
             }
-          }
 
-        elevator.currentRequest = Request.ElevatorRequest.ClosedLoop(reefLevelElevatorHeight)
-        if (elevator.isAtTargetedPosition) {
-          arm.currentRequest = Request.ArmRequest.ClosedLoop(reefLevelArmAngle)
-          if (arm.isAtTargetedPosition && currentRequest is Request.SuperstructureRequest.Score) {
-            nextState = SuperstructureStates.SCORE_CORAL
+          val reefLevelArmAngle: Angle =
+            when (coralScoringLevel) {
+              CoralLevel.L1 -> ArmTunableValues.ArmAngles.scoreCoralL1Angle.get()
+              CoralLevel.L2 -> ArmTunableValues.ArmAngles.scoreCoralL2Angle.get()
+              CoralLevel.L3 -> ArmTunableValues.ArmAngles.scoreCoralL3Angle.get()
+              CoralLevel.L4 -> ArmTunableValues.ArmAngles.scoreCoralL4Angle.get()
+              else -> {
+                0.0.degrees
+              }
+            }
+
+          elevator.currentRequest = Request.ElevatorRequest.ClosedLoop(reefLevelElevatorHeight)
+          if (elevator.isAtTargetedPosition) {
+            arm.currentRequest = Request.ArmRequest.ClosedLoop(reefLevelArmAngle)
+            if (arm.isAtTargetedPosition && currentRequest is Request.SuperstructureRequest.Score) {
+              nextState = SuperstructureStates.SCORE_CORAL
+            }
           }
         }
 
+        //handle request idle
         if (currentRequest is Request.SuperstructureRequest.Idle) {
           nextState = SuperstructureStates.SCORE_CLEANUP
         }
@@ -339,29 +350,37 @@ class Superstructure(
         }
       }
       SuperstructureStates.PREP_INTAKE_ALGAE -> {
-        val algaeIntakeElevatorHeight: Length =
-          when (algaeIntakeLevel) {
-            AlgaeLevel.GROUND ->
-              ElevatorTunableValues.ElevatorHeights.intakeAlgaeGroundHeight.get()
-            AlgaeLevel.L2 -> ElevatorTunableValues.ElevatorHeights.intakeAlgaeL2Height.get()
-            AlgaeLevel.L3 -> ElevatorTunableValues.ElevatorHeights.intakeAlgaeL3Height.get()
-            else -> 0.0.inches
-          }
 
-        val algaeIntakeArmAngle: Angle =
-          when (algaeIntakeLevel) {
-            AlgaeLevel.GROUND -> ArmTunableValues.ArmAngles.intakeAlgaeGroundAngle.get()
-            AlgaeLevel.L2 -> ArmTunableValues.ArmAngles.intakeAlgaeL2Angle.get()
-            AlgaeLevel.L3 -> ArmTunableValues.ArmAngles.intakeAlgaeL3Angle.get()
-            else -> 0.0.degrees
-          }
+        //handle request different height
+        if (currentRequest is Request.SuperstructureRequest.ScorePrepCoral && algaeIntakeLevel != lastAlgaeIntakeLevel) {
+          nextState = SuperstructureStates.PREP_ELEVATOR_MOVEMENT
+        } else {
 
-        elevator.currentRequest = Request.ElevatorRequest.ClosedLoop(algaeIntakeElevatorHeight)
+          val algaeIntakeElevatorHeight: Length =
+            when (algaeIntakeLevel) {
+              AlgaeLevel.GROUND ->
+                ElevatorTunableValues.ElevatorHeights.intakeAlgaeGroundHeight.get()
 
-        if (elevator.isAtTargetedPosition) {
-          arm.currentRequest = Request.ArmRequest.ClosedLoop(algaeIntakeArmAngle)
-          if (arm.isAtTargetedPosition) {
-            nextState = SuperstructureStates.INTAKE_ALGAE
+              AlgaeLevel.L2 -> ElevatorTunableValues.ElevatorHeights.intakeAlgaeL2Height.get()
+              AlgaeLevel.L3 -> ElevatorTunableValues.ElevatorHeights.intakeAlgaeL3Height.get()
+              else -> 0.0.inches
+            }
+
+          val algaeIntakeArmAngle: Angle =
+            when (algaeIntakeLevel) {
+              AlgaeLevel.GROUND -> ArmTunableValues.ArmAngles.intakeAlgaeGroundAngle.get()
+              AlgaeLevel.L2 -> ArmTunableValues.ArmAngles.intakeAlgaeL2Angle.get()
+              AlgaeLevel.L3 -> ArmTunableValues.ArmAngles.intakeAlgaeL3Angle.get()
+              else -> 0.0.degrees
+            }
+
+          elevator.currentRequest = Request.ElevatorRequest.ClosedLoop(algaeIntakeElevatorHeight)
+
+          if (elevator.isAtTargetedPosition) {
+            arm.currentRequest = Request.ArmRequest.ClosedLoop(algaeIntakeArmAngle)
+            if (arm.isAtTargetedPosition) {
+              nextState = SuperstructureStates.INTAKE_ALGAE
+            }
           }
         }
 
@@ -509,6 +528,9 @@ class Superstructure(
     if (nextState != currentState) {
       lastTransitionTime = Clock.fpgaTime
     }
+
+    lastCoralScoringLevel = coralScoringLevel
+    lastAlgaeIntakeLevel = algaeIntakeLevel
 
     currentState = nextState
   }
