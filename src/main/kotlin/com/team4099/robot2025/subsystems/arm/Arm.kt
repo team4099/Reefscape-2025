@@ -47,13 +47,13 @@ class Arm(private val io: ArmIO) {
   init {
     // Initialize Arm Tunable Values
     if (RobotBase.isReal()) {
-      armKP.initDefault(ArmConstants.PID.SIM_ARM_KP)
-      armKI.initDefault(ArmConstants.PID.SIM_ARM_KI)
-      armKD.initDefault(ArmConstants.PID.SIM_ARM_KD)
-    } else {
       armKP.initDefault(ArmConstants.PID.REAL_ARM_KP)
       armKI.initDefault(ArmConstants.PID.REAL_ARM_KI)
       armKD.initDefault(ArmConstants.PID.REAL_ARM_KD)
+    } else {
+      armKP.initDefault(ArmConstants.PID.SIM_ARM_KP)
+      armKI.initDefault(ArmConstants.PID.SIM_ARM_KI)
+      armKD.initDefault(ArmConstants.PID.SIM_ARM_KD)
     }
   }
 
