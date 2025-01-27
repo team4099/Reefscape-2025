@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj.RobotBase
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import org.team4099.lib.units.base.inInches
 import org.team4099.lib.units.base.inches
-import org.team4099.lib.units.base.seconds
 import org.team4099.lib.units.derived.ElectricalPotential
 import org.team4099.lib.units.derived.inVolts
 import org.team4099.lib.units.derived.volts
@@ -139,9 +138,7 @@ class Elevator(val io: ElevatorIO) : SubsystemBase() {
 
     CustomLogger.recordOutput("Elevator/isAtTargetPosition", isAtTargetedPosition)
 
-    CustomLogger.recordOutput(
-      "Elevator/elevatorPositionTarget", elevatorPositionTarget.inInches
-    )
+    CustomLogger.recordOutput("Elevator/elevatorPositionTarget", elevatorPositionTarget.inInches)
     CustomLogger.recordOutput(
       "Elevator/elevatorVelocityTarget", elevatorVelocityTarget.inInchesPerSecond
     )
@@ -189,7 +186,6 @@ class Elevator(val io: ElevatorIO) : SubsystemBase() {
         io.setPosition(elevatorPositionTarget)
 
         nextState = fromElevatorRequestToState(currentRequest)
-
       }
     }
     currentState = nextState

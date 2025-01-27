@@ -50,7 +50,6 @@ object ElevatorTunableValues {
   val kGSecond = LoggedTunableValue("Elevator/kGSecondStage", Pair({ it.inVolts }, { it.volts }))
   val kGThird = LoggedTunableValue("Elevator/kGThirdStage", Pair({ it.inVolts }, { it.volts }))
 
-
   object TunableElevatorHeights {
     val minPosition =
       LoggedTunableValue(
