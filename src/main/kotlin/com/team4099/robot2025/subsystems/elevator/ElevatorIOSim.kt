@@ -118,6 +118,5 @@ object ElevatorIOSim : ElevatorIO {
     kS: StaticFeedforward<Volt>,
     kV: VelocityFeedforward<Meter, Volt>,
     kA: AccelerationFeedforward<Meter, Volt>
-  ) {
-  }
+  ) {}
 }
