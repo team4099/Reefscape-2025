@@ -28,6 +28,7 @@
    }
   },
   "mass":{
+<<<<<<< HEAD
    "exp":"109.0691008 lbs",
    "val":49.4729119256409
   },
@@ -50,6 +51,30 @@
   "tmax":{
    "exp":"1.134 N * m",
    "val":1.134
+=======
+   "exp":"150 lbs",
+   "val":68.0388555
+  },
+  "inertia":{
+   "exp":"6 kg m ^ 2",
+   "val":6.0
+  },
+  "gearing":{
+   "exp":"6.5",
+   "val":6.5
+  },
+  "radius":{
+   "exp":"2 in",
+   "val":0.0508
+  },
+  "vmax":{
+   "exp":"6000 RPM",
+   "val":628.3185307179587
+  },
+  "tmax":{
+   "exp":"1.2 N * m",
+   "val":1.2
+>>>>>>> 65321da (choreo working)
   },
   "cof":{
    "exp":"1.5",
@@ -57,6 +82,7 @@
   },
   "bumper":{
    "front":{
+<<<<<<< HEAD
     "exp":"17.75 in",
     "val":0.45085
    },
@@ -67,6 +93,18 @@
    "back":{
     "exp":"17.75 in",
     "val":0.45085
+=======
+    "exp":"16 in",
+    "val":0.4064
+   },
+   "side":{
+    "exp":"16 in",
+    "val":0.4064
+   },
+   "back":{
+    "exp":"16 in",
+    "val":0.4064
+>>>>>>> 65321da (choreo working)
    }
   },
   "differentialTrackWidth":{

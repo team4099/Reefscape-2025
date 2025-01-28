@@ -115,7 +115,7 @@ object DrivetrainConstants {
         if (RobotBase.isReal()) {
           return 3.3.meters.perSecond / 1.0.meters // todo:4
         } else {
-          return 10.0.meters.perSecond / 1.0.meters
+          return 30.0.meters.perSecond / 1.0.meters
         }
       }
     val AUTO_POS_KI: IntegralGain<Meter, Velocity<Meter>>
