@@ -77,15 +77,7 @@ class SwerveModuleIOTalon(
   private val driveConfiguration: TalonFXConfiguration = TalonFXConfiguration()
 
   private val potentiometerOutput: Double
-    get() {
-      return if (label == Constants.Drivetrain.FRONT_RIGHT_MODULE_NAME ||
-        label == Constants.Drivetrain.BACK_RIGHT_MODULE_NAME
-      ) {
-        potentiometer.voltage / RobotController.getVoltage5V() * 2.0 * PI
-      } else {
-        2 * PI - potentiometer.voltage / RobotController.getVoltage5V() * 2.0 * Math.PI
-      }
-    }
+    get() = 2 * PI - potentiometer.voltage / RobotController.getVoltage5V() * 2.0 * Math.PI
 
   val driveStatorCurrentSignal: StatusSignal<Current>
   val driveSupplyCurrentSignal: StatusSignal<Current>
@@ -126,7 +118,7 @@ class SwerveModuleIOTalon(
 
     steeringConfiguration.MotorOutput.NeutralMode =
       NeutralModeValue.Brake // change back to coast maybe?
-    steeringFalcon.inverted = true
+    steeringConfiguration.MotorOutput.Inverted = InvertedValue.Clockwise_Positive
 
     steeringFalcon.configurator.apply(steeringConfiguration)
 
@@ -295,13 +287,7 @@ class SwerveModuleIOTalon(
   override fun zeroSteering(isInAutonomous: Boolean) {
     steeringFalcon.setPosition(
       steeringSensor.positionToRawUnits(
-        if (label == Constants.Drivetrain.FRONT_RIGHT_MODULE_NAME ||
-          label == Constants.Drivetrain.BACK_RIGHT_MODULE_NAME
-        ) {
-          (potentiometerOutput.radians - zeroOffset)
-        } else {
-          (2 * PI).radians - (potentiometerOutput.radians - zeroOffset)
-        }
+        (2 * PI).radians - (potentiometerOutput.radians - zeroOffset)
       )
     )
 
@@ -383,9 +369,9 @@ class SwerveModuleIOTalon(
     } else {
       motorOutputConfig.NeutralMode = NeutralModeValue.Coast
     }
+
+    motorOutputConfig.Inverted = InvertedValue.Clockwise_Positive
     steeringFalcon.configurator.apply(motorOutputConfig)
-    // motor output configs might overwrite invert?
-    steeringFalcon.inverted = true
   }
 
   override fun runCharacterization(input: ElectricalPotential) {
