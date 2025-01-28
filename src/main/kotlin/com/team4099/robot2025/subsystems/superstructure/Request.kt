@@ -31,6 +31,13 @@ sealed interface Request {
     class Characterize(val voltage: ElectricalPotential) : DrivetrainRequest
   }
 
+  sealed interface ClimberRequest : Request {
+    class OpenLoop(val voltage: ElectricalPotential) : ClimberRequest
+
+    class ClosedLoop(val position: Angle) : ClimberRequest
+
+    class Home() : ClimberRequest
+
   sealed interface ArmRequest : Request {
     class OpenLoop(val armVoltage: ElectricalPotential) : ArmRequest
     class CloseLoop(val armPosition: Angle) : ArmRequest
@@ -39,6 +46,7 @@ sealed interface Request {
 
   sealed interface RollersRequest : Request {
     class OpenLoop(val RollersVoltage: ElectricalPotential) : RollersRequest
+<<<<<<< HEAD
     class Zero() : RollersRequest
   }
 
@@ -46,5 +54,9 @@ sealed interface Request {
     class ClosedLoop(val position: Length) : ElevatorRequest
     class OpenLoop(val voltage: ElectricalPotential) : ElevatorRequest
     class Home() : ElevatorRequest
+=======
+    class Zero(): RollersRequest
+
+>>>>>>> fa8a3a35c5d982eaf743e0c6f8a8cc376b3440e4
   }
 }
