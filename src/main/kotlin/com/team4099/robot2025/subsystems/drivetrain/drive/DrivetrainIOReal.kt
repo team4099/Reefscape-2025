@@ -17,6 +17,7 @@ object DrivetrainIOReal : DrivetrainIO {
           TalonFX(Constants.Drivetrain.FRONT_LEFT_DRIVE_ID, CANIVORE_NAME),
           AnalogInput(Constants.Drivetrain.FRONT_LEFT_ANALOG_POTENTIOMETER),
           DrivetrainConstants.FRONT_LEFT_MODULE_ZERO,
+          DrivetrainConstants.MK4N_STEERING_SENSOR_GEAR_RATIO,
           Constants.Drivetrain.FRONT_LEFT_MODULE_NAME
         )
       ),
@@ -26,6 +27,7 @@ object DrivetrainIOReal : DrivetrainIO {
           TalonFX(Constants.Drivetrain.FRONT_RIGHT_DRIVE_ID, CANIVORE_NAME),
           AnalogInput(Constants.Drivetrain.FRONT_RIGHT_ANALOG_POTENTIOMETER),
           DrivetrainConstants.FRONT_RIGHT_MODULE_ZERO,
+          DrivetrainConstants.MK4N_STEERING_SENSOR_GEAR_RATIO,
           Constants.Drivetrain.FRONT_RIGHT_MODULE_NAME
         )
       ),
@@ -35,6 +37,7 @@ object DrivetrainIOReal : DrivetrainIO {
           TalonFX(Constants.Drivetrain.BACK_LEFT_DRIVE_ID, CANIVORE_NAME),
           AnalogInput(Constants.Drivetrain.BACK_LEFT_ANALOG_POTENTIOMETER),
           DrivetrainConstants.BACK_LEFT_MODULE_ZERO,
+          DrivetrainConstants.MK4I_STEERING_SENSOR_GEAR_RATIO,
           Constants.Drivetrain.BACK_LEFT_MODULE_NAME
         )
       ),
@@ -47,6 +50,7 @@ object DrivetrainIOReal : DrivetrainIO {
           TalonFX(Constants.Drivetrain.BACK_RIGHT_DRIVE_ID, CANIVORE_NAME),
           AnalogInput(Constants.Drivetrain.BACK_RIGHT_ANALOG_POTENTIOMETER),
           DrivetrainConstants.BACK_RIGHT_MODULE_ZERO,
+          DrivetrainConstants.MK4I_STEERING_SENSOR_GEAR_RATIO,
           Constants.Drivetrain.BACK_RIGHT_MODULE_NAME
         )
       )

@@ -57,7 +57,9 @@ class SwerveModuleIOTalon(
   private val driveFalcon: TalonFX,
   private val potentiometer: AnalogInput,
   private val zeroOffset: Angle,
-  override val label: String
+  private val steeringRatio: Double,
+  override val label: String,
+
 ) : SwerveModuleIO {
   private val steeringSensor =
     ctreAngularMechanismSensor(
@@ -114,7 +116,7 @@ class SwerveModuleIOTalon(
     steeringConfiguration.ClosedLoopGeneral.ContinuousWrap = true
     steeringConfiguration.CurrentLimits.SupplyCurrentLimitEnable = true
     steeringConfiguration.Feedback.SensorToMechanismRatio =
-      1 / DrivetrainConstants.STEERING_SENSOR_GEAR_RATIO
+      1 / steeringRatio
 
     steeringConfiguration.MotorOutput.NeutralMode =
       NeutralModeValue.Brake // change back to coast maybe?
