@@ -55,11 +55,4 @@ sealed interface Request {
     class OpenLoop(val voltage: ElectricalPotential) : ElevatorRequest
     class Home() : ElevatorRequest
   }
-
-  sealed interface ElevatorRequest : Request {
-    class ClosedLoop(val position: Length) : ElevatorRequest
-    class OpenLoop(val voltage: ElectricalPotential) : ElevatorRequest
-    class Home() : ElevatorRequest
-  }
-
 }

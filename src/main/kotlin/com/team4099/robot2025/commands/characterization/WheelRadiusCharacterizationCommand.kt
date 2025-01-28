@@ -99,7 +99,7 @@ class WheelRadiusCharacterizationCommand(
   }
 
   override fun end(interrupted: Boolean) {
-    if (accumGyroYawRads <= (Math.PI * 2.0).radians) {
+    if (accumGyroYawRads.absoluteValue <= (Math.PI * 2.0).radians) {
       CustomLogger.recordDebugOutput(
         "Drivetrain/radiansOffFromWheelRadius",
         ((Math.PI * 2.0).radians - accumGyroYawRads).inRadians

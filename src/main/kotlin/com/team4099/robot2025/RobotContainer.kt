@@ -1,5 +1,6 @@
 package com.team4099.robot2025
 
+import WheelRadiusCharacterizationCommand
 import com.team4099.lib.logging.LoggedTunableValue
 import com.team4099.robot2023.subsystems.limelight.LimelightVisionIOReal
 import com.team4099.robot2025.auto.AutonomousSelector
@@ -106,8 +107,13 @@ object RobotContainer {
   fun requestIdle() {}
 
   fun mapTeleopControls() {
-
     ControlBoard.resetGyro.whileTrue(ResetGyroYawCommand(drivetrain))
+
+    ControlBoard.characterizeSubsystem.whileTrue(
+      WheelRadiusCharacterizationCommand(
+        drivetrain, WheelRadiusCharacterizationCommand.Companion.Direction.CLOCKWISE
+      )
+    )
   }
 
   fun mapTestControls() {}

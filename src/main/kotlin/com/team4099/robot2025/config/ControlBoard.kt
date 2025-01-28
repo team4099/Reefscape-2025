@@ -47,6 +47,8 @@ object ControlBoard {
   val intake = Trigger { driver.rightShoulderButton }
   val forceIdle = Trigger { driver.dPadDown || operator.startButton && operator.selectButton }
 
+  val characterizeSubsystem = Trigger { driver.leftTriggerAxis > 0.5 }
+
   // sim trigger
   // val score = Trigger {driver.bButton}
   // val intake = Trigger { driver.xButton}
