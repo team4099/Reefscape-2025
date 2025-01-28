@@ -70,7 +70,8 @@ object DrivetrainConstants {
   const val STEERING_SENSOR_CPR = 2048
 
   const val DRIVE_SENSOR_GEAR_RATIO = (16.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0)
-  const val STEERING_SENSOR_GEAR_RATIO = 7.0 / 150.0
+  const val MK4I_STEERING_SENSOR_GEAR_RATIO = 7.0 / 150.0
+  const val MK4N_STEERING_SENSOR_GEAR_RATIO = 1 / 18.75
 
   val ALLOWED_STEERING_ANGLE_ERROR = 1.degrees
 
@@ -80,13 +81,14 @@ object DrivetrainConstants {
   val DRIVE_TRIGGER_THRESHOLD_TIME = 0.1.seconds
 
   val DRIVE_STATOR_CURRENT_LIMIT = 80.0.amps
+
   val DRIVE_STATOR_THRESHOLD_CURRENT_LIMIT = 80.0.amps
   val DRIVE_STATOR_TRIGGER_THRESHOLD_TIME = 1.0.seconds
 
-  val FRONT_LEFT_MODULE_ZERO = 0.19.radians // good
-  val FRONT_RIGHT_MODULE_ZERO = 6.016.radians // good
-  val BACK_LEFT_MODULE_ZERO = 2.538.radians // good
-  val BACK_RIGHT_MODULE_ZERO = 1.25.radians // good
+  val FRONT_LEFT_MODULE_ZERO = 5.626.radians // good
+  val FRONT_RIGHT_MODULE_ZERO = 3.077.radians // good
+  val BACK_LEFT_MODULE_ZERO = 4.355.radians // good
+  val BACK_RIGHT_MODULE_ZERO = 2.258.radians // good
 
   val STEERING_COMPENSATION_VOLTAGE = 10.volts
   val DRIVE_COMPENSATION_VOLTAGE = 12.volts
