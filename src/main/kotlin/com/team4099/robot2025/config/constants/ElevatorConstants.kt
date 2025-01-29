@@ -69,8 +69,8 @@ object ElevatorConstants {
   val ELEVATOR_GROUND_OFFSET = 3.829.inches
 
   // TODO: make real maxes
-  val MAX_VELOCITY = 140.0.inches.perSecond
-  val MAX_ACCELERATION = 24.0.inches.perSecond.perSecond
+  val MAX_VELOCITY = 150.0.inches.perSecond
+  val MAX_ACCELERATION = 50.0.inches.perSecond.perSecond
 
   object PID {
     // TODO: tune all

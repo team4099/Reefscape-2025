@@ -60,8 +60,8 @@ object ArmConstants {
   val INVERSION_VALUE: InvertedValue = InvertedValue.Clockwise_Positive
   val NEUTRAL_MODE_VALUE: NeutralModeValue = NeutralModeValue.Brake
 
-  val MOTION_MAGIC_ACCELERATION = 50.0.degrees.perSecond.perSecond
-  val MOTION_MAGIC_CRUISE_VELOCITY = 100.0.degrees.perSecond
+  val MOTION_MAGIC_ACCELERATION = 400.0.degrees.perSecond.perSecond
+  val MOTION_MAGIC_CRUISE_VELOCITY = 400.0.degrees.perSecond
 
   val ENCODER_DIRECTION_VALUE: SensorDirectionValue = SensorDirectionValue.Clockwise_Positive
   val ENCODER_OFFSET = 0.0.degrees

@@ -4,6 +4,7 @@ import com.team4099.lib.hal.Clock
 import com.team4099.robot2025.config.constants.Constants.Universal.AlgaeLevel
 import com.team4099.robot2025.config.constants.Constants.Universal.CoralLevel
 import com.team4099.robot2025.config.constants.Constants.Universal.GamePiece
+import com.team4099.robot2025.config.constants.ElevatorConstants
 import com.team4099.robot2025.subsystems.arm.Arm
 import com.team4099.robot2025.subsystems.arm.ArmTunableValues
 import com.team4099.robot2025.subsystems.climber.Climber
@@ -17,7 +18,13 @@ import com.team4099.robot2025.subsystems.rollers.RollersTunableValues
 import com.team4099.robot2025.util.CustomLogger
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
+import org.team4099.lib.geometry.Pose3d
+import org.team4099.lib.geometry.Pose3dWPILIB
+import org.team4099.lib.geometry.Rotation3d
+import org.team4099.lib.geometry.Transform3d
+import org.team4099.lib.geometry.Translation3d
 import org.team4099.lib.units.base.Length
+import org.team4099.lib.units.base.inMeters
 import org.team4099.lib.units.base.inMilliseconds
 import org.team4099.lib.units.base.inches
 import org.team4099.lib.units.derived.Angle
@@ -63,6 +70,7 @@ class Superstructure(
 
   private var lastTransitionTime = Clock.fpgaTime
 
+
   override fun periodic() {
 
     val armLoopStartTime = Clock.realTimestamp
@@ -95,6 +103,48 @@ class Superstructure(
     CustomLogger.recordOutput("Superstructure/currentRequest", currentRequest.javaClass.simpleName)
     CustomLogger.recordOutput("Superstructure/currentState", currentState.name)
     CustomLogger.recordOutput("Superstructure/isAtAllTargetedPositions", isAtRequestedState)
+
+    val elevatorPosition = elevator.inputs.elevatorPosition
+    //Firsts Stage
+    CustomLogger.recordOutput("SimulatedMechanisms/0",
+      Pose3d().transformBy(
+        Transform3d(
+          Translation3d(0.0.inches, 0.0.inches,
+            if (elevatorPosition > ElevatorConstants.SECOND_STAGE_HEIGHT) elevatorPosition - ElevatorConstants.SECOND_STAGE_HEIGHT
+            else 0.0.inches),
+          Rotation3d()
+        )
+      ).pose3d)
+
+    //Second Stage
+    CustomLogger.recordOutput("SimulatedMechanisms/1",
+      Pose3d().transformBy(
+        Transform3d(
+          Translation3d(0.0.inches, 0.0.inches,
+            if (elevatorPosition > ElevatorConstants.FIRST_STAGE_HEIGHT) elevatorPosition - ElevatorConstants.FIRST_STAGE_HEIGHT
+            else 0.0.inches),
+          Rotation3d()
+        )
+      ).pose3d)
+
+    //Carriage
+    CustomLogger.recordOutput("SimulatedMechanisms/2",
+      Pose3d().transformBy(
+        Transform3d(
+          Translation3d(0.0.inches, 0.0.inches, elevatorPosition),
+          Rotation3d()
+        )
+      ).pose3d)
+
+    //Arm
+    CustomLogger.recordOutput("SimulatedMechanisms/3",
+      Pose3d().transformBy(
+        Transform3d(
+          Translation3d(8.5.inches, 0.0.inches, 15.3125.inches + elevatorPosition),
+          Rotation3d(0.0.degrees, -arm.inputs.armPosition, 0.0.degrees)
+        )
+      ).pose3d)
+
 
     var nextState = currentState
     when (currentState) {
