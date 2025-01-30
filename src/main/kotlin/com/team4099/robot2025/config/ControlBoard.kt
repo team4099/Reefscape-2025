@@ -41,54 +41,20 @@ object ControlBoard {
     get() = driver.leftShoulderButton
 
   val resetGyro = Trigger { driver.startButton && driver.selectButton }
+  val forceIdle = Trigger { driver.dPadDown }
 
-  // sim triggers
-  val score = Trigger { driver.leftTriggerAxis > 0.5 }
-  val intake = Trigger { driver.rightShoulderButton }
-  val forceIdle = Trigger { driver.dPadDown || operator.startButton && operator.selectButton }
-
-  // sim trigger
-  // val score = Trigger {driver.bButton}
-  // val intake = Trigger { driver.xButton}
-
-  // real triggers
-  // val score = Trigger {driver.leftTriggerAxis > 0.5}
-  // val intake = Trigger { driver.rightShoulderButton}
-
+  //Tuning Binds
   val testElevatorBind = Trigger { driver.aButton }
   val testClimberBind = Trigger { driver.bButton }
   val testRollersBind = Trigger { driver.xButton }
   val testArmBind = Trigger { driver.yButton }
 
-  /* (last years commands)
+  //Single Driver Binds
+  val prepL2 = Trigger { driver.aButton }
+  val prepL3 = Trigger { driver.bButton }
+  val prepL4 = Trigger { driver.yButton }
 
-  val targetAmp = Trigger { driver.aButton }
-  val prepAmp = Trigger { operator.aButton }
-  val prepLow = Trigger { operator.xButton }
-  val prepHighProtected = Trigger { operator.bButton }
-  val prepHigh = Trigger { operator.yButton }
-  val passingShot = Trigger { operator.leftShoulderButton }
-  val passingShotAlignment = Trigger { driver.yButton }
-  val underStagePassingShot = Trigger { operator.rightShoulderButton }
+  val score = Trigger { driver.rightTriggerAxis > 0.5 }
+  val intakeCoral = Trigger { driver.leftTriggerAxis > 0.5 }
 
-  val extendClimb = Trigger { operator.dPadUp }
-  val retractClimb = Trigger { operator.dPadDown }
-
-  val ejectGamePiece = Trigger { driver.rightTriggerAxis > 0.5 }
-
-  val testWrist = Trigger { driver.aButton }
-
-  val characterizeWrist = Trigger { driver.rightShoulderButton }
-
-  val climbAlignFar = Trigger { driver.dPadUp }
-  val climbAlignLeft = Trigger { driver.dPadLeft }
-  val climbAlignRight = Trigger { driver.dPadRight }
-
-  val targetSpeaker = Trigger { driver.xButton } // TODO: switch back to climbAlignLeft
-  val climbAutoAlign = Trigger { driver.bButton }
-
-  val lockWheels = Trigger { driver.startButton }
-
-  // week0 controls
-  */
 }

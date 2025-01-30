@@ -5,11 +5,6 @@ import org.team4099.lib.units.base.seconds
 import org.team4099.lib.units.milli
 import org.team4099.lib.units.perSecond
 
-typealias GamePiece = Constants.Universal.GamePiece
-
-typealias CoralLevel = Constants.Universal.CoralLevel
-
-typealias AlgaeLevel = Constants.Universal.AlgaeLevel
 
 object Constants {
   object Universal {

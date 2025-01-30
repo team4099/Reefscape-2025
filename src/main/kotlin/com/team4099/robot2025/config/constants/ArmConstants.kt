@@ -24,24 +24,24 @@ object ArmConstants {
   val ARM_GEAR_RATIO = ARM_SPROCKET_RATIO / ARM_MAX_PLANETARY_RATIO
   val ARM_ENCODER_TO_MECHANISM_RATIO = 1.0
 
-  val ZERO_ANGLE = 30.0.degrees
-  val IDLE_CORAL_ANGLE = 0.0.degrees
+  val IDLE_ANGLE = 90.0.degrees
+  val IDLE_CORAL_ANGLE = 90.0.degrees
   val IDLE_ALGAE_ANGLE = 0.0.degrees
 
-  val SAFE_ELEVATOR_FRONT_ANGLE = 0.0.degrees
-  val SAFE_ELEVATOR_BACK_ANGLE = 0.0.degrees
+  val SAFE_ELEVATOR_FRONT_ANGLE = 70.degrees
+  val SAFE_ELEVATOR_BACK_ANGLE = 180.degrees
 
-  val INTAKE_CORAL_ANGLE = 0.0.degrees
+  val INTAKE_CORAL_ANGLE = 235.degrees
   val INTAKE_ALGAE_GROUND_ANGLE = 0.0.degrees
   val INTAKE_ALGAE_L2_ANGLE = 0.0.degrees
   val INTAKE_ALGAE_L3_ANGLE = 0.0.degrees
 
-  val SCORE_CORAL_L1_ANGLE = 0.0.degrees
-  val SCORE_CORAL_L2_ANGLE = 0.0.degrees
-  val SCORE_CORAL_L3_ANGLE = 0.0.degrees
-  val SCORE_CORAL_L4_ANGLE = 0.0.degrees
+  val SCORE_CORAL_L1_ANGLE = 75.degrees
+  val SCORE_CORAL_L2_ANGLE = 55.degrees
+  val SCORE_CORAL_L3_ANGLE = 55.degrees
+  val SCORE_CORAL_L4_ANGLE = 15.degrees
 
-  val EJECT_ANGLE = 0.0.degrees
+  val EJECT_ANGLE = 75.degrees
 
   val SCORE_ALGAE_PROCESSOR_ANGLE = 0.0.degrees
   val SCORE_ALGAE_BARGE_ANGLE = 0.0.degrees

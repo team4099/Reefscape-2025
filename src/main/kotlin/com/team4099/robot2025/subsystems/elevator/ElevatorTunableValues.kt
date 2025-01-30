@@ -82,7 +82,7 @@ object ElevatorTunableValues {
     val idleAlgaeHeight =
       LoggedTunableValue(
         "Elevator/idleAlgaeHeight",
-        ElevatorConstants.IDLE_CORAL_HEIGHT,
+        ElevatorConstants.IDLE_ALGAE_HEIGHT,
         Pair({ it.inInches }, { it.inches })
       )
 
@@ -90,6 +90,14 @@ object ElevatorTunableValues {
       LoggedTunableValue(
         "Elevator/passThroughHeight",
         ElevatorConstants.PASS_THROUGH_HEIGHT,
+        Pair({ it.inInches }, { it.inches })
+      )
+
+
+    val intakeCoralHeight =
+      LoggedTunableValue(
+        "Elevator/intakeCoralHeight",
+        ElevatorConstants.INTAKE_CORAL_HEIGHT,
         Pair({ it.inInches }, { it.inches })
       )
 
@@ -168,19 +176,6 @@ object ElevatorTunableValues {
         "Elevator/L4Height", ElevatorConstants.L4_HEIGHT, Pair({ it.inInches }, { it.inches })
       )
 
-    val algaeLowHeight =
-      LoggedTunableValue(
-        "Elevator/algaeLowHeight",
-        ElevatorConstants.ALGAE_LOW_HEIGHT,
-        Pair({ it.inInches }, { it.inches })
-      )
-
-    val algaeHighHeight =
-      LoggedTunableValue(
-        "Elevator/algaeHighHeight",
-        ElevatorConstants.ALGAE_LOW_HEIGHT,
-        Pair({ it.inInches }, { it.inches })
-      )
 
     val ejectHeight =
       LoggedTunableValue(

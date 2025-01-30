@@ -46,6 +46,7 @@ object ElevatorConstants {
   val IDLE_ALGAE_HEIGHT = 0.0.inches
 
   val PASS_THROUGH_HEIGHT = 0.0.inches
+  val INTAKE_CORAL_HEIGHT = 18.448.inches
 
   val INTAKE_ALGAE_GROUND_HEIGHT = 0.0.inches
   val INTAKE_ALGAE_L2_HEIGHT = 0.0.inches
@@ -55,15 +56,11 @@ object ElevatorConstants {
   val SCORE_BARGE_HEIGHT = 0.0.inches
 
   // TODO: adjust scoring/intaking heights for end-effector offset
-  val L1_HEIGHT = 18.0.inches
-  val L2_HEIGHT = (24.0 + 7.0 + 7.0 / 8.0).inches
-  val L3_HEIGHT = (36.0 + 11.0 + 5.0 / 8.0).inches
-  val L4_HEIGHT = 72.0.inches
+  val L1_HEIGHT =  0.0.inches
+  val L2_HEIGHT = 13.039.inches
+  val L3_HEIGHT = 28.789.inches
+  val L4_HEIGHT = 64.138.inches
 
-  val ALGAE_LOW_HEIGHT = L2_HEIGHT
-  val ALGAE_HIGH_HEIGHT = L3_HEIGHT
-
-  val INTAKE_HEIGHT = (36.0 + 1.0 + 1.0 / 2.0).inches
   val EJECT_HEIGHT = 0.0.inches
 
   val ELEVATOR_GROUND_OFFSET = 3.829.inches

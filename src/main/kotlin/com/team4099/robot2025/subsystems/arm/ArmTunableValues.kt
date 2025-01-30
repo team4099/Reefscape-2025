@@ -27,9 +27,9 @@ object ArmTunableValues {
 
   object ArmAngles {
 
-    val zeroAngle =
+    val idleAngle =
       LoggedTunableValue(
-        "Arm/zeroAngle", ArmConstants.ZERO_ANGLE, Pair({ it.inDegrees }, { it.degrees })
+        "Arm/idleAngle", ArmConstants.IDLE_ANGLE, Pair({ it.inDegrees }, { it.degrees })
       )
 
     val idleCoralAngle =
