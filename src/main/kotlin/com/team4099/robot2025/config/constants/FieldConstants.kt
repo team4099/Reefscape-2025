@@ -1,237 +1,176 @@
-package com.team4099.robot2025.config.constants
-
-import edu.wpi.first.apriltag.AprilTagFields
-import org.team4099.lib.apriltag.AprilTag
-import org.team4099.lib.apriltag.AprilTagFieldLayout
-import org.team4099.lib.geometry.Pose2d
-import org.team4099.lib.geometry.Pose3d
-import org.team4099.lib.geometry.Rotation3d
-import org.team4099.lib.geometry.Translation2d
-import org.team4099.lib.geometry.Translation3d
-import org.team4099.lib.units.base.inMeters
-import org.team4099.lib.units.base.inches
-import org.team4099.lib.units.base.meters
-import org.team4099.lib.units.base.seconds
-import org.team4099.lib.units.derived.degrees
-
-// Copyright (c) 2024 FRC 6328
+// Copyright (c) 2025 FRC 6328
 // http://github.com/Mechanical-Advantage
 //
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE file at
 // the root directory of this project.
+package com.team4099.robot2025.config.constants
+
+import com.fasterxml.jackson.core.JsonProcessingException
+import com.fasterxml.jackson.databind.ObjectMapper
+import edu.wpi.first.apriltag.AprilTagFieldLayout
+import edu.wpi.first.apriltag.AprilTagFields
+import edu.wpi.first.math.util.Units
+import edu.wpi.first.wpilibj.Filesystem
+import org.team4099.lib.geometry.Pose2d
+import org.team4099.lib.geometry.Pose3d
+import org.team4099.lib.geometry.Rotation3d
+import org.team4099.lib.geometry.Transform2d
+import org.team4099.lib.geometry.Translation3d
+import org.team4099.lib.geometry.Translation2d
+import org.team4099.lib.units.base.Length
+import org.team4099.lib.units.base.inches
+import org.team4099.lib.units.derived.Angle
+import org.team4099.lib.units.derived.degrees
+import java.io.IOException
+import java.nio.file.Path
 
 /**
- * Contains various field dimensions and useful reference points. Dimensions are in meters, and sets
- * of corners start in the lower left moving clockwise. **All units in Meters** <br></br> <br></br>
- *
- * All translations and poses are stored with the origin at the rightmost point on the BLUE ALLIANCE
- * wall.<br></br> <br></br> Length refers to the *x* direction (as described by wpilib) <br></br>
- * Width refers to the *y* direction (as described by wpilib)
+ * Contains various field dimensions and useful reference points. All units are in meters and poses
+ * have a blue alliance origin.
  */
 object FieldConstants {
-  var fieldLength = 651.223.inches
-  var fieldWidth = 323.277.inches
+  val fieldLength: Length = 690.876.inches
+  val fieldWidth: Length = 317.0.inches
+  val startingLineX: Length = 299.438.inches // Measured from the inside of starting line
+  val algaeDiameter: Length = 16.0.inches
+  val aprilTagWidth: Length = 6.50.inches
+  val aprilTagCount: Int = 22
 
-  val aprilTags: List<AprilTag> = listOf()
-  val homeAprilTags: List<AprilTag> = listOf()
+  object Processor {
+    val centerFace: Pose2d = Pose2d(235.726.inches, 0.0.inches, 90.0.degrees)
+  }
 
-  val wpilibAprilTags =
-    if (Constants.Universal.REAL_FIELD) aprilTags.map { it.apriltagWpilib }
-    else homeAprilTags.map { it.apriltagWpilib }
+  object Barge {
+    val farCage: Translation2d = Translation2d(345.428.inches, 286.779.inches)
+    val middleCage: Translation2d = Translation2d(345.428.inches, 242.855.inches)
+    val closeCage: Translation2d = Translation2d(345.428.inches, 199.947.inches)
 
-  val wpilibFieldLayout =
-    edu.wpi.first.apriltag.AprilTagFieldLayout(
-      wpilibAprilTags, fieldLength.inMeters, fieldWidth.inMeters
+    // Measured from floor to bottom of cage
+    val deepHeight: Double = Units.inchesToMeters(3.125)
+    val shallowHeight: Double = Units.inchesToMeters(30.125)
+  }
+
+  object CoralStation {
+    val leftCenterFace: Pose2d = Pose2d(
+      33.526.inches,
+      291.176.inches,
+      (90 - 144.011).degrees
     )
+    val rightCenterFace: Pose2d = Pose2d(
+      33.526.inches,
+      25.824.inches,
+      (144.011 - 90).degrees
+    )
+  }
 
-  var wingX = 229.201.inches
-  var podiumX = 126.75.inches
-  var startingLineX = 74.111.inches
-  var subwooferX = 28.inches
-  val edgeOfBumperToCenter = 12.75.inches + 3.5.inches
+  object Reef {
+    val center: Translation2d = Translation2d(176.746.inches, 158.501.inches)
+    val faceToZoneLine: Double = Units.inchesToMeters(12.0) // Side of the reef to the inside of the reef zone line
+    val centerFaces: MutableList<Pose2d?> = mutableListOf<Pose2d?>() // Starting facing the driver station in clockwise order
+    val branchPositions: MutableList<Map<ReefHeight, Pose3d>> =
+      ArrayList() // Starting at the right branch facing the driver station in clockwise
 
-  val fieldAprilTags: List<AprilTag> =
-    listOf(
-      AprilTag(
-        0,
-        Pose3d(
-          Translation3d(1.meters, 57.25.inches, 57.125.inches),
-          Rotation3d(0.degrees, 0.degrees, 180.degrees)
-        )
-      ),
-      AprilTag(
-        1,
-        Pose3d(
-          Translation3d(1.meters, 57.25.inches, 57.125.inches),
-          Rotation3d(0.degrees, 0.degrees, 180.degrees)
-        )
-      ),
-      AprilTag(
-        2,
-        Pose3d(
-          Translation3d(1.meters, 57.25.inches, 57.125.inches),
-          Rotation3d(0.degrees, 0.degrees, 180.degrees)
-        )
-      ),
-      AprilTag(
-        3,
-        Pose3d(
-          Translation3d(652.755.inches, 218.416.inches - 22.25.inches, 57.125.inches),
-          Rotation3d(0.degrees, 0.degrees, 180.degrees)
-        )
-      ),
-      AprilTag(
-        4,
-        Pose3d(
-          Translation3d(652.755.inches, 218.416.inches, 57.125.inches),
-          Rotation3d(0.degrees, 0.degrees, 180.degrees)
-        )
-      ),
-      AprilTag(
-        5,
-        Pose3d(
-          Translation3d(652.755.inches, 218.416.inches, 57.125.inches),
-          Rotation3d(0.degrees, 0.degrees, 180.degrees)
-        )
-      ),
-      AprilTag(
-        6,
-        Pose3d(
-          Translation3d(652.755.inches, 218.416.inches, 57.125.inches),
-          Rotation3d(0.degrees, 0.degrees, 180.degrees)
-        )
-      ),
-      AprilTag(
-        7,
-        Pose3d(
-          Translation3d(652.755.inches, 218.416.inches, 57.125.inches),
-          Rotation3d(0.degrees, 0.degrees, 180.degrees)
-        )
-      ),
-      AprilTag(
-        8,
-        Pose3d(
-          Translation3d(652.755.inches, 218.416.inches, 57.125.inches),
-          Rotation3d(0.degrees, 0.degrees, 180.degrees)
-        )
-      ),
-      AprilTag(
-        9,
-        Pose3d(
-          Translation3d(652.755.inches, 218.416.inches, 57.125.inches),
-          Rotation3d(0.degrees, 0.degrees, 180.degrees)
-        )
-      ),
-      AprilTag(
-        10,
-        Pose3d(
-          Translation3d(652.755.inches, 218.416.inches, 57.125.inches),
-          Rotation3d(0.degrees, 0.degrees, 180.degrees)
-        )
-      ),
-      AprilTag(
-        11,
-        Pose3d(
-          Translation3d(652.755.inches, 218.416.inches, 57.125.inches),
-          Rotation3d(0.degrees, 0.degrees, 180.degrees)
-        )
-      ),
-      AprilTag(
-        12,
-        Pose3d(
-          Translation3d(652.755.inches, 218.416.inches, 57.125.inches),
-          Rotation3d(0.degrees, 0.degrees, 180.degrees)
-        )
-      ),
-      AprilTag(
-        13,
-        Pose3d(
-          Translation3d(652.755.inches, 218.416.inches, 57.125.inches),
-          Rotation3d(0.degrees, 0.degrees, 180.degrees)
-        )
-      ),
-      AprilTag(
-        14,
-        Pose3d(
-          Translation3d(652.755.inches, 218.416.inches, 57.125.inches),
-          Rotation3d(0.degrees, 0.degrees, 180.degrees)
-        )
-      ),
-      AprilTag(
-        15,
-        Pose3d(
-          Translation3d(652.755.inches, 218.416.inches, 57.125.inches),
-          Rotation3d(0.degrees, 0.degrees, 180.degrees)
-        )
-      ),
-      AprilTag(
-        16,
-        Pose3d(
-          Translation3d(652.755.inches, 218.416.inches, 57.125.inches),
-          Rotation3d(0.degrees, 0.degrees, 180.degrees)
-        )
+    init {
+      // Initialize faces
+      centerFaces.addAll(
+        mutableListOf<Pose2d?>(
+        Pose2d(
+          144.003.inches,
+          158.500.inches,
+          180.0.degrees
+        ),
+        Pose2d(
+          160.373.inches,
+          186.857.inches,
+          120.0.degrees
+        ),
+        Pose2d(
+          193.116.inches,
+          186.858.inches,
+          60.0.degrees
+        ),
+        Pose2d(
+          209.489.inches,
+          158.502.inches,
+          0.0.degrees
+        ),
+        Pose2d(
+          193.118.inches,
+          130.145.inches,
+          -60.0.degrees
+        ),
+        Pose2d(
+          160.375.inches,
+          130.144.inches,
+          -120.0.degrees
+        ))
       )
-    )
 
-  val tags = AprilTagFields.k2024Crescendo
-
-  var ampCenter = Translation2d(72.455.inches, 322.996.inches)
-
-  var aprilTagWidth = 6.50.inches
-
-  var noteThickness = 2.inches
-
-  val bottomRightSpeaker = Pose2d(0.0.inches, 238.815.inches, 0.degrees)
-  val bottomLeftSpeaker = Pose2d(0.0.inches, 197.765.inches, 0.degrees)
-  val topRightSpeaker = Pose2d(18.055.inches, 238.815.inches, 0.degrees)
-  val topLeftSpeaker = Pose2d(18.055.inches, 197.765.inches, 0.degrees)
-
-  // Center of the speaker opening for the blue alliance
-  val centerSpeakerOpening = bottomLeftSpeaker.interpolate(topRightSpeaker, 0.5.seconds)
-
-  /** Staging locations for each note */
-  object StagingLocations {
-    var centerlineX = fieldLength / 2.0
-
-    // need to update
-    var centerlineFirstY = 29.638.inches
-    var centerlineSeparationY = 66.0.inches
-    var spikeX = 114.0.inches
-
-    // need
-    var spikeFirstY = 161.638.inches
-    var spikeSeparationY = 57.0.inches
-
-    var centerlineTranslations: Array<Translation2d?> = arrayOfNulls(5)
-    var spikeTranslations: Array<Translation2d?> = arrayOfNulls(3)
-
-    init {
-      for (i in centerlineTranslations.indices) {
-        centerlineTranslations[i] =
-          Translation2d(centerlineX, centerlineFirstY + (centerlineSeparationY * i))
-      }
-    }
-
-    init {
-      for (i in spikeTranslations.indices) {
-        spikeTranslations[i] = Translation2d(spikeX, spikeFirstY + (spikeSeparationY * i))
+      // Initialize branch positions
+      for (face in 0..5) {
+        val fillRight: MutableMap<ReefHeight, Pose3d> = HashMap()
+        val fillLeft: MutableMap<ReefHeight, Pose3d> = HashMap()
+        for (level: ReefHeight in ReefHeight.values()) {
+          val poseDirection: Pose2d = Pose2d(center, (180 - (60 * face)).degrees)
+          val adjustX: Length = 30.738.inches
+          val adjustY: Length = 6.469.inches
+          fillRight[level] = Pose3d(
+            Translation3d(
+              poseDirection
+                .transformBy(Transform2d(Translation2d(adjustX, adjustY), 0.degrees))
+                .x,
+              poseDirection
+                .transformBy(Transform2d(Translation2d(adjustX, adjustY), 0.degrees))
+                .y,
+              level.height
+            ),
+            Rotation3d(
+              0.0.degrees,
+              level.pitch,
+              poseDirection.rotation
+            )
+          )
+          fillLeft[level] = Pose3d(
+            Translation3d(
+              poseDirection
+                .transformBy(Transform2d(Translation2d(adjustX, -adjustY), 0.degrees))
+                .x,
+              poseDirection
+                .transformBy(Transform2d(Translation2d(adjustX, -adjustY), 0.degrees))
+                .y,
+              level.height
+            ),
+            Rotation3d(
+              0.0.degrees,
+              level.pitch,
+              poseDirection.rotation
+            )
+          )
+        }
+        branchPositions.add(fillRight)
+        branchPositions.add(fillLeft)
       }
     }
   }
 
-  /** Each corner of the speaker * */
-  object Speaker {
-    // corners (blue alliance origin)
-    var topRightSpeaker = Translation3d(18.055.inches, 238.815.inches, 83.091.inches)
-
-    var topLeftSpeaker = Translation3d(18.055.inches, 197.765.inches, 83.091.inches)
-
-    var bottomRightSpeaker: Translation3d = Translation3d(0.0.inches, 238.815.inches, 78.324.inches)
-    var bottomLeftSpeaker: Translation3d = Translation3d(0.0.inches, 197.765.inches, 78.324.inches)
-
-    /** Center of the speaker opening (blue alliance) */
-    var centerSpeakerOpening: Translation3d = (bottomLeftSpeaker + topRightSpeaker) / 2.0
-    var speakerTargetPose = Pose2d(centerSpeakerOpening.x, centerSpeakerOpening.y, 0.0.degrees)
+  object StagingPositions {
+    // Measured from the center of the ice cream
+    val leftIceCream: Pose2d = Pose2d(48.0.inches, 230.5.inches, 0.degrees)
+    val middleIceCream: Pose2d = Pose2d(48.0.inches, 158.5.inches, 0.degrees)
+    val rightIceCream: Pose2d = Pose2d(48.0.inches, 86.5.inches, 0.degrees)
   }
+
+  enum class ReefHeight // in degrees
+    (val height: Length, val pitch: Angle) {
+    L4(72.0.inches, -90.degrees),
+    L3(47.625.inches, -35.degrees),
+    L2(31.875.inches, -35.degrees),
+    L1(18.0.inches, 0.degrees)
+  }
+
+  object AprilTagLayout {
+
+  }
+
 }

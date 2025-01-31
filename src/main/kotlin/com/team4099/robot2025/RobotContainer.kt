@@ -2,6 +2,7 @@ package com.team4099.robot2025
 
 import com.team4099.lib.logging.LoggedTunableValue
 import com.team4099.robot2023.subsystems.limelight.LimelightVisionIOReal
+import com.team4099.robot2023.subsystems.vision.Vision
 import com.team4099.robot2025.auto.AutonomousSelector
 import com.team4099.robot2025.commands.drivetrain.ResetGyroYawCommand
 import com.team4099.robot2025.commands.drivetrain.TeleopDriveCommand
@@ -14,6 +15,7 @@ import com.team4099.robot2025.subsystems.drivetrain.gyro.GyroIO
 import com.team4099.robot2025.subsystems.drivetrain.gyro.GyroIOPigeon2
 import com.team4099.robot2025.subsystems.limelight.LimelightVision
 import com.team4099.robot2025.subsystems.limelight.LimelightVisionIO
+import com.team4099.robot2025.subsystems.vision.camera.CameraIO
 import com.team4099.robot2025.util.driver.Jessika
 import edu.wpi.first.wpilibj.RobotBase
 import edu.wpi.first.wpilibj2.command.Command
@@ -25,32 +27,20 @@ import com.team4099.robot2025.subsystems.superstructure.Request.DrivetrainReques
 
 object RobotContainer {
   private val drivetrain: Drivetrain
-  private val limelight: LimelightVision
-
-  var setClimbAngle = -1337.degrees
-  var setAmpAngle = 270.0.degrees
-  var climbAngle: () -> Angle = { setClimbAngle }
-  var ampAngle: () -> Angle = { setAmpAngle }
-
-  val podiumAngle =
-    LoggedTunableValue(
-      "Defense/PodiumShotAngle", 25.0.degrees, Pair({ it.inDegrees }, { it.degrees })
-    )
+  private val vision: Vision
 
   init {
     if (RobotBase.isReal()) {
       // Real Hardware Implementations
-      // drivetrain = Drivetrain(object: GyroIO {},object: DrivetrainIO {}
-
       drivetrain = Drivetrain(GyroIOPigeon2, DrivetrainIOReal)
-      limelight = LimelightVision(LimelightVisionIOReal)
+      vision = Vision()
     } else {
       // Simulation implementations
       drivetrain = Drivetrain(object : GyroIO {}, DrivetrainIOSim)
-      limelight = LimelightVision(object : LimelightVisionIO {})
+      vision = Vision(object : CameraIO {})
     }
 
-    limelight.poseSupplier = { drivetrain.odomTRobot }
+//    limelight.poseSupplier = { drivetrain.odomTRobot }
   }
 
   fun mapDefaultCommands() {
@@ -64,16 +54,6 @@ object RobotContainer {
         { ControlBoard.slowMode },
         drivetrain
       )
-    /*
-    module steeing tuning
-
-    drivetrain.defaultCommand =
-      SwerveModuleTuningCommand(
-        drivetrain,
-        { (ControlBoard.forward.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) * 180).degrees },
-      )
-
-     */
   }
 
   fun zeroSteering() {
