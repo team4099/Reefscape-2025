@@ -48,6 +48,9 @@ object ElevatorConstants {
   val PASS_THROUGH_HEIGHT = 0.0.inches
   val INTAKE_CORAL_HEIGHT = 18.448.inches
 
+  val SAFE_ARM_PASS_THROUGH_HEIGHT = 10.inches
+  val SAFE_ARM_PASS_UNDER_CARRIAGE_HEIGHT = 4.inches
+
   val INTAKE_ALGAE_GROUND_HEIGHT = 0.0.inches
   val INTAKE_ALGAE_L2_HEIGHT = 0.0.inches
   val INTAKE_ALGAE_L3_HEIGHT = 0.0.inches

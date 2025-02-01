@@ -29,7 +29,7 @@ object ArmConstants {
   val IDLE_ALGAE_ANGLE = 0.0.degrees
 
   val SAFE_ELEVATOR_FRONT_ANGLE = 70.degrees
-  val SAFE_ELEVATOR_BACK_ANGLE = 180.degrees
+  val SAFE_ELEVATOR_BACK_ANGLE = 155.degrees
 
   val INTAKE_CORAL_ANGLE = 235.degrees
   val INTAKE_ALGAE_GROUND_ANGLE = 0.0.degrees
@@ -60,8 +60,8 @@ object ArmConstants {
   val INVERSION_VALUE: InvertedValue = InvertedValue.Clockwise_Positive
   val NEUTRAL_MODE_VALUE: NeutralModeValue = NeutralModeValue.Brake
 
-  val MOTION_MAGIC_ACCELERATION = 400.0.degrees.perSecond.perSecond
-  val MOTION_MAGIC_CRUISE_VELOCITY = 400.0.degrees.perSecond
+  val MOTION_MAGIC_ACCELERATION = 800.0.degrees.perSecond.perSecond
+  val MOTION_MAGIC_CRUISE_VELOCITY = 600.0.degrees.perSecond
 
   val ENCODER_DIRECTION_VALUE: SensorDirectionValue = SensorDirectionValue.Clockwise_Positive
   val ENCODER_OFFSET = 0.0.degrees

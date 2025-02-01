@@ -86,10 +86,19 @@ object ElevatorTunableValues {
         Pair({ it.inInches }, { it.inches })
       )
 
-    val passThroughHeight =
+
+    val safeArmPassThroughCarriageHeight =
       LoggedTunableValue(
-        "Elevator/passThroughHeight",
-        ElevatorConstants.PASS_THROUGH_HEIGHT,
+      "Elevator/safeArmPassThroughHeight",
+      ElevatorConstants.SAFE_ARM_PASS_THROUGH_HEIGHT,
+      Pair({ it.inInches }, { it.inches })
+    )
+
+
+    val safeArmPassUnderCarriageHeight =
+      LoggedTunableValue(
+        "Elevator/safeArmPassUnderCarriageHeight",
+        ElevatorConstants.SAFE_ARM_PASS_UNDER_CARRIAGE_HEIGHT,
         Pair({ it.inInches }, { it.inches })
       )
 

@@ -1,6 +1,7 @@
 package com.team4099.robot2025.subsystems.superstructure
 
 import com.team4099.lib.hal.Clock
+import com.team4099.robot2025.config.constants.ArmConstants
 import com.team4099.robot2025.config.constants.Constants
 import com.team4099.robot2025.config.constants.Constants.Universal.AlgaeLevel
 import com.team4099.robot2025.config.constants.Constants.Universal.CoralLevel
@@ -224,7 +225,7 @@ class Superstructure(
             is Request.SuperstructureRequest.IntakeAlgae ->
               SuperstructureStates.PREP_ELEVATOR_MOVEMENT
             is Request.SuperstructureRequest.IntakeCoral ->
-              SuperstructureStates.PASS_THROUGH_TO_BACK
+              SuperstructureStates.PREP_INTAKE_CORAL
             is Request.SuperstructureRequest.ScorePrepCoral ->
               SuperstructureStates.PREP_ELEVATOR_MOVEMENT
             is Request.SuperstructureRequest.ScorePrepAlgaeProcessor ->
@@ -239,40 +240,32 @@ class Superstructure(
             else -> currentState
           }
       }
-      SuperstructureStates.PASS_THROUGH_TO_BACK -> {
-        elevator.currentRequest =
-          Request.ElevatorRequest.ClosedLoop(
-            ElevatorTunableValues.ElevatorHeights.passThroughHeight.get()
-          )
-        if (elevator.isAtTargetedPosition) {
-          arm.currentRequest =
-            Request.ArmRequest.ClosedLoop(ArmTunableValues.ArmAngles.safeElevatorBackAngle.get())
-          if (arm.isAtTargetedPosition) {
-            nextState = SuperstructureStates.PREP_INTAKE_CORAL
-          }
+      SuperstructureStates.PREP_INTAKE_CORAL -> {
+
+        val elevatorInSafeState = elevator.inputs.elevatorPosition > ElevatorTunableValues.ElevatorHeights.safeArmPassUnderCarriageHeight.get()
+        val armInSafeState = arm.inputs.armPosition > ArmTunableValues.ArmAngles.safeElevatorBackAngle.get()
+
+        if (!elevatorInSafeState) {
+          arm.currentRequest = Request.ArmRequest.ClosedLoop(ArmTunableValues.ArmAngles.safeElevatorBackAngle.get())
+        } else {
+          arm.currentRequest = Request.ArmRequest.ClosedLoop(ArmTunableValues.ArmAngles.intakeCoralAngle.get())
         }
 
-        if (currentRequest is Request.SuperstructureRequest.Idle) {
-          nextState = SuperstructureStates.PASS_THROUGH_TO_FRONT
+        if (!armInSafeState) {
+          elevator.currentRequest = Request.ElevatorRequest.ClosedLoop(ElevatorTunableValues.ElevatorHeights.safeArmPassUnderCarriageHeight.get())
+        } else {
+          elevator.currentRequest = Request.ElevatorRequest.ClosedLoop(ElevatorTunableValues.ElevatorHeights.intakeCoralHeight.get())
         }
-      }
-      SuperstructureStates.PREP_INTAKE_CORAL -> {
-        elevator.currentRequest =
-          Request.ElevatorRequest.ClosedLoop(
-            ElevatorTunableValues.ElevatorHeights.intakeCoralHeight.get()
-          )
-        if (elevator.isAtTargetedPosition) {
-          arm.currentRequest =
-            Request.ArmRequest.ClosedLoop(ArmTunableValues.ArmAngles.intakeCoralAngle.get())
-          if (arm.isAtTargetedPosition) {
-            nextState = SuperstructureStates.INTAKE_CORAL
-          }
+
+        if (armInSafeState && elevatorInSafeState && arm.isAtTargetedPosition && elevator.isAtTargetedPosition) {
+          nextState = SuperstructureStates.INTAKE_CORAL
         }
 
         if (currentRequest is Request.SuperstructureRequest.Idle) {
           nextState = SuperstructureStates.INTAKE_CORAL_CLEANUP
         }
       }
+
       SuperstructureStates.INTAKE_CORAL -> {
         Request.RollersRequest.OpenLoop(RollersTunableValues.intakeCoralVoltage.get())
 
@@ -285,36 +278,37 @@ class Superstructure(
           nextState = SuperstructureStates.INTAKE_CORAL_CLEANUP
         }
       }
+
       SuperstructureStates.INTAKE_CORAL_CLEANUP -> {
-        rollers.currentRequest =
-          Request.RollersRequest.OpenLoop(RollersTunableValues.idleCoralVoltage.get())
-        arm.currentRequest =
-          Request.ArmRequest.ClosedLoop(ArmTunableValues.ArmAngles.safeElevatorBackAngle.get())
-        if (arm.isAtTargetedPosition) {
-          elevator.currentRequest =
-            Request.ElevatorRequest.ClosedLoop(
-              ElevatorTunableValues.ElevatorHeights.passThroughHeight.get()
-            )
-          nextState = SuperstructureStates.PASS_THROUGH_TO_FRONT
-        }
-      }
-      SuperstructureStates.PASS_THROUGH_TO_FRONT -> {
-        elevator.currentRequest =
-          Request.ElevatorRequest.ClosedLoop(
-            ElevatorTunableValues.ElevatorHeights.passThroughHeight.get()
+        rollers.currentRequest = Request.RollersRequest.OpenLoop(RollersTunableValues.idleCoralVoltage.get())
+
+        val elevatorInSafeState = elevator.inputs.elevatorPosition < ElevatorTunableValues.ElevatorHeights.safeArmPassThroughCarriageHeight.get()
+        val armInSafeState = arm.inputs.armPosition < ArmTunableValues.ArmAngles.safeElevatorBackAngle.get()
+
+        if (!armInSafeState) {
+          elevator.currentRequest = Request.ElevatorRequest.ClosedLoop(ElevatorTunableValues.ElevatorHeights.safeArmPassUnderCarriageHeight.get())
+        } else {
+          elevator.currentRequest = Request.ElevatorRequest.ClosedLoop(
+            if (theoreticalGamePiece == GamePiece.CORAL) ElevatorTunableValues.ElevatorHeights.idleCoralHeight.get()
+            else ElevatorTunableValues.ElevatorHeights.idleHeight.get()
           )
-        if (elevator.isAtTargetedPosition) {
-          arm.currentRequest =
-            Request.ArmRequest.ClosedLoop(
-              if (theoreticalGamePiece == GamePiece.CORAL) ArmTunableValues.ArmAngles.idleCoralAngle.get()
-              else ArmTunableValues.ArmAngles.idleAngle.get()
-            )
-          if (arm.isAtTargetedPosition) {
-            currentRequest = Request.SuperstructureRequest.Idle()
-            nextState = SuperstructureStates.IDLE
-          }
         }
+
+        if (!elevatorInSafeState) {
+          arm.currentRequest = Request.ArmRequest.ClosedLoop(ArmTunableValues.ArmAngles.safeElevatorBackAngle.get())
+        } else {
+          arm.currentRequest = Request.ArmRequest.ClosedLoop(
+            if (theoreticalGamePiece == GamePiece.CORAL) ArmTunableValues.ArmAngles.idleCoralAngle.get()
+            else ArmTunableValues.ArmAngles.idleAngle.get()
+          )
+        }
+
+        if (armInSafeState && elevatorInSafeState && arm.isAtTargetedPosition && elevator.isAtTargetedPosition) {
+          nextState = SuperstructureStates.IDLE
+        }
+
       }
+
       SuperstructureStates.PREP_ELEVATOR_MOVEMENT -> {
         arm.currentRequest =
           Request.ArmRequest.ClosedLoop(ArmTunableValues.ArmAngles.safeElevatorFrontAngle.get())
@@ -761,8 +755,6 @@ class Superstructure(
       HOME_PREP,
       HOME,
       PREP_INTAKE_CORAL,
-      PASS_THROUGH_TO_BACK,
-      PASS_THROUGH_TO_FRONT,
       INTAKE_CORAL,
       INTAKE_CORAL_CLEANUP,
       PREP_INTAKE_ALGAE,
