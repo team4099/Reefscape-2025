@@ -94,5 +94,5 @@ interface ArmIO {
     kS: ElectricalPotential,
     kA: AccelerationFeedforward<Radian, Volt>,
     kV: VelocityFeedforward<Radian, Volt>
-  )
+  ) {}
 }

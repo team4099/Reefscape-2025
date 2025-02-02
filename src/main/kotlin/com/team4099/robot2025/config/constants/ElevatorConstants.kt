@@ -20,7 +20,7 @@ object ElevatorConstants {
   val HOMING_APPLIED_VOLTAGE = 0.0.volts
   val HOMING_STALL_CURRENT = 0.0.amps
   val HOMING_STALL_TIME_THRESHOLD = 0.0.seconds
-  val UPWARDS_EXTENSION_LIMIT = 90.0.inches
+  val UPWARDS_EXTENSION_LIMIT = 70.0.inches
   val DOWNWARDS_EXTENSION_LIMIT = 0.0.inches
 
   val SPOOL_DIAMETER = 1.5038.inches
@@ -28,15 +28,15 @@ object ElevatorConstants {
 
   val ELEVATOR_TOLERANCE = 0.5.inches
 
-  val LEADER_STATOR_CURRENT_LIMIT = 0.0.amps
-  val LEADER_SUPPLY_CURRENT_LIMIT = 0.0.amps
-  val LEADER_SUPPLY_CURRENT_LOWER_LIMIT = 0.0.amps
-  val LEADER_SUPPLY_CURRENT_LOWER_TIME = 0.0.amps
+  val LEADER_STATOR_CURRENT_LIMIT = 60.0.amps
+  val LEADER_SUPPLY_CURRENT_LIMIT = 60.0.amps
+  val LEADER_SUPPLY_CURRENT_LOWER_LIMIT = 60.0.amps
+  val LEADER_SUPPLY_CURRENT_LOWER_TIME = 60.0.amps
 
-  val FOLLOWER_STATOR_CURRENT_LIMIT = 0.0.amps
-  val FOLLOWER_SUPPLY_CURRENT_LIMIT = 0.0.amps
-  val FOLLOWER_SUPPLY_CURRENT_LOWER_LIMIT = 0.0.amps
-  val FOLLOWER_SUPPLY_CURRENT_LOWER_TIME = 0.0.amps
+  val FOLLOWER_STATOR_CURRENT_LIMIT = 60.0.amps
+  val FOLLOWER_SUPPLY_CURRENT_LIMIT = 60.0.amps
+  val FOLLOWER_SUPPLY_CURRENT_LOWER_LIMIT = 60.0.amps
+  val FOLLOWER_SUPPLY_CURRENT_LOWER_TIME = 60.0.amps
 
   // TODO: recheck
   /* thresholds for changing PID/FF values */
@@ -76,7 +76,7 @@ object ElevatorConstants {
 
   object PID {
     // TODO: tune all
-    val REAL_KP = 8.0.volts / 1.inches
+    val REAL_KP = 0.0.volts / 1.inches
     val REAL_KI = 0.0.volts / (1.inches * 1.seconds)
     val REAL_KD = 0.0.volts / (1.inches.perSecond)
 
@@ -84,13 +84,13 @@ object ElevatorConstants {
     val SIM_KI = 0.0.volts / (1.inches * 1.seconds)
     val SIM_KD = 0.0.volts / (1.inches.perSecond)
 
-    val KS = 0.54.volts
-    val KV = 0.037.volts / 1.0.inches.perSecond
-    val KA = 0.0025.volts / 1.0.inches.perSecond.perSecond
+    val KS = 0.volts // 0.54
+    val KV = 0.volts / 1.0.inches.perSecond //  0.037
+    val KA = 0.volts / 1.0.inches.perSecond.perSecond // 0.0025
 
     val KG_DEFAULT = 0.0.volts
-    val KG_FIRST_STAGE = 0.25.volts
-    val KG_SECOND_STAGE = 1.0.volts
-    val KG_THIRD_STAGE = 0.25.volts
+    val KG_FIRST_STAGE = 0.0.volts
+    val KG_SECOND_STAGE = 0.0.volts
+    val KG_THIRD_STAGE = 0.0.volts
   }
 }
