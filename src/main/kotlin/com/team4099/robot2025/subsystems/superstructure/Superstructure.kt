@@ -162,9 +162,9 @@ class Superstructure(
         }
       }
       SuperstructureStates.HOME -> {
-        elevator.currentRequest = Request.ElevatorRequest.Home()
+        elevator.currentRequest = Request.ElevatorRequest.OpenLoop(ElevatorTunableValues.testingVoltage.get())
 
-        if (elevator.isHomed) {
+        if (elevator.isHomed && false) {
           nextState = SuperstructureStates.IDLE
         }
       }

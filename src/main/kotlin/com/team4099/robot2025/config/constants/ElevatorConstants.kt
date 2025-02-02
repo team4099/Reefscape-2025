@@ -8,6 +8,8 @@ import org.team4099.lib.units.derived.volts
 import org.team4099.lib.units.perSecond
 
 object ElevatorConstants {
+
+  val TESTING_VOLTAGE = 0.0.volts
   const val ENABLE_ELEVATOR = true
 
   val GEAR_RATIO = 16.0 / 48.0
