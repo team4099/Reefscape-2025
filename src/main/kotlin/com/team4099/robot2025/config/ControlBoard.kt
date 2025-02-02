@@ -45,6 +45,7 @@ object ControlBoard {
 
   //Tuning Binds
   val testElevatorBind = Trigger { driver.aButton }
+  val testElevatorDownBind = Trigger { driver.bButton }
   val testClimberBind = Trigger { driver.bButton }
   val testRollersBind = Trigger { driver.xButton }
   val testArmBind = Trigger { driver.yButton }

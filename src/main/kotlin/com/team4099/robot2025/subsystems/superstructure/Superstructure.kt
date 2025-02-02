@@ -32,6 +32,7 @@ import org.team4099.lib.units.base.inSeconds
 import org.team4099.lib.units.base.inches
 import org.team4099.lib.units.derived.Angle
 import org.team4099.lib.units.derived.degrees
+import org.team4099.lib.units.derived.volts
 
 class Superstructure(
   private val drivetrain: Drivetrain,
@@ -51,7 +52,7 @@ class Superstructure(
   private var lastAlgaeIntakeLevel: AlgaeLevel = AlgaeLevel.NONE
   private var algaeIntakeLevel: AlgaeLevel = AlgaeLevel.NONE
 
-  var currentRequest: Request.SuperstructureRequest = Request.SuperstructureRequest.Idle()
+  var currentRequest: Request.SuperstructureRequest = Request.SuperstructureRequest.Tuning()
     set(value) {
       when (value) {
         is Request.SuperstructureRequest.IntakeAlgae -> {
@@ -119,7 +120,7 @@ class Superstructure(
         )
       ).pose3d)
 
-    //Second Stage
+       //Second Stage
     CustomLogger.recordOutput("SimulatedMechanisms/1",
       Pose3d().transformBy(
         Transform3d(
@@ -162,13 +163,15 @@ class Superstructure(
         }
       }
       SuperstructureStates.HOME -> {
-        elevator.currentRequest = Request.ElevatorRequest.OpenLoop(ElevatorTunableValues.testingVoltage.get())
+        elevator.currentRequest = Request.ElevatorRequest.Home()
 
-        if (elevator.isHomed && false) {
-          nextState = SuperstructureStates.IDLE
+        if (elevator.isHomed) {
+          elevator.currentRequest =  Request.ElevatorRequest.OpenLoop(0.0.volts)
+          nextState = SuperstructureStates.TUNING
         }
       }
       SuperstructureStates.TUNING -> {
+
         if (currentRequest is Request.SuperstructureRequest.Idle) {
           nextState = SuperstructureStates.IDLE
         }
@@ -734,6 +737,22 @@ class Superstructure(
       }
     }
     returnCommand.name = "TestElevatorCommand"
+    return returnCommand
+  }
+
+  fun testElevatorDownCommand(): Command {
+    val returnCommand = run {
+      currentRequest = Request.SuperstructureRequest.Tuning()
+      elevator.currentRequest =
+        Request.ElevatorRequest.ClosedLoop(
+          5.inches
+        )
+
+      if (elevator.isAtTargetedPosition) {
+        currentRequest = Request.SuperstructureRequest.Idle()
+      }
+    }
+    returnCommand.name = "TestElevatorDownCommand"
     return returnCommand
   }
 

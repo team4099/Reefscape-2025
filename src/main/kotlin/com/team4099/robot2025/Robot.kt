@@ -176,7 +176,10 @@ object Robot : LoggedRobot() {
     // checking for logging errors
     logReceiverQueueAlert.set(Logger.getReceiverQueueFault())
 
+    RobotContainer.requestTuning()
+
     val superstructureLoopTimeMS = Clock.realTimestamp
+    RobotContainer.superstructure.periodic()
     Logger.recordOutput(
       "LoggedRobot/Subsystems/SuperstructureLoopTimeMS",
       (Clock.realTimestamp - superstructureLoopTimeMS).inMilliseconds
@@ -195,8 +198,8 @@ object Robot : LoggedRobot() {
     DebugLogger.recordDebugOutput("LoggedRobot/port1", port1.voltage)
     DebugLogger.recordDebugOutput("LoggedRobot/port2", port2.voltage)
     Logger.recordOutput("LoggedRobot/port3", port3.voltage)
-
      */
+
   }
 
   override fun teleopInit() {

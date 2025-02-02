@@ -1,7 +1,7 @@
 package com.team4099.robot2025.subsystems.superstructure
 
-import com.team4099.robot2025.config.constants.AlgaeLevel
-import com.team4099.robot2025.config.constants.CoralLevel
+
+import com.team4099.robot2025.config.constants.Constants
 import edu.wpi.first.math.kinematics.ChassisSpeeds
 import org.team4099.lib.units.AngularVelocity
 import org.team4099.lib.units.LinearVelocity
@@ -18,9 +18,9 @@ sealed interface Request {
 
     class IntakeCoral() : SuperstructureRequest
 
-    class IntakeAlgae(val level: AlgaeLevel) : SuperstructureRequest
+    class IntakeAlgae(val level: Constants.Universal.AlgaeLevel) : SuperstructureRequest
 
-    class ScorePrepCoral(val level: CoralLevel) : SuperstructureRequest
+    class ScorePrepCoral(val level: Constants.Universal.CoralLevel) : SuperstructureRequest
 
     class ScorePrepAlgaeProcessor() : SuperstructureRequest
     class ScorePrepAlgaeBarge() : SuperstructureRequest

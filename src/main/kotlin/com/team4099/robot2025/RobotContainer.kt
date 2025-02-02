@@ -16,6 +16,7 @@ import com.team4099.robot2025.subsystems.climber.ClimberIO
 import com.team4099.robot2025.subsystems.climber.ClimberIOSim
 import com.team4099.robot2025.subsystems.climber.ClimberIOTalon
 import com.team4099.robot2025.subsystems.drivetrain.drive.Drivetrain
+import com.team4099.robot2025.subsystems.drivetrain.drive.DrivetrainIO
 import com.team4099.robot2025.subsystems.drivetrain.drive.DrivetrainIOReal
 import com.team4099.robot2025.subsystems.drivetrain.drive.DrivetrainIOSim
 import com.team4099.robot2025.subsystems.drivetrain.gyro.GyroIO
@@ -45,14 +46,14 @@ object RobotContainer {
   private val climber: Climber
   private val elevator: Elevator
   private val rollers: Rollers
-  private val superstructure: Superstructure
+  val superstructure: Superstructure
 
   init {
     if (RobotBase.isReal()) {
       // Real Hardware Implementations
       // drivetrain = Drivetrain(object: GyroIO {},object: DrivetrainIO {}
 
-      drivetrain = Drivetrain(GyroIOPigeon2, DrivetrainIOReal)
+      drivetrain = Drivetrain(object : GyroIO {}, object : DrivetrainIO {})
       limelight = LimelightVision(object : LimelightVisionIO {} )
       arm = Arm(object : ArmIO {})
       climber = Climber(object : ClimberIO {})
@@ -127,12 +128,17 @@ object RobotContainer {
     superstructure.currentRequest = Request.SuperstructureRequest.Idle()
   }
 
+  fun requestTuning() {
+    superstructure.currentRequest = Request.SuperstructureRequest.Tuning()
+  }
+
   fun mapTeleopControls() {
 
     ControlBoard.resetGyro.whileTrue(ResetGyroYawCommand(drivetrain))
 
-    //tuning command
-    //ControlBoard.testElevatorBind.whileTrue(superstructure.testElevatorCommand())
+    //tuning commands
+    ControlBoard.testElevatorBind.whileTrue(superstructure.testElevatorCommand())
+    ControlBoard.testElevatorDownBind.whileTrue(superstructure.testElevatorDownCommand())
     //ControlBoard.testClimberBind.whileTrue(superstructure.testClimberCommand())
     //ControlBoard.testRollersBind.whileTrue(superstructure.testRollersCommand())
     //ControlBoard.testArmBind.whileTrue(superstructure.testArmCommand())
@@ -141,8 +147,8 @@ object RobotContainer {
 //    ControlBoard.prepL2.whileTrue(superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L2))
 //    ControlBoard.prepL3.whileTrue(superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L3))
 //    ControlBoard.prepL4.whileTrue(superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L4))
-    ControlBoard.score.onTrue(TestElevatorCommand(elevator))
-    ControlBoard.forceIdle.whileTrue(superstructure.requestIdleCommand())
+    //ControlBoard.score.onTrue(TestElevatorCommand(elevator))
+    //ControlBoard.forceIdle.whileTrue(superstructure.requestIdleCommand())
   }
 
   fun mapTestControls() {}

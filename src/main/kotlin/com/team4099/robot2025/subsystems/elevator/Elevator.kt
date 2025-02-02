@@ -17,8 +17,6 @@ import com.team4099.robot2025.subsystems.superstructure.Request.ElevatorRequest 
 class Elevator(val io: ElevatorIO) : SubsystemBase() {
   val inputs = ElevatorIO.ElevatorInputs()
 
-  var targetVoltage: ElectricalPotential = 0.0.volts
-
   val upperLimitReached: Boolean
     get() = inputs.elevatorPosition >= ElevatorConstants.UPWARDS_EXTENSION_LIMIT
 
@@ -177,7 +175,7 @@ class Elevator(val io: ElevatorIO) : SubsystemBase() {
         }
       }
       ElevatorState.OPEN_LOOP -> {
-        setVoltage(targetVoltage)
+        setVoltage(elevatorVoltageTarget)
         nextState = fromElevatorRequestToState(currentRequest)
       }
       ElevatorState.CLOSED_LOOP -> {
@@ -191,8 +189,8 @@ class Elevator(val io: ElevatorIO) : SubsystemBase() {
   }
 
   fun setVoltage(targetVoltage: ElectricalPotential) {
-    if ((upperLimitReached && targetVoltage > 0.0.volts) ||
-      (lowerLimitReached && targetVoltage < 0.0.volts)
+    if (((upperLimitReached && targetVoltage > 0.0.volts) ||
+      (lowerLimitReached && targetVoltage < 0.0.volts) ) && isHomed
     ) {
       io.setVoltage(0.0.volts)
     } else {

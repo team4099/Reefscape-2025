@@ -1,7 +1,9 @@
 package com.team4099.robot2025.config.constants
 
 import org.team4099.lib.units.base.amps
+import org.team4099.lib.units.base.inInches
 import org.team4099.lib.units.base.inches
+import org.team4099.lib.units.base.meters
 import org.team4099.lib.units.base.pounds
 import org.team4099.lib.units.base.seconds
 import org.team4099.lib.units.derived.volts
@@ -17,13 +19,13 @@ object ElevatorConstants {
 
   val OPEN_LOOP_EXTEND_VOLTAGE = 8.0.volts
   val OPEN_LOOP_RETRACT_VOLTAGE = -(12.0.volts)
-  val HOMING_APPLIED_VOLTAGE = 0.0.volts
-  val HOMING_STALL_CURRENT = 0.0.amps
-  val HOMING_STALL_TIME_THRESHOLD = 0.0.seconds
-  val UPWARDS_EXTENSION_LIMIT = 70.0.inches
-  val DOWNWARDS_EXTENSION_LIMIT = 0.0.inches
+  val HOMING_APPLIED_VOLTAGE = -1.0.volts
+  val HOMING_STALL_CURRENT = 20.0.amps
+  val HOMING_STALL_TIME_THRESHOLD = 0.15.seconds
+  val UPWARDS_EXTENSION_LIMIT = 30.0.inches
+  val DOWNWARDS_EXTENSION_LIMIT = -0.5.inches
 
-  val SPOOL_DIAMETER = 1.5038.inches
+  val SPOOL_DIAMETER = 2.0051.inches
   val VOLTAGE_COMPENSATION = 12.0.volts
 
   val ELEVATOR_TOLERANCE = 0.5.inches
@@ -70,27 +72,30 @@ object ElevatorConstants {
 
   val ELEVATOR_GROUND_OFFSET = 3.829.inches
 
+
+
   // TODO: make real maxes
-  val MAX_VELOCITY = 150.0.inches.perSecond
-  val MAX_ACCELERATION = 50.0.inches.perSecond.perSecond
+  val MAX_VELOCITY = 200.0.inches.perSecond
+  val MAX_ACCELERATION = 100.0.inches.perSecond.perSecond
+
 
   object PID {
     // TODO: tune all
-    val REAL_KP = 0.0.volts / 1.inches
+    val REAL_KP = 1.5.volts / 1.inches
     val REAL_KI = 0.0.volts / (1.inches * 1.seconds)
-    val REAL_KD = 0.0.volts / (1.inches.perSecond)
+    val REAL_KD = 0.2.volts / (1.inches.perSecond)
 
     val SIM_KP = 10.volts / 1.inches
     val SIM_KI = 0.0.volts / (1.inches * 1.seconds)
     val SIM_KD = 0.0.volts / (1.inches.perSecond)
 
-    val KS = 0.volts // 0.54
-    val KV = 0.volts / 1.0.inches.perSecond //  0.037
-    val KA = 0.volts / 1.0.inches.perSecond.perSecond // 0.0025
+    val KS = 0.1.volts
+    val KV = (0.32.volts) / 1.0.meters.perSecond //  0.037
+    val KA = (0.03.volts) / 1.0.meters.perSecond.perSecond // 0.0025
 
-    val KG_DEFAULT = 0.0.volts
-    val KG_FIRST_STAGE = 0.0.volts
-    val KG_SECOND_STAGE = 0.0.volts
-    val KG_THIRD_STAGE = 0.0.volts
+    val KG_DEFAULT = 0.16.volts
+    val KG_FIRST_STAGE = 0.16.volts
+    val KG_SECOND_STAGE = 0.16.volts
+    val KG_THIRD_STAGE = 0.16.volts
   }
 }

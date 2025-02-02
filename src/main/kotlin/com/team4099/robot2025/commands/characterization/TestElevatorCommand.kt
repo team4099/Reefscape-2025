@@ -14,7 +14,7 @@ class TestElevatorCommand(
     }
 
     override fun execute() {
-        elevator.currentRequest = Request.ElevatorRequest.OpenLoop(ElevatorTunableValues.testVoltage.get())
+        elevator.currentRequest = Request.ElevatorRequest.OpenLoop(ElevatorTunableValues.testingVoltage.get())
     }
 
     override fun end(interrupted: Boolean) {

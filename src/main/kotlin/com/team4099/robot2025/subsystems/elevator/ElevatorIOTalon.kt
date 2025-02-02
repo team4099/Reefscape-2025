@@ -13,6 +13,8 @@ import com.team4099.robot2025.config.constants.Constants
 import com.team4099.robot2025.config.constants.ElevatorConstants
 import com.team4099.robot2025.config.constants.ElevatorConstants.MAX_ACCELERATION
 import com.team4099.robot2025.config.constants.ElevatorConstants.MAX_VELOCITY
+import edu.wpi.first.units.measure.AngularVelocity
+import org.littletonrobotics.junction.Logger
 import org.team4099.lib.units.base.Length
 import org.team4099.lib.units.base.Meter
 import org.team4099.lib.units.base.amps
@@ -20,8 +22,10 @@ import org.team4099.lib.units.base.celsius
 import org.team4099.lib.units.base.inAmperes
 import org.team4099.lib.units.base.inInches
 import org.team4099.lib.units.base.inches
+import org.team4099.lib.units.base.meters
 import org.team4099.lib.units.ctreLinearMechanismSensor
 import org.team4099.lib.units.derived.AccelerationFeedforward
+import org.team4099.lib.units.derived.Angle
 import org.team4099.lib.units.derived.DerivativeGain
 import org.team4099.lib.units.derived.ElectricalPotential
 import org.team4099.lib.units.derived.IntegralGain
@@ -30,7 +34,16 @@ import org.team4099.lib.units.derived.StaticFeedforward
 import org.team4099.lib.units.derived.VelocityFeedforward
 import org.team4099.lib.units.derived.Volt
 import org.team4099.lib.units.derived.inVolts
+import org.team4099.lib.units.derived.inVoltsPerInch
+import org.team4099.lib.units.derived.inVoltsPerInchPerSecond
+import org.team4099.lib.units.derived.inVoltsPerInchSeconds
+import org.team4099.lib.units.derived.inVoltsPerMetersPerSecondPerSecond
 import org.team4099.lib.units.derived.volts
+import org.team4099.lib.units.inInchesPerSecond
+import org.team4099.lib.units.inInchesPerSecondPerSecond
+import org.team4099.lib.units.inMetersPerSecond
+import org.team4099.lib.units.inMetersPerSecondPerSecond
+import kotlin.time.times
 import edu.wpi.first.units.measure.Current as WPILibCurrent
 import edu.wpi.first.units.measure.Temperature as WPILibTemperature
 import edu.wpi.first.units.measure.Voltage as WPILibVoltage
@@ -41,7 +54,6 @@ object ElevatorIOTalon : ElevatorIO {
 
   private val configs: TalonFXConfiguration = TalonFXConfiguration()
   private var slot0Configs = configs.Slot0
-  private var motionMagicConfigs: MotionMagicConfigs = configs.MotionMagic
 
   private val voltageControl: VoltageOut = VoltageOut(-1337.volts.inVolts)
   private val motionMagicControl: MotionMagicVoltage = MotionMagicVoltage(-1337.inches.inInches)
@@ -58,6 +70,8 @@ object ElevatorIOTalon : ElevatorIO {
   private var leaderSupplyCurrentSignal: StatusSignal<WPILibCurrent>
   private var leaderTempSignal: StatusSignal<WPILibTemperature>
   private var leaderDutyCycle: StatusSignal<Double>
+  private var leaderPositionSignal: StatusSignal<edu.wpi.first.units.measure.Angle>
+  private var leaderVelocitySignal: StatusSignal<AngularVelocity>
 
   private var followerStatorCurrentSignal: StatusSignal<WPILibCurrent>
   private var followerSupplyCurrentSignal: StatusSignal<WPILibCurrent>
@@ -65,6 +79,9 @@ object ElevatorIOTalon : ElevatorIO {
   private var followerDutyCycle: StatusSignal<Double>
   private var motorVoltage: StatusSignal<WPILibVoltage>
   private var motorTorque: StatusSignal<WPILibCurrent>
+
+  private var motionMagicTargetVelocity: StatusSignal<Double>
+  private var motionMagicTargetPostion: StatusSignal<Double>
 
   init {
     leaderTalon.clearStickyFaults()
@@ -81,19 +98,22 @@ object ElevatorIOTalon : ElevatorIO {
     configs.CurrentLimits.StatorCurrentLimitEnable = true
     configs.CurrentLimits.SupplyCurrentLimitEnable = true
 
-    configs.SoftwareLimitSwitch.ForwardSoftLimitEnable = true
-    configs.SoftwareLimitSwitch.ReverseSoftLimitEnable = true
-    configs.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
-      leaderSensor.positionToRawUnits(ElevatorConstants.UPWARDS_EXTENSION_LIMIT)
-    configs.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
-      leaderSensor.positionToRawUnits(ElevatorConstants.DOWNWARDS_EXTENSION_LIMIT)
+    //configs.SoftwareLimitSwitch.ForwardSoftLimitEnable = true
+    //configs.SoftwareLimitSwitch.ReverseSoftLimitEnable = true
 
-    motionMagicConfigs.MotionMagicCruiseVelocity = leaderSensor.velocityToRawUnits(MAX_VELOCITY)
-    motionMagicConfigs.MotionMagicAcceleration =
-      leaderSensor.accelerationToRawUnits(MAX_ACCELERATION)
+    //configs.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
+      //leaderSensor.positionToRawUnits(ElevatorConstants.UPWARDS_EXTENSION_LIMIT)
+
+    //configs.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
+      //leaderSensor.positionToRawUnits(ElevatorConstants.DOWNWARDS_EXTENSION_LIMIT)
+
+    configs.MotionMagic.MotionMagicCruiseVelocity = MAX_VELOCITY.inInchesPerSecond
+    configs.MotionMagic.MotionMagicAcceleration = MAX_ACCELERATION.inInchesPerSecondPerSecond
 
     followerTalon.setControl(Follower(Constants.Elevator.LEADER_MOTOR_ID, true))
 
+    leaderPositionSignal = leaderTalon.position
+    leaderVelocitySignal = leaderTalon.velocity
     leaderStatorCurrentSignal = leaderTalon.statorCurrent
     leaderSupplyCurrentSignal = leaderTalon.supplyCurrent
     leaderTempSignal = leaderTalon.deviceTemp
@@ -104,17 +124,27 @@ object ElevatorIOTalon : ElevatorIO {
     followerTempSignal = followerTalon.deviceTemp
     followerDutyCycle = followerTalon.dutyCycle
 
+
     motorVoltage = leaderTalon.motorVoltage
     motorTorque = leaderTalon.torqueCurrent
 
+    motionMagicTargetPostion = leaderTalon.closedLoopReference
+    motionMagicTargetVelocity = leaderTalon.closedLoopReferenceSlope
+
+    motionMagicTargetPostion.setUpdateFrequency(250.0)
+    motionMagicTargetVelocity.setUpdateFrequency(250.0)
+
     leaderTalon.configurator.apply(configs)
     followerTalon.configurator.apply(configs)
+
   }
 
   private fun updateSignals() {
     BaseStatusSignal.refreshAll(
       motorTorque,
       motorVoltage,
+      leaderPositionSignal,
+      leaderVelocitySignal,
       leaderTempSignal,
       leaderDutyCycle,
       leaderStatorCurrentSignal,
@@ -123,6 +153,8 @@ object ElevatorIOTalon : ElevatorIO {
       followerDutyCycle,
       followerStatorCurrentSignal,
       followerSupplyCurrentSignal,
+      motionMagicTargetPostion,
+      motionMagicTargetVelocity
     )
   }
 
@@ -132,15 +164,19 @@ object ElevatorIOTalon : ElevatorIO {
     inputs.elevatorPosition = leaderSensor.position
     inputs.elevatorVelocity = leaderSensor.velocity
 
-    inputs.leaderTemperature = leaderTalon.deviceTemp.valueAsDouble.celsius
-    inputs.leaderSupplyCurrent = leaderTalon.supplyCurrent.valueAsDouble.amps
-    inputs.leaderStatorCurrent = leaderTalon.statorCurrent.valueAsDouble.amps
-    inputs.leaderAppliedVoltage = leaderTalon.dutyCycle.valueAsDouble.volts
+    inputs.leaderTemperature = leaderTempSignal.valueAsDouble.celsius
+    inputs.leaderSupplyCurrent = leaderSupplyCurrentSignal.valueAsDouble.amps
+    inputs.leaderStatorCurrent = leaderStatorCurrentSignal.valueAsDouble.amps
+    inputs.leaderAppliedVoltage = leaderDutyCycle.valueAsDouble.volts
 
-    inputs.followerTemperature = followerTalon.deviceTemp.valueAsDouble.celsius
-    inputs.followerStatorCurrent = followerTalon.statorCurrent.valueAsDouble.amps
-    inputs.followerSupplyCurrent = followerTalon.supplyCurrent.valueAsDouble.amps
-    inputs.followerAppliedVoltage = followerTalon.dutyCycle.valueAsDouble.volts
+    inputs.followerTemperature = followerTempSignal.valueAsDouble.celsius
+    inputs.followerStatorCurrent = followerStatorCurrentSignal.valueAsDouble.amps
+    inputs.followerSupplyCurrent = followerSupplyCurrentSignal.valueAsDouble.amps
+    inputs.followerAppliedVoltage = followerDutyCycle.valueAsDouble.volts
+
+    Logger.recordOutput("Elevator/motionMagicPositon", motionMagicTargetPostion.value*ElevatorConstants.GEAR_RATIO*(Math.PI*ElevatorConstants.SPOOL_DIAMETER.inInches))
+    Logger.recordOutput("Elevator/motionMagicVelocity", motionMagicTargetVelocity.value*ElevatorConstants.GEAR_RATIO*(Math.PI*ElevatorConstants.SPOOL_DIAMETER.inInches))
+
   }
 
   override fun configPID(
@@ -148,9 +184,9 @@ object ElevatorIOTalon : ElevatorIO {
     kI: IntegralGain<Meter, Volt>,
     kD: DerivativeGain<Meter, Volt>
   ) {
-    slot0Configs.kP = leaderSensor.proportionalPositionGainToRawUnits(kP)
-    slot0Configs.kI = leaderSensor.integralPositionGainToRawUnits(kI)
-    slot0Configs.kD = leaderSensor.derivativePositionGainToRawUnits(kD)
+    slot0Configs.kP = kP.inVoltsPerInch
+    slot0Configs.kI = kI.inVoltsPerInchSeconds
+    slot0Configs.kD = kD.inVoltsPerInchPerSecond
 
     leaderTalon.configurator.apply(slot0Configs)
     followerTalon.configurator.apply(slot0Configs)
@@ -164,8 +200,8 @@ object ElevatorIOTalon : ElevatorIO {
   ) {
     slot0Configs.kG = kG.inVolts
     slot0Configs.kS = kS.inVolts
-    slot0Configs.kV = leaderSensor.velocityFeedforwardToRawUnits(kV)
-    slot0Configs.kA = leaderSensor.accelerationFeedforwardToRawUnits(kA)
+    slot0Configs.kV = kV.inVoltsPerInchPerSecond
+    slot0Configs.kA = kA.inVoltsPerMetersPerSecondPerSecond
     slot0Configs.GravityType = GravityTypeValue.Elevator_Static
 
     leaderTalon.configurator.apply(slot0Configs)
@@ -187,13 +223,11 @@ object ElevatorIOTalon : ElevatorIO {
       motionMagicControl
         .withPosition(leaderSensor.positionToRawUnits(position))
         .withFeedForward(feedforward.inVolts)
-        .withLimitForwardMotion(true)
-        .withLimitReverseMotion(true)
     )
   }
 
   override fun setVoltage(targetVoltage: ElectricalPotential) {
-    leaderTalon.setControl(voltageControl.withOutput(targetVoltage.inVolts))
+    leaderTalon.setControl(VoltageOut(targetVoltage.inVolts))
   }
 
   override fun zeroEncoder() {
