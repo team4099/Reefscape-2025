@@ -113,22 +113,18 @@ object Constants {
     const val FOLLOWER_MOTOR_ID = 41 //left
   }
 
+
   object Gyro {
     const val PIGEON_2_ID = 1
   }
 
-  object Shooter {
-    const val FLYWHEEL_LEFT_MOTOR_ID = 51
-    const val FLYWHEEL_RIGHT_MOTOR_ID = 52
-  }
-
   object Arm {
-    const val ARM_MOTOR_ID = 61
-    const val CANCODER_ID = 62
+    const val ARM_MOTOR_ID = 51
+    const val CANCODER_ID = 52
   }
 
   object Rollers {
-    const val ROLLERS_MOTOR_ID = 71
+    const val ROLLERS_MOTOR_ID = 61
   }
 
   object Alert {

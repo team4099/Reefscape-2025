@@ -714,11 +714,54 @@ class Superstructure(
     return returnCommand
   }
 
+  fun testArmDownCommand() : Command {
+    val returnCommand = run {
+      currentRequest = Request.SuperstructureRequest.Tuning()
+      arm.currentRequest = Request.ArmRequest.ClosedLoop(0.0.degrees)
+
+      if (arm.isAtTargetedPosition) {
+        currentRequest = Request.SuperstructureRequest.Idle()
+      }
+    }
+    returnCommand.name = "TestArmDownCommand"
+    return returnCommand
+  }
+
   fun testRollersCommand(): Command {
     val returnCommand = run {
       currentRequest = Request.SuperstructureRequest.Tuning()
       rollers.currentRequest =
         Request.RollersRequest.OpenLoop(RollersTunableValues.intakeCoralVoltage.get())
+    }
+    returnCommand.name = "TestRollersCommand"
+    return returnCommand
+  }
+
+  fun intakeRollersCommand(): Command {
+    val returnCommand = run {
+      currentRequest = Request.SuperstructureRequest.Tuning()
+      rollers.currentRequest =
+        Request.RollersRequest.OpenLoop(RollersTunableValues.intakeCoralVoltage.get())
+    }
+    returnCommand.name = "TestRollersCommand"
+    return returnCommand
+  }
+
+  fun outtakeRollersCommand(): Command {
+    val returnCommand = run {
+      currentRequest = Request.SuperstructureRequest.Tuning()
+      rollers.currentRequest =
+        Request.RollersRequest.OpenLoop(RollersTunableValues.scoreCoralVoltage.get())
+    }
+    returnCommand.name = "TestRollersCommand"
+    return returnCommand
+  }
+
+  fun stopRollersCommand(): Command {
+    val returnCommand = run {
+      currentRequest = Request.SuperstructureRequest.Tuning()
+      rollers.currentRequest =
+        Request.RollersRequest.OpenLoop(0.0.volts)
     }
     returnCommand.name = "TestRollersCommand"
     return returnCommand

@@ -81,7 +81,7 @@ object ElevatorIOTalon : ElevatorIO {
   private var motorTorque: StatusSignal<WPILibCurrent>
 
   private var motionMagicTargetVelocity: StatusSignal<Double>
-  private var motionMagicTargetPostion: StatusSignal<Double>
+  private var motionMagicTargetPosition: StatusSignal<Double>
 
   init {
     leaderTalon.clearStickyFaults()
@@ -128,10 +128,10 @@ object ElevatorIOTalon : ElevatorIO {
     motorVoltage = leaderTalon.motorVoltage
     motorTorque = leaderTalon.torqueCurrent
 
-    motionMagicTargetPostion = leaderTalon.closedLoopReference
+    motionMagicTargetPosition = leaderTalon.closedLoopReference
     motionMagicTargetVelocity = leaderTalon.closedLoopReferenceSlope
 
-    motionMagicTargetPostion.setUpdateFrequency(250.0)
+    motionMagicTargetPosition.setUpdateFrequency(250.0)
     motionMagicTargetVelocity.setUpdateFrequency(250.0)
 
     leaderTalon.configurator.apply(configs)
@@ -153,7 +153,7 @@ object ElevatorIOTalon : ElevatorIO {
       followerDutyCycle,
       followerStatorCurrentSignal,
       followerSupplyCurrentSignal,
-      motionMagicTargetPostion,
+      motionMagicTargetPosition,
       motionMagicTargetVelocity
     )
   }
@@ -174,7 +174,7 @@ object ElevatorIOTalon : ElevatorIO {
     inputs.followerSupplyCurrent = followerSupplyCurrentSignal.valueAsDouble.amps
     inputs.followerAppliedVoltage = followerDutyCycle.valueAsDouble.volts
 
-    Logger.recordOutput("Elevator/motionMagicPositon", motionMagicTargetPostion.value*ElevatorConstants.GEAR_RATIO*(Math.PI*ElevatorConstants.SPOOL_DIAMETER.inInches))
+    Logger.recordOutput("Elevator/motionMagicPositon", motionMagicTargetPosition.value*ElevatorConstants.GEAR_RATIO*(Math.PI*ElevatorConstants.SPOOL_DIAMETER.inInches))
     Logger.recordOutput("Elevator/motionMagicVelocity", motionMagicTargetVelocity.value*ElevatorConstants.GEAR_RATIO*(Math.PI*ElevatorConstants.SPOOL_DIAMETER.inInches))
 
   }

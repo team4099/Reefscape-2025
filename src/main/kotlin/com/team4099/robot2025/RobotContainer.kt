@@ -55,10 +55,10 @@ object RobotContainer {
 
       drivetrain = Drivetrain(object : GyroIO {}, object : DrivetrainIO {})
       limelight = LimelightVision(object : LimelightVisionIO {} )
-      arm = Arm(object : ArmIO {})
+      arm = Arm(ArmIOTalonFX)
       climber = Climber(object : ClimberIO {})
       elevator = Elevator(ElevatorIOTalon)
-      rollers = Rollers(object : RollersIO {})
+      rollers = Rollers(RollersIOTalonFX)
     } else {
       // Simulation implementations
       drivetrain = Drivetrain(object : GyroIO {}, DrivetrainIOSim)
@@ -139,6 +139,14 @@ object RobotContainer {
     //tuning commands
     ControlBoard.testElevatorBind.whileTrue(superstructure.testElevatorCommand())
     ControlBoard.testElevatorDownBind.whileTrue(superstructure.testElevatorDownCommand())
+    ControlBoard.testArmBind.whileTrue(superstructure.testArmCommand())
+    ControlBoard.testArmDownBind.whileTrue(superstructure.testArmDownCommand())
+
+    ControlBoard.testIntakeBind.whileTrue(superstructure.outtakeRollersCommand())
+    ControlBoard.testOuttakeBind.whileTrue(superstructure.intakeRollersCommand())
+
+    ControlBoard.stopRollersBind.whileTrue(superstructure.stopRollersCommand())
+
     //ControlBoard.testClimberBind.whileTrue(superstructure.testClimberCommand())
     //ControlBoard.testRollersBind.whileTrue(superstructure.testRollersCommand())
     //ControlBoard.testArmBind.whileTrue(superstructure.testArmCommand())
@@ -149,6 +157,7 @@ object RobotContainer {
 //    ControlBoard.prepL4.whileTrue(superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L4))
     //ControlBoard.score.onTrue(TestElevatorCommand(elevator))
     //ControlBoard.forceIdle.whileTrue(superstructure.requestIdleCommand())
+
   }
 
   fun mapTestControls() {}

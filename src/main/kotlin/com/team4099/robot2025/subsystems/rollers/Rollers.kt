@@ -62,6 +62,8 @@ class Rollers(val io: RollersIO) {
         lastRollerRunTime = Clock.fpgaTime
       }
     }
+
+    currentState = nextState
   }
 
   companion object {

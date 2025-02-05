@@ -8,19 +8,30 @@ import org.team4099.lib.units.derived.inVolts
 import org.team4099.lib.units.derived.volts
 
 object RollersTunableValues {
-  val idleVoltage = LoggedTunableValue("Rollers/idleVoltage", Pair({ it.inVolts }, { it.volts }))
+  val idleVoltage = LoggedTunableValue("Rollers/idleVoltage",
+    RollersConstants.IDLE_VOLTAGE,
+    Pair({ it.inVolts }, { it.volts }))
 
   val idleCoralVoltage =
-    LoggedTunableValue("Rollers/idleCoralVoltage", Pair({ it.inVolts }, { it.volts }))
+    LoggedTunableValue("Rollers/idleCoralVoltage",
+      RollersConstants.IDLE_CORAL_VOLTAGE,
+      Pair({ it.inVolts }, { it.volts })
+    )
 
   val idleAlgaeVoltage =
-    LoggedTunableValue("Rollers/idleAlgaeVoltage", Pair({ it.inVolts }, { it.volts }))
+    LoggedTunableValue("Rollers/idleAlgaeVoltage",
+      RollersConstants.IDLE_ALGAE_VOLTAGE,
+      Pair({ it.inVolts }, { it.volts }))
 
   val intakeCoralVoltage =
-    LoggedTunableValue("Rollers/intakeCoralVoltage", Pair({ it.inVolts }, { it.volts }))
+    LoggedTunableValue("Rollers/intakeCoralVoltage",
+      RollersConstants.INTAKE_CORAL_VOLTAGE,
+      Pair({ it.inVolts }, { it.volts }))
 
   val intakeAlgaeVoltage =
-    LoggedTunableValue("Rollers/intakeAlgaeVoltage", Pair({ it.inVolts }, { it.volts }))
+    LoggedTunableValue("Rollers/intakeAlgaeVoltage",
+      RollersConstants.INTAKE_ALGAE_VOLTAGE,
+      Pair({ it.inVolts }, { it.volts }))
 
   val scoreBargeAlgaeVoltage =
     LoggedTunableValue(

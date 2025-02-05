@@ -13,13 +13,22 @@ import org.team4099.lib.units.perSecond
 
 object RollersConstants {
 
+
+
   val STATOR_CURRENT_LIMIT = 40.0.amps
   val SUPPLY_CURRENT_LIMIT = 60.0.amps
 
   val INTAKE_VOLTAGE = 0.0.volts
+
+  val IDLE_VOLTAGE = 0.0.volts
+  val IDLE_CORAL_VOLTAGE = 0.0.volts
+  val IDLE_ALGAE_VOLTAGE = 0.0.volts
+  val INTAKE_ALGAE_VOLTAGE = 0.0.volts
+  val INTAKE_CORAL_VOLTAGE = -2.5.volts
+
   val SCORE_BARGE_ALGAE_VOLTAGE = 0.0.volts
   val SCORE_PROCESSOR_ALGAE_VOLTAGE = 0.0.volts
-  val SCORE_CORAL_VOLTAGE = 0.0.volts
+  val SCORE_CORAL_VOLTAGE = 2.5.volts
   val EJECT_VOLTAGE = 0.0.volts
 
   val CORAL_VELOCITY_THRESHOLD = 0.0.rotations.perSecond
