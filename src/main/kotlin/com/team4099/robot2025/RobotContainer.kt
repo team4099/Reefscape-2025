@@ -2,6 +2,7 @@ package com.team4099.robot2025
 
 import com.team4099.lib.logging.LoggedTunableValue
 import com.team4099.robot2023.subsystems.limelight.LimelightVisionIOReal
+import com.team4099.robot2023.subsystems.vision.camera.CameraIO
 import com.team4099.robot2025.auto.AutonomousSelector
 import com.team4099.robot2025.commands.drivetrain.ResetGyroYawCommand
 import com.team4099.robot2025.commands.drivetrain.TargetTagCommand
@@ -16,6 +17,7 @@ import com.team4099.robot2025.subsystems.drivetrain.gyro.GyroIO
 import com.team4099.robot2025.subsystems.drivetrain.gyro.GyroIOPigeon2
 import com.team4099.robot2025.subsystems.limelight.LimelightVision
 import com.team4099.robot2025.subsystems.limelight.LimelightVisionIOSim
+import com.team4099.robot2025.subsystems.vision.Vision
 import com.team4099.robot2025.util.driver.Jessika
 import edu.wpi.first.wpilibj.RobotBase
 import edu.wpi.first.wpilibj2.command.Command
@@ -27,7 +29,7 @@ import com.team4099.robot2025.subsystems.superstructure.Request.DrivetrainReques
 
 object RobotContainer {
   private val drivetrain: Drivetrain
-  private val limelight: LimelightVision
+  private val vision: Vision
 
   var setClimbAngle = -1337.degrees
   var setAmpAngle = 270.0.degrees
@@ -45,14 +47,20 @@ object RobotContainer {
       // drivetrain = Drivetrain(object: GyroIO {},object: DrivetrainIO {}
 
       drivetrain = Drivetrain(GyroIOPigeon2, DrivetrainIOReal)
-      limelight = LimelightVision(LimelightVisionIOReal(LIMELIGHT_NAME))
+      vision = Vision(object : CameraIO {})
     } else {
       // Simulation implementations
+      vision = Vision(object : CameraIO {})
       drivetrain = Drivetrain(object : GyroIO {}, DrivetrainIOSim)
-      limelight = LimelightVision(LimelightVisionIOSim(LIMELIGHT_NAME))
     }
 
-    limelight.poseSupplier = { drivetrain.odomTRobot }
+    vision.setDataInterfaces(
+      { drivetrain.fieldTRobot },
+      { drivetrain.addVisionData(it) },
+      { drivetrain.addSpeakerVisionData(it) }
+    )
+    vision.drivetrainOdometry = { drivetrain.odomTRobot }
+
   }
 
   fun mapDefaultCommands() {
@@ -118,9 +126,7 @@ object RobotContainer {
         { ControlBoard.strafe.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
         { ControlBoard.turn.smoothDeadband(Constants.Joysticks.TURN_DEADBAND) },
         { ControlBoard.slowMode },
-        drivetrain,
-        limelight,
-        { 90.degrees }
+        drivetrain
       )
     )
   }

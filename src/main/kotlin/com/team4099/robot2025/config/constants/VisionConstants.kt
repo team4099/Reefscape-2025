@@ -15,19 +15,25 @@ object VisionConstants {
 
   const val NUM_OF_CAMERAS = 2
 
+  val BLUE_REEF_TAGS = arrayOf(17, 18, 19, 20, 21, 22)
+  val RED_REEF_TAGS = arrayOf(6, 7, 8, 9, 10, 11)
+
   val TRUSTED_CAMERA_ORDER = arrayOf<Int>(1, 0)
 
 
   val CAMERA_TRANSFORMS =
     listOf(
-  Transform3d(
-  Translation3d(12.653.inches, -9.1.inches, 14.25.inches), // 18.69
-  Rotation3d(-5.3.degrees, 30.degrees, -72.77.degrees)
-  ), // left
-  Transform3d(
-  Translation3d(4.8.inches, 0.inches, 17.164.inches), // 18.69
-  Rotation3d(0.degrees, 30.degrees, 0.degrees)
+      Transform3d(
+      Translation3d(12.653.inches, -9.1.inches, 14.25.inches), // 18.69
+      Rotation3d(-5.3.degrees, 30.degrees, -72.77.degrees)
+      ), // left
+      Transform3d(
+      Translation3d(4.8.inches, 0.inches, 17.164.inches), // 18.69
+      Rotation3d(0.degrees, 30.degrees, 0.degrees)
   ) )
+
+  val REEF_TAG_HEIGHT = 12.inches
+
 
   val CAMERA_NAMES = listOf("parakeet_1", "parakeet_2", "parakeet_3")
 

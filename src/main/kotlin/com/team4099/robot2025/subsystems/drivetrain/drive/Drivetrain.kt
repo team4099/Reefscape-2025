@@ -440,6 +440,7 @@ class Drivetrain(val gyroIO: GyroIO, swerveModuleIOs: DrivetrainIO) : SubsystemB
   ) {
 
     Logger.recordOutput("Drivetrain/isFieldOriented", fieldOriented)
+
     // flip the direction base don alliance color
     val flipDrive = if (FMSData.allianceColor == DriverStation.Alliance.Red) -1 else 1
     val allianceFlippedDriveVector =
@@ -467,8 +468,8 @@ class Drivetrain(val gyroIO: GyroIO, swerveModuleIOs: DrivetrainIO) : SubsystemB
     } else {
       desiredChassisSpeeds =
         ChassisSpeeds(
-          allianceFlippedDriveVector.first,
-          allianceFlippedDriveVector.second,
+          driveVector.first,
+          driveVector.second,
           angularVelocity,
         )
     }
