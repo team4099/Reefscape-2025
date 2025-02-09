@@ -22,7 +22,7 @@ object ClimberConstants {
   val MAX_ACCELERATION = 50.0.degrees.perSecond.perSecond
   val MAX_ANGLE = 180.0.degrees
   val MIN_ANGLE = 0.0.degrees
-  val TOLERANCE = 0.0.degrees
+  val TOLERANCE = 5.0.degrees
 
   val HOMING_APPLIED_VOLTAGE = 0.0.volts
   val HOMING_STALL_CURRENT = 0.0.amps
@@ -31,7 +31,7 @@ object ClimberConstants {
   val VOLTAGE_COMPENSATION = 12.0.volts
   val STATOR_CURRENT_LIMIT = 30.0.amps
   val SUPPLY_CURRENT_LIMIT = 40.0.amps
-  val THRESHOLD_CURRENT_LIMIT = 0.0.amps
+  val THRESHOLD_CURRENT_LIMIT = 40.0.amps
 
   // make few constants[[-;[
 
@@ -42,7 +42,7 @@ object ClimberConstants {
 
   val LENGTH = 13.408.inches
   val INERTIA = 16.767866.pounds * 1.0.inches.squared
-  val GEAR_RATIO = 1.0
+  val GEAR_RATIO = 80.0/1.0
 
   // TODO: Tune the PID values
   object PID {
