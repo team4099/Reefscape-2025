@@ -1,7 +1,6 @@
 package com.team4099.robot2025.config.constants
 
 import org.team4099.lib.units.base.amps
-import org.team4099.lib.units.base.inInches
 import org.team4099.lib.units.base.inches
 import org.team4099.lib.units.base.meters
 import org.team4099.lib.units.base.pounds
@@ -63,7 +62,7 @@ object ElevatorConstants {
   val SCORE_BARGE_HEIGHT = 0.0.inches
 
   // TODO: adjust scoring/intaking heights for end-effector offset
-  val L1_HEIGHT =  0.0.inches
+  val L1_HEIGHT = 0.0.inches
   val L2_HEIGHT = 13.039.inches
   val L3_HEIGHT = 28.789.inches
   val L4_HEIGHT = 64.138.inches
@@ -72,12 +71,9 @@ object ElevatorConstants {
 
   val ELEVATOR_GROUND_OFFSET = 3.829.inches
 
-
-
   // TODO: make real maxes
   val MAX_VELOCITY = 200.0.inches.perSecond
   val MAX_ACCELERATION = 100.0.inches.perSecond.perSecond
-
 
   object PID {
     // TODO: tune all

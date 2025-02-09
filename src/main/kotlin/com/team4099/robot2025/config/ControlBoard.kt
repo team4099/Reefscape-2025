@@ -44,7 +44,7 @@ object ControlBoard {
   val forceIdle = Trigger { driver.dPadDown }
 
   val stopRollersBind = Trigger { driver.dPadDown }
-  //Tuning Binds
+  // Tuning Binds
   val testElevatorBind = Trigger { driver.aButton }
   val testElevatorDownBind = Trigger { driver.bButton }
   val testClimberBind = Trigger { driver.bButton }
@@ -55,12 +55,11 @@ object ControlBoard {
   val testArmBind = Trigger { driver.yButton }
   val testArmDownBind = Trigger { driver.xButton }
 
-  //Single Driver Binds
+  // Single Driver Binds
   val prepL2 = Trigger { driver.aButton }
   val prepL3 = Trigger { driver.bButton }
   val prepL4 = Trigger { driver.yButton }
 
   val score = Trigger { driver.rightTriggerAxis > 0.5 }
   val intakeCoral = Trigger { driver.leftTriggerAxis > 0.5 }
-
 }

@@ -13,8 +13,6 @@ import org.team4099.lib.units.perSecond
 
 object RollersConstants {
 
-
-
   val STATOR_CURRENT_LIMIT = 40.0.amps
   val SUPPLY_CURRENT_LIMIT = 60.0.amps
 

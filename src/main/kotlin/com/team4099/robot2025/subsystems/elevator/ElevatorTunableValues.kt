@@ -50,7 +50,12 @@ object ElevatorTunableValues {
   val kGSecond = LoggedTunableValue("Elevator/kGSecondStage", Pair({ it.inVolts }, { it.volts }))
   val kGThird = LoggedTunableValue("Elevator/kGThirdStage", Pair({ it.inVolts }, { it.volts }))
 
-  val testingVoltage = LoggedTunableValue("Elevator/testingVoltage", ElevatorConstants.TESTING_VOLTAGE, Pair({it.inVolts}, {it.volts}))
+  val testingVoltage =
+    LoggedTunableValue(
+      "Elevator/testingVoltage",
+      ElevatorConstants.TESTING_VOLTAGE,
+      Pair({ it.inVolts }, { it.volts })
+    )
 
   object ElevatorHeights {
     val minHeight =
@@ -88,14 +93,12 @@ object ElevatorTunableValues {
         Pair({ it.inInches }, { it.inches })
       )
 
-
     val safeArmPassThroughCarriageHeight =
       LoggedTunableValue(
-      "Elevator/safeArmPassThroughHeight",
-      ElevatorConstants.SAFE_ARM_PASS_THROUGH_HEIGHT,
-      Pair({ it.inInches }, { it.inches })
-    )
-
+        "Elevator/safeArmPassThroughHeight",
+        ElevatorConstants.SAFE_ARM_PASS_THROUGH_HEIGHT,
+        Pair({ it.inInches }, { it.inches })
+      )
 
     val safeArmPassUnderCarriageHeight =
       LoggedTunableValue(
@@ -103,7 +106,6 @@ object ElevatorTunableValues {
         ElevatorConstants.SAFE_ARM_PASS_UNDER_CARRIAGE_HEIGHT,
         Pair({ it.inInches }, { it.inches })
       )
-
 
     val intakeCoralHeight =
       LoggedTunableValue(
@@ -186,7 +188,6 @@ object ElevatorTunableValues {
       LoggedTunableValue(
         "Elevator/L4Height", ElevatorConstants.L4_HEIGHT, Pair({ it.inInches }, { it.inches })
       )
-
 
     val ejectHeight =
       LoggedTunableValue(

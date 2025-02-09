@@ -1,34 +1,26 @@
 package com.team4099.robot2025
 
-import com.team4099.robot2023.subsystems.limelight.LimelightVisionIOReal
 import com.team4099.robot2025.auto.AutonomousSelector
-import com.team4099.robot2025.commands.characterization.TestElevatorCommand
 import com.team4099.robot2025.commands.drivetrain.ResetGyroYawCommand
 import com.team4099.robot2025.commands.drivetrain.TeleopDriveCommand
 import com.team4099.robot2025.config.ControlBoard
 import com.team4099.robot2025.config.constants.Constants
 import com.team4099.robot2025.subsystems.arm.Arm
-import com.team4099.robot2025.subsystems.arm.ArmIO
 import com.team4099.robot2025.subsystems.arm.ArmIOSim
 import com.team4099.robot2025.subsystems.arm.ArmIOTalonFX
 import com.team4099.robot2025.subsystems.climber.Climber
 import com.team4099.robot2025.subsystems.climber.ClimberIO
 import com.team4099.robot2025.subsystems.climber.ClimberIOSim
-import com.team4099.robot2025.subsystems.climber.ClimberIOTalon
 import com.team4099.robot2025.subsystems.drivetrain.drive.Drivetrain
 import com.team4099.robot2025.subsystems.drivetrain.drive.DrivetrainIO
-import com.team4099.robot2025.subsystems.drivetrain.drive.DrivetrainIOReal
 import com.team4099.robot2025.subsystems.drivetrain.drive.DrivetrainIOSim
 import com.team4099.robot2025.subsystems.drivetrain.gyro.GyroIO
-import com.team4099.robot2025.subsystems.drivetrain.gyro.GyroIOPigeon2
 import com.team4099.robot2025.subsystems.elevator.Elevator
-import com.team4099.robot2025.subsystems.elevator.ElevatorIO
 import com.team4099.robot2025.subsystems.elevator.ElevatorIOSim
 import com.team4099.robot2025.subsystems.elevator.ElevatorIOTalon
 import com.team4099.robot2025.subsystems.limelight.LimelightVision
 import com.team4099.robot2025.subsystems.limelight.LimelightVisionIO
 import com.team4099.robot2025.subsystems.rollers.Rollers
-import com.team4099.robot2025.subsystems.rollers.RollersIO
 import com.team4099.robot2025.subsystems.rollers.RollersIOTalonFX
 import com.team4099.robot2025.subsystems.superstructure.Request
 import com.team4099.robot2025.subsystems.superstructure.Superstructure
@@ -54,7 +46,7 @@ object RobotContainer {
       // drivetrain = Drivetrain(object: GyroIO {},object: DrivetrainIO {}
 
       drivetrain = Drivetrain(object : GyroIO {}, object : DrivetrainIO {})
-      limelight = LimelightVision(object : LimelightVisionIO {} )
+      limelight = LimelightVision(object : LimelightVisionIO {})
       arm = Arm(ArmIOTalonFX)
       climber = Climber(object : ClimberIO {})
       elevator = Elevator(ElevatorIOTalon)
@@ -69,7 +61,7 @@ object RobotContainer {
       rollers = Rollers(RollersIOTalonFX)
     }
 
-    superstructure = Superstructure(drivetrain, elevator, rollers, arm, climber, limelight)
+    superstructure = Superstructure(elevator, rollers, arm, climber, limelight)
 
     limelight.poseSupplier = { drivetrain.odomTRobot }
   }
@@ -136,28 +128,33 @@ object RobotContainer {
 
     ControlBoard.resetGyro.whileTrue(ResetGyroYawCommand(drivetrain))
 
-    //tuning commands
-    ControlBoard.testElevatorBind.whileTrue(superstructure.testElevatorCommand())
-    ControlBoard.testElevatorDownBind.whileTrue(superstructure.testElevatorDownCommand())
-    ControlBoard.testArmBind.whileTrue(superstructure.testArmCommand())
-    ControlBoard.testArmDownBind.whileTrue(superstructure.testArmDownCommand())
+    // tuning commands
+    //    ControlBoard.testElevatorBind.whileTrue(superstructure.testElevatorCommand())
+    //    ControlBoard.testElevatorDownBind.whileTrue(superstructure.testElevatorDownCommand())
+    //    ControlBoard.testArmBind.whileTrue(superstructure.testArmCommand())
+    //    ControlBoard.testArmDownBind.whileTrue(superstructure.testArmDownCommand())
+    //
+    //    ControlBoard.testIntakeBind.whileTrue(superstructure.outtakeRollersCommand())
+    //    ControlBoard.testOuttakeBind.whileTrue(superstructure.intakeRollersCommand())
+    //
+    //    ControlBoard.stopRollersBind.whileTrue(superstructure.stopRollersCommand())
 
-    ControlBoard.testIntakeBind.whileTrue(superstructure.outtakeRollersCommand())
-    ControlBoard.testOuttakeBind.whileTrue(superstructure.intakeRollersCommand())
+    // ControlBoard.testClimberBind.whileTrue(superstructure.testClimberCommand())
+    // ControlBoard.testRollersBind.whileTrue(superstructure.testRollersCommand())
+    // ControlBoard.testArmBind.whileTrue(superstructure.testArmCommand())
 
-    ControlBoard.stopRollersBind.whileTrue(superstructure.stopRollersCommand())
-
-    //ControlBoard.testClimberBind.whileTrue(superstructure.testClimberCommand())
-    //ControlBoard.testRollersBind.whileTrue(superstructure.testRollersCommand())
-    //ControlBoard.testArmBind.whileTrue(superstructure.testArmCommand())
-
-//    ControlBoard.intakeCoral.whileTrue(superstructure.intakeCoralCommand())
-//    ControlBoard.prepL2.whileTrue(superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L2))
-//    ControlBoard.prepL3.whileTrue(superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L3))
-//    ControlBoard.prepL4.whileTrue(superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L4))
-    //ControlBoard.score.onTrue(TestElevatorCommand(elevator))
-    //ControlBoard.forceIdle.whileTrue(superstructure.requestIdleCommand())
-
+    ControlBoard.intakeCoral.whileTrue(superstructure.intakeCoralCommand())
+    ControlBoard.prepL2.whileTrue(
+      superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L2)
+    )
+    ControlBoard.prepL3.whileTrue(
+      superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L3)
+    )
+    ControlBoard.prepL4.whileTrue(
+      superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L4)
+    )
+    // ControlBoard.score.onTrue(TestElevatorCommand(elevator))
+    // ControlBoard.forceIdle.whileTrue(superstructure.requestIdleCommand())
   }
 
   fun mapTestControls() {}

@@ -19,8 +19,8 @@ import org.team4099.lib.units.perSecond
 
 object ArmConstants {
 
-  val ZERO_OFFSET = -36.degrees
-  val ARM_GEAR_RATIO =  1 / 27.5
+  val ZERO_OFFSET = -19.8.degrees
+  val ARM_GEAR_RATIO = 1 / 27.5
   val ARM_ENCODER_TO_MECHANISM_RATIO = 1.0
 
   val IDLE_ANGLE = 90.0.degrees
@@ -35,9 +35,9 @@ object ArmConstants {
   val INTAKE_ALGAE_L2_ANGLE = 0.0.degrees
   val INTAKE_ALGAE_L3_ANGLE = 0.0.degrees
 
-  val SCORE_CORAL_L1_ANGLE = 75.degrees
-  val SCORE_CORAL_L2_ANGLE = 55.degrees
-  val SCORE_CORAL_L3_ANGLE = 55.degrees
+  val SCORE_CORAL_L1_ANGLE = 145.degrees
+  val SCORE_CORAL_L2_ANGLE = 145.degrees
+  val SCORE_CORAL_L3_ANGLE = 145.degrees
   val SCORE_CORAL_L4_ANGLE = 15.degrees
 
   val EJECT_ANGLE = 75.degrees
@@ -56,11 +56,11 @@ object ArmConstants {
   val STATOR_CURRENT_LIMIT = 30.0.amps
   val SUPPLY_CURRENT_LIMIT = 30.0.amps
 
-  val INVERSION_VALUE: InvertedValue = InvertedValue.Clockwise_Positive
+  val INVERSION_VALUE: InvertedValue = InvertedValue.CounterClockwise_Positive
   val NEUTRAL_MODE_VALUE: NeutralModeValue = NeutralModeValue.Coast
 
-  val MOTION_MAGIC_ACCELERATION = 60.degrees.perSecond.perSecond
-  val MOTION_MAGIC_CRUISE_VELOCITY = 50.degrees.perSecond
+  val MOTION_MAGIC_ACCELERATION = 30.degrees.perSecond.perSecond // cut by half up later
+  val MOTION_MAGIC_CRUISE_VELOCITY = 25.degrees.perSecond
 
   val ENCODER_DIRECTION_VALUE: SensorDirectionValue = SensorDirectionValue.Clockwise_Positive
   val ENCODER_OFFSET = 0.0.degrees

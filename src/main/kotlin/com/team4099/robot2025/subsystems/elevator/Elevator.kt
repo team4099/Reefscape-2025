@@ -189,8 +189,10 @@ class Elevator(val io: ElevatorIO) : SubsystemBase() {
   }
 
   fun setVoltage(targetVoltage: ElectricalPotential) {
-    if (((upperLimitReached && targetVoltage > 0.0.volts) ||
-      (lowerLimitReached && targetVoltage < 0.0.volts) ) && isHomed
+    if ((
+      (upperLimitReached && targetVoltage > 0.0.volts) ||
+        (lowerLimitReached && targetVoltage < 0.0.volts)
+      ) && isHomed
     ) {
       io.setVoltage(0.0.volts)
     } else {
