@@ -20,7 +20,7 @@ import org.team4099.lib.units.perSecond
 object ArmConstants {
 
   val ZERO_OFFSET = -36.degrees
-  val ARM_GEAR_RATIO =  1 / 27.5
+  val ARM_GEAR_RATIO = 1 / 27.5
   val ARM_ENCODER_TO_MECHANISM_RATIO = 1.0
 
   val IDLE_ANGLE = 90.0.degrees

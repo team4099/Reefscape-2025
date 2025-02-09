@@ -2,7 +2,6 @@ package com.team4099.robot2025.subsystems.elevator
 
 import com.ctre.phoenix6.BaseStatusSignal
 import com.ctre.phoenix6.StatusSignal
-import com.ctre.phoenix6.configs.MotionMagicConfigs
 import com.ctre.phoenix6.configs.TalonFXConfiguration
 import com.ctre.phoenix6.controls.Follower
 import com.ctre.phoenix6.controls.MotionMagicVoltage
@@ -22,7 +21,6 @@ import org.team4099.lib.units.base.celsius
 import org.team4099.lib.units.base.inAmperes
 import org.team4099.lib.units.base.inInches
 import org.team4099.lib.units.base.inches
-import org.team4099.lib.units.base.meters
 import org.team4099.lib.units.ctreLinearMechanismSensor
 import org.team4099.lib.units.derived.AccelerationFeedforward
 import org.team4099.lib.units.derived.Angle
@@ -41,8 +39,6 @@ import org.team4099.lib.units.derived.inVoltsPerMetersPerSecondPerSecond
 import org.team4099.lib.units.derived.volts
 import org.team4099.lib.units.inInchesPerSecond
 import org.team4099.lib.units.inInchesPerSecondPerSecond
-import org.team4099.lib.units.inMetersPerSecond
-import org.team4099.lib.units.inMetersPerSecondPerSecond
 import kotlin.time.times
 import edu.wpi.first.units.measure.Current as WPILibCurrent
 import edu.wpi.first.units.measure.Temperature as WPILibTemperature
@@ -98,14 +94,14 @@ object ElevatorIOTalon : ElevatorIO {
     configs.CurrentLimits.StatorCurrentLimitEnable = true
     configs.CurrentLimits.SupplyCurrentLimitEnable = true
 
-    //configs.SoftwareLimitSwitch.ForwardSoftLimitEnable = true
-    //configs.SoftwareLimitSwitch.ReverseSoftLimitEnable = true
+    // configs.SoftwareLimitSwitch.ForwardSoftLimitEnable = true
+    // configs.SoftwareLimitSwitch.ReverseSoftLimitEnable = true
 
-    //configs.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
-      //leaderSensor.positionToRawUnits(ElevatorConstants.UPWARDS_EXTENSION_LIMIT)
+    // configs.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
+    // leaderSensor.positionToRawUnits(ElevatorConstants.UPWARDS_EXTENSION_LIMIT)
 
-    //configs.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
-      //leaderSensor.positionToRawUnits(ElevatorConstants.DOWNWARDS_EXTENSION_LIMIT)
+    // configs.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
+    // leaderSensor.positionToRawUnits(ElevatorConstants.DOWNWARDS_EXTENSION_LIMIT)
 
     configs.MotionMagic.MotionMagicCruiseVelocity = MAX_VELOCITY.inInchesPerSecond
     configs.MotionMagic.MotionMagicAcceleration = MAX_ACCELERATION.inInchesPerSecondPerSecond
@@ -124,7 +120,6 @@ object ElevatorIOTalon : ElevatorIO {
     followerTempSignal = followerTalon.deviceTemp
     followerDutyCycle = followerTalon.dutyCycle
 
-
     motorVoltage = leaderTalon.motorVoltage
     motorTorque = leaderTalon.torqueCurrent
 
@@ -136,7 +131,6 @@ object ElevatorIOTalon : ElevatorIO {
 
     leaderTalon.configurator.apply(configs)
     followerTalon.configurator.apply(configs)
-
   }
 
   private fun updateSignals() {
@@ -174,9 +168,18 @@ object ElevatorIOTalon : ElevatorIO {
     inputs.followerSupplyCurrent = followerSupplyCurrentSignal.valueAsDouble.amps
     inputs.followerAppliedVoltage = followerDutyCycle.valueAsDouble.volts
 
-    Logger.recordOutput("Elevator/motionMagicPositon", motionMagicTargetPosition.value*ElevatorConstants.GEAR_RATIO*(Math.PI*ElevatorConstants.SPOOL_DIAMETER.inInches))
-    Logger.recordOutput("Elevator/motionMagicVelocity", motionMagicTargetVelocity.value*ElevatorConstants.GEAR_RATIO*(Math.PI*ElevatorConstants.SPOOL_DIAMETER.inInches))
-
+    Logger.recordOutput(
+      "Elevator/motionMagicPositon",
+      motionMagicTargetPosition.value *
+        ElevatorConstants.GEAR_RATIO *
+        (Math.PI * ElevatorConstants.SPOOL_DIAMETER.inInches)
+    )
+    Logger.recordOutput(
+      "Elevator/motionMagicVelocity",
+      motionMagicTargetVelocity.value *
+        ElevatorConstants.GEAR_RATIO *
+        (Math.PI * ElevatorConstants.SPOOL_DIAMETER.inInches)
+    )
   }
 
   override fun configPID(

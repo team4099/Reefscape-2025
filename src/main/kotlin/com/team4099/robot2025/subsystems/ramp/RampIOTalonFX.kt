@@ -21,7 +21,7 @@ import edu.wpi.first.units.measure.Current as WPILibCurrent
 import edu.wpi.first.units.measure.Temperature as WPILibTemperature
 import edu.wpi.first.units.measure.Voltage as WPILibVoltage
 
-object RollersIOTalonFX : RollersIO {
+object RampIOTalonFX : RampIO {
 
   private val rollersTalon: TalonFX = TalonFX(Constants.Rollers.ROLLERS_MOTOR_ID)
   private val rollersConfiguration: TalonFXConfiguration = TalonFXConfiguration()
@@ -73,13 +73,13 @@ object RollersIOTalonFX : RollersIO {
     )
   }
 
-  override fun updateInputs(inputs: RollersIO.RollersIOInputs) {
+  override fun updateInputs(inputs: RampIO.RampIOInputs) {
     refreshStatusSignals()
-    inputs.rollerVelocity = rollerSensor.velocity
-    inputs.rollerAppliedVoltage = rollerAppliedVoltageStatusSignal.valueAsDouble.volts
-    inputs.rollerStatorCurrent = rollerStatorCurrentStatusSignal.valueAsDouble.amps
-    inputs.rollerSupplyCurrent = rollerSupplyCurrentStatusSignal.valueAsDouble.amps
-    inputs.rollerTemp = rollerTempStatusSignal.valueAsDouble.celsius
+    inputs.velocity = rollerSensor.velocity
+    inputs.appliedVoltage = rollerAppliedVoltageStatusSignal.valueAsDouble.volts
+    inputs.statorCurrent = rollerStatorCurrentStatusSignal.valueAsDouble.amps
+    inputs.supplyCurrent = rollerSupplyCurrentStatusSignal.valueAsDouble.amps
+    inputs.motorTemp = rollerTempStatusSignal.valueAsDouble.celsius
     inputs.beamBroken = beamBreakStatusSignal.value
   }
 

@@ -4,6 +4,8 @@ import com.team4099.lib.hal.Clock
 import com.team4099.robot2025.config.constants.RollersConstants
 import com.team4099.robot2025.subsystems.superstructure.Request
 import com.team4099.robot2025.util.CustomLogger
+import edu.wpi.first.math.filter.Debouncer
+import org.team4099.lib.units.base.inSeconds
 import org.team4099.lib.units.derived.ElectricalPotential
 import org.team4099.lib.units.derived.volts
 
@@ -15,7 +17,7 @@ class Rollers(val io: RollersIO) {
     set(value) {
       when (value) {
         is Request.RollersRequest.OpenLoop -> {
-          rollersTargetVoltage = value.RollersVoltage
+          rollersTargetVoltage = value.voltage
         }
         else -> {}
       }
@@ -24,7 +26,11 @@ class Rollers(val io: RollersIO) {
 
   var lastRollerRunTime = Clock.fpgaTime
 
-  val hasCoral: Boolean
+  var hasCoralVertical = false
+
+  var debounceFilter = Debouncer(RollersConstants.BEAM_BREAK_FILTER_TIME.inSeconds)
+
+  val hasCoralHorizontal: Boolean
     get() {
       return inputs.rollerVelocity.absoluteValue <= RollersConstants.CORAL_VELOCITY_THRESHOLD &&
         inputs.rollerStatorCurrent > RollersConstants.CORAL_CURRENT_THRESHOLD &&
@@ -49,6 +55,8 @@ class Rollers(val io: RollersIO) {
     CustomLogger.processInputs("Rollers", inputs)
     CustomLogger.recordOutput("Rollers/currentState", currentState.toString())
 
+    hasCoralVertical = debounceFilter.calculate(inputs.beamBroken)
+
     var nextState = currentState
     CustomLogger.recordOutput("Rollers/nextState", nextState.toString())
 
@@ -57,7 +65,7 @@ class Rollers(val io: RollersIO) {
         nextState = fromRequestToState(currentRequest)
       }
       RollersState.OPEN_LOOP -> {
-        io.setRollerVoltage(rollersTargetVoltage)
+        io.setVoltage(rollersTargetVoltage)
         nextState = fromRequestToState(currentRequest)
         lastRollerRunTime = Clock.fpgaTime
       }

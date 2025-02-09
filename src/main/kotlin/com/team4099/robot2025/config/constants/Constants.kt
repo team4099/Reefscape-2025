@@ -5,7 +5,6 @@ import org.team4099.lib.units.base.seconds
 import org.team4099.lib.units.milli
 import org.team4099.lib.units.perSecond
 
-
 object Constants {
   object Universal {
     val gravity = -9.8.meters.perSecond.perSecond
@@ -109,10 +108,9 @@ object Constants {
 
   // leader is right motor and follower is left
   object Elevator {
-    const val LEADER_MOTOR_ID = 42 //right
-    const val FOLLOWER_MOTOR_ID = 41 //left
+    const val LEADER_MOTOR_ID = 42 // right
+    const val FOLLOWER_MOTOR_ID = 41 // left
   }
-
 
   object Gyro {
     const val PIGEON_2_ID = 1
@@ -125,6 +123,7 @@ object Constants {
 
   object Rollers {
     const val ROLLERS_MOTOR_ID = 61
+    const val CANDI_ID = 62
   }
 
   object Alert {

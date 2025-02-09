@@ -8,14 +8,12 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage
 import com.ctre.phoenix6.controls.VoltageOut
 import com.ctre.phoenix6.hardware.CANcoder
 import com.ctre.phoenix6.hardware.TalonFX
-import com.ctre.phoenix6.signals.FeedbackSensorSourceValue
 import com.ctre.phoenix6.signals.GravityTypeValue
 import com.ctre.phoenix6.signals.NeutralModeValue
 import com.team4099.robot2025.config.constants.ArmConstants
 import com.team4099.robot2025.config.constants.ArmConstants.ARM_KA
 import com.team4099.robot2025.config.constants.ArmConstants.ARM_KV
 import com.team4099.robot2025.config.constants.Constants
-import com.team4099.robot2025.config.constants.ElevatorConstants
 import com.team4099.robot2025.subsystems.arm.ArmIO.ArmIOInputs
 import com.team4099.robot2025.util.CustomLogger
 import edu.wpi.first.units.measure.AngularVelocity
@@ -24,7 +22,6 @@ import org.team4099.lib.units.AngularMechanismSensor
 import org.team4099.lib.units.base.amps
 import org.team4099.lib.units.base.celsius
 import org.team4099.lib.units.base.inAmperes
-import org.team4099.lib.units.base.inInches
 import org.team4099.lib.units.ctreAngularMechanismSensor
 import org.team4099.lib.units.derived.AccelerationFeedforward
 import org.team4099.lib.units.derived.Angle
@@ -37,13 +34,11 @@ import org.team4099.lib.units.derived.VelocityFeedforward
 import org.team4099.lib.units.derived.Volt
 import org.team4099.lib.units.derived.degrees
 import org.team4099.lib.units.derived.inDegrees
-import org.team4099.lib.units.derived.inRotations
 import org.team4099.lib.units.derived.inVolts
 import org.team4099.lib.units.derived.inVoltsPerDegree
 import org.team4099.lib.units.derived.inVoltsPerDegreePerSecond
 import org.team4099.lib.units.derived.inVoltsPerDegreeSeconds
 import org.team4099.lib.units.derived.inVoltsPerDegreesPerSecondPerSecond
-import org.team4099.lib.units.derived.rotations
 import org.team4099.lib.units.derived.volts
 import org.team4099.lib.units.inDegreesPerSecond
 import org.team4099.lib.units.inDegreesPerSecondPerSecond
@@ -123,8 +118,10 @@ object ArmIOTalonFX : ArmIO {
     armConfiguration.MotorOutput.NeutralMode = ArmConstants.NEUTRAL_MODE_VALUE
 
     // Configure Motion Magic
-    armConfiguration.MotionMagic.MotionMagicAcceleration = ArmConstants.MOTION_MAGIC_ACCELERATION.inDegreesPerSecondPerSecond
-    armConfiguration.MotionMagic.MotionMagicCruiseVelocity = ArmConstants.MOTION_MAGIC_CRUISE_VELOCITY.inDegreesPerSecond
+    armConfiguration.MotionMagic.MotionMagicAcceleration =
+      ArmConstants.MOTION_MAGIC_ACCELERATION.inDegreesPerSecondPerSecond
+    armConfiguration.MotionMagic.MotionMagicCruiseVelocity =
+      ArmConstants.MOTION_MAGIC_CRUISE_VELOCITY.inDegreesPerSecond
 
     // Configure Softlimits
     armConfiguration.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
@@ -138,14 +135,13 @@ object ArmIOTalonFX : ArmIO {
     // Apply Configs+
 
     armTalon.configurator.apply(armConfiguration)
-    //absoluteEncoder.configurator.apply(absoluteEncoderConfiguration)
+    // absoluteEncoder.configurator.apply(absoluteEncoderConfiguration)
 
     motionMagicTargetPosition = armTalon.closedLoopReference
     motionMagicTargetVelocity = armTalon.closedLoopReferenceSlope
 
     motionMagicTargetPosition.setUpdateFrequency(250.0)
     motionMagicTargetVelocity.setUpdateFrequency(250.0)
-
 
     armPositionSignal = armTalon.position
     armVelocitySignal = armTalon.velocity
@@ -186,8 +182,14 @@ object ArmIOTalonFX : ArmIO {
     inputs.armSupplyCurrent = armSupplyCurrentStatusSignal.valueAsDouble.amps
     inputs.armTemp = armTempStatusSignal.valueAsDouble.celsius
 
-    Logger.recordOutput("Arm/motionMagicPosition", motionMagicTargetPosition.value * ArmConstants.ARM_GEAR_RATIO * 360)
-    Logger.recordOutput("Arm/motionMagicVelocity", motionMagicTargetVelocity.value * ArmConstants.ARM_GEAR_RATIO * 360)
+    Logger.recordOutput(
+      "Arm/motionMagicPosition",
+      motionMagicTargetPosition.value * ArmConstants.ARM_GEAR_RATIO * 360
+    )
+    Logger.recordOutput(
+      "Arm/motionMagicVelocity",
+      motionMagicTargetVelocity.value * ArmConstants.ARM_GEAR_RATIO * 360
+    )
   }
 
   override fun setArmVoltage(voltage: ElectricalPotential) {
@@ -209,7 +211,6 @@ object ArmIOTalonFX : ArmIO {
      */
 
     armTalon.setPosition(armSensor.positionToRawUnits(ArmConstants.ZERO_OFFSET))
-
   }
 
   override fun setArmBrakeMode(brake: Boolean) {

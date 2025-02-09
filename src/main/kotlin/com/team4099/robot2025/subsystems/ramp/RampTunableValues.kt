@@ -7,7 +7,7 @@ import org.team4099.lib.units.base.seconds
 import org.team4099.lib.units.derived.inVolts
 import org.team4099.lib.units.derived.volts
 
-object RollersTunableValues {
+object RampTunableValues {
   val idleVoltage =
     LoggedTunableValue(
       "Rollers/idleVoltage", RollersConstants.IDLE_VOLTAGE, Pair({ it.inVolts }, { it.volts })

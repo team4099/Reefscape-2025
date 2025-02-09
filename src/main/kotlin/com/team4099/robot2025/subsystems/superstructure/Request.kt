@@ -1,6 +1,5 @@
 package com.team4099.robot2025.subsystems.superstructure
 
-
 import com.team4099.robot2025.config.constants.Constants
 import edu.wpi.first.math.kinematics.ChassisSpeeds
 import org.team4099.lib.units.AngularVelocity
@@ -70,8 +69,11 @@ sealed interface Request {
   }
 
   sealed interface RollersRequest : Request {
-    class OpenLoop(val RollersVoltage: ElectricalPotential) : RollersRequest
-    class Zero() : RollersRequest
+    class OpenLoop(val voltage: ElectricalPotential) : RollersRequest
+  }
+
+  sealed interface RampRequest : Request {
+    class OpenLoop(val voltage: ElectricalPotential) : RampRequest
   }
 
   sealed interface ElevatorRequest : Request {

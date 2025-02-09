@@ -21,6 +21,7 @@ interface RollersIO {
     var rollerStatorCurrent = 0.0.amps
     var rollerSupplyCurrent = 0.0.amps
     var rollerTemp = 0.0.celsius
+    var beamBroken = false
     var isSimulating = false
 
     override fun toLog(table: LogTable?) {
@@ -29,6 +30,7 @@ interface RollersIO {
       table?.put("rollerStatorCurrentAmps", rollerStatorCurrent.inAmperes)
       table?.put("rollerSupplyCurrentAmps", rollerSupplyCurrent.inAmperes)
       table?.put("rollerTempCelsius", rollerTemp.inCelsius)
+      table?.put("beamBroken", beamBroken)
     }
 
     override fun fromLog(table: LogTable?) {
@@ -45,12 +47,13 @@ interface RollersIO {
         rollerSupplyCurrent = it.amps
       }
       table?.get("rollerTempCelsius", rollerTemp.inCelsius)?.let { rollerTemp = it.celsius }
+      table?.get("beamBroken", beamBroken)?.let { beamBroken = it }
     }
   }
 
   fun updateInputs(inputs: RollersIOInputs) {}
 
-  fun setRollerVoltage(voltage: ElectricalPotential) {}
+  fun setVoltage(voltage: ElectricalPotential) {}
 
-  fun setRollerBrakeMode(brake: Boolean) {}
+  fun setBrakeMode(brake: Boolean) {}
 }
