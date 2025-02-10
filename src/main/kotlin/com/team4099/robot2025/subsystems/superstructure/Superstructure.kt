@@ -174,22 +174,34 @@ class Superstructure(
     )
 
     // Arm
-    CustomLogger.recordOutput("SimulatedMechanisms/3",
+    CustomLogger.recordOutput(
+      "SimulatedMechanisms/3",
       Pose3d()
         .transformBy(
-          Transform3d(Translation3d(0.21.meters, 0.meters, 0.38.meters + elevatorPosition), Rotation3d(0.degrees, -armAngle, 0.degrees))
+          Transform3d(
+            Translation3d(0.21.meters, 0.meters, 0.38.meters + elevatorPosition),
+            Rotation3d(0.degrees, -armAngle, 0.degrees)
+          )
         )
         .pose3d
     )
 
     // Manipulator
-    CustomLogger.recordOutput("SimulatedMechanisms/4",
+    CustomLogger.recordOutput(
+      "SimulatedMechanisms/4",
       Pose3d()
         .transformBy(
-          Transform3d(Translation3d(0.21.meters + 0.2775.meters * armAngle.cos, 0.meters, 0.38.meters + 0.2775.meters * armAngle.sin + elevatorPosition), Rotation3d())
+          Transform3d(
+            Translation3d(
+              0.21.meters + 0.2775.meters * armAngle.cos,
+              0.meters,
+              0.38.meters + 0.2775.meters * armAngle.sin + elevatorPosition
+            ),
+            Rotation3d()
+          )
         )
         .pose3d
-      )
+    )
 
     var nextState = currentState
     when (currentState) {

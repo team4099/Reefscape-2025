@@ -25,7 +25,7 @@ object ArmConstants {
 
   val IDLE_ANGLE = 90.0.degrees
   val IDLE_CORAL_ANGLE = 90.0.degrees
-  val IDLE_CORAL_L1_ANGLE = 90.0.degrees
+  val IDLE_CORAL_L1_ANGLE = 70.degrees
   val IDLE_ALGAE_ANGLE = 0.0.degrees
 
   val SAFE_ELEVATOR_FRONT_ANGLE = 70.degrees
@@ -64,13 +64,13 @@ object ArmConstants {
   val MOTION_MAGIC_ACCELERATION = 60.degrees.perSecond.perSecond
   val MOTION_MAGIC_CRUISE_VELOCITY = 50.degrees.perSecond
 
-  val SIM_ACCELERATION = 400.degrees.perSecond.perSecond
   val SIM_VELOCITY = 400.degrees.perSecond
+  val SIM_ACCELERATION = 400.degrees.perSecond.perSecond
 
   val ENCODER_DIRECTION_VALUE: SensorDirectionValue = SensorDirectionValue.Clockwise_Positive
   val ENCODER_OFFSET = 0.0.degrees
 
-  val ARM_INERTIA = 16.767866.pounds * 0.5.inches.squared
+  val ARM_INERTIA = 16.767866.pounds * 1.0.inches.squared
   val ARM_LENGTH = 13.408.inches
   val ARM_MAX_ANGLE = 235.0.degrees
   val ARM_MIN_ANGLE = (-70.0).degrees

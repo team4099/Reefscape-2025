@@ -136,23 +136,24 @@ object RobotContainer {
     ControlBoard.resetGyro.whileTrue(ResetGyroYawCommand(drivetrain))
 
     // tuning commands
-    /*
     ControlBoard.testElevatorBind.whileTrue(superstructure.testElevatorCommand())
     ControlBoard.testElevatorDownBind.whileTrue(superstructure.testElevatorDownCommand())
     ControlBoard.testArmBind.whileTrue(superstructure.testArmCommand())
     ControlBoard.testArmDownBind.whileTrue(superstructure.testArmDownCommand())
 
-     */
+    // ControlBoard.testClimberBind.whileTrue(superstructure.testClimberCommand())
+    // ControlBoard.testRollersBind.whileTrue(superstructure.testRollersCommand())
+    // ControlBoard.testArmBind.whileTrue(superstructure.testArmCommand())
 
-    ControlBoard.intakeCoral.whileTrue(superstructure.intakeCoralCommand())
-
-    ControlBoard.prepL2.whileTrue(superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L2))
-
-    ControlBoard.prepL3.whileTrue(superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L3))
-
-    ControlBoard.prepL4.whileTrue(superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L4))
-    ControlBoard.score.onTrue(superstructure.scoreCommand())
-    ControlBoard.forceIdle.whileTrue(superstructure.requestIdleCommand())
+    //    ControlBoard.intakeCoral.whileTrue(superstructure.intakeCoralCommand())
+    //
+    // ControlBoard.prepL2.whileTrue(superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L2))
+    //
+    // ControlBoard.prepL3.whileTrue(superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L3))
+    //
+    // ControlBoard.prepL4.whileTrue(superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L4))
+    // ControlBoard.score.onTrue(TestElevatorCommand(elevator))
+    // ControlBoard.forceIdle.whileTrue(superstructure.requestIdleCommand())
   }
 
   fun mapTestControls() {}

@@ -47,9 +47,7 @@ object ArmIOSim : ArmIO {
       ArmConstants.PID.SIM_ARM_KP,
       ArmConstants.PID.SIM_ARM_KI,
       ArmConstants.PID.SIM_ARM_KD,
-      TrapezoidProfile.Constraints(
-        ArmConstants.SIM_VELOCITY, ArmConstants.SIM_ACCELERATION
-      )
+      TrapezoidProfile.Constraints(ArmConstants.SIM_VELOCITY, ArmConstants.SIM_ACCELERATION)
     )
 
   private var appliedVoltage = 0.0.volts
