@@ -28,14 +28,14 @@ object ArmConstants {
   val IDLE_CORAL_L1_ANGLE = 70.degrees
   val IDLE_ALGAE_ANGLE = 0.0.degrees
 
-  val SAFE_ELEVATOR_FRONT_ANGLE = 70.degrees
+  val SAFE_ELEVATOR_FRONT_ANGLE = 90.degrees
   val SAFE_ELEVATOR_BACK_ANGLE = 155.degrees
 
   val INTAKE_CORAL_ANGLE = 135.degrees
   val INTAKE_L1_ANGLE = 45.degrees
-  val INTAKE_ALGAE_GROUND_ANGLE = 0.0.degrees
-  val INTAKE_ALGAE_L2_ANGLE = 0.0.degrees
-  val INTAKE_ALGAE_L3_ANGLE = 0.0.degrees
+  val INTAKE_ALGAE_GROUND_ANGLE = -15.0.degrees
+  val INTAKE_ALGAE_L2_ANGLE = 60.0.degrees
+  val INTAKE_ALGAE_L3_ANGLE = 60.0.degrees
 
   val SCORE_CORAL_L1_ANGLE = 75.degrees
   val SCORE_CORAL_L2_ANGLE = 55.degrees
@@ -45,7 +45,7 @@ object ArmConstants {
   val EJECT_ANGLE = 75.degrees
 
   val SCORE_ALGAE_PROCESSOR_ANGLE = 0.0.degrees
-  val SCORE_ALGAE_BARGE_ANGLE = 0.0.degrees
+  val SCORE_ALGAE_BARGE_ANGLE = 90.0.degrees
 
   val TEST_ANGLE = 45.0.degrees
 

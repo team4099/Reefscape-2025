@@ -35,8 +35,7 @@ class Rollers(val io: RollersIO) {
       return inputs.rollerVelocity.absoluteValue <= RollersConstants.CORAL_VELOCITY_THRESHOLD &&
         inputs.rollerStatorCurrent > RollersConstants.CORAL_CURRENT_THRESHOLD &&
         inputs.rollerAppliedVoltage.sign < 0 &&
-        (Clock.fpgaTime - lastRollerRunTime) >= RollersConstants.CORAL_DETECTION_TIME_THRESHOLD ||
-        inputs.isSimulating
+        (Clock.fpgaTime - lastRollerRunTime) >= RollersConstants.CORAL_DETECTION_TIME_THRESHOLD
     }
 
   val hasAlgae: Boolean
@@ -44,8 +43,7 @@ class Rollers(val io: RollersIO) {
       return inputs.rollerVelocity.absoluteValue <= RollersConstants.ALGAE_VELOCITY_THRESHOLD &&
         inputs.rollerStatorCurrent > RollersConstants.ALGAE_CURRENT_THRESHOLD &&
         inputs.rollerAppliedVoltage.sign < 0 &&
-        (Clock.fpgaTime - lastRollerRunTime) >= RollersConstants.ALGAE_DETECTION_TIME_THRESHOLD ||
-        inputs.isSimulating
+        (Clock.fpgaTime - lastRollerRunTime) >= RollersConstants.ALGAE_DETECTION_TIME_THRESHOLD
     }
 
   var rollersTargetVoltage: ElectricalPotential = 0.0.volts

@@ -712,6 +712,15 @@ class Superstructure(
     return returnCommand
   }
 
+  fun intakeL1Command(): Command {
+    val returnCommand =
+      runOnce { currentRequest = Request.SuperstructureRequest.IntakeL1() }.until {
+        isAtRequestedState && currentState == SuperstructureStates.PREP_INTAKE_L1
+      }
+    returnCommand.name = "IntakeCoralCommand"
+    return returnCommand
+  }
+
   fun intakeAlgaeCommand(level: AlgaeLevel): Command {
     val returnCommand =
       runOnce { currentRequest = Request.SuperstructureRequest.IntakeAlgae(level) }.until {
@@ -754,7 +763,11 @@ class Superstructure(
         if (currentState == SuperstructureStates.IDLE ||
           currentState == SuperstructureStates.PREP_ELEVATOR_MOVEMENT
         ) {
-          currentRequest = Request.SuperstructureRequest.ScorePrepCoral(CoralLevel.L1)
+          when(theoreticalGamePiece) {
+            GamePiece.CORAL_L1 -> currentRequest = Request.SuperstructureRequest.ScorePrepCoral(CoralLevel.L1)
+            GamePiece.ALGAE -> currentRequest = Request.SuperstructureRequest.ScorePrepAlgaeProcessor()
+          }
+
         } else {
           currentRequest = Request.SuperstructureRequest.Score()
         }
