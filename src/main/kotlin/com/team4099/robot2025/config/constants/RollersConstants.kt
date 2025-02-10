@@ -20,13 +20,18 @@ object RollersConstants {
 
   val IDLE_VOLTAGE = 0.0.volts
   val IDLE_CORAL_VOLTAGE = 0.0.volts
+  val IDLE_CORAL_L1_VOLTAGE = 0.0.volts
   val IDLE_ALGAE_VOLTAGE = 0.0.volts
   val INTAKE_ALGAE_VOLTAGE = 0.0.volts
-  val INTAKE_CORAL_VOLTAGE = -2.5.volts
+  val INTAKE_CORAL_VOLTAGE_FAST = -2.5.volts
+  val INTAKE_CORAL_VOLTAGE_SLOW = -1.5.volts
+
+  val INTAKE_L1_VOLTAGE = 1.volts
 
   val SCORE_BARGE_ALGAE_VOLTAGE = 0.0.volts
   val SCORE_PROCESSOR_ALGAE_VOLTAGE = 0.0.volts
   val SCORE_CORAL_VOLTAGE = 2.5.volts
+  val SCORE_CORAL_L1_VOLTAGE = 2.5.volts
   val EJECT_VOLTAGE = 0.0.volts
 
   val CORAL_VELOCITY_THRESHOLD = 0.0.rotations.perSecond
@@ -38,6 +43,7 @@ object RollersConstants {
   val ALGAE_DETECTION_TIME_THRESHOLD = 0.0.seconds
 
   val CORAL_SPIT_TIME = 0.5.seconds
+  val CORAL_L1_SPIT_TIME = 0.5.seconds
   val ALGAE_PROCESSOR_SPIT_TIME = 0.5.seconds
   val ALGAE_BARGE_SPIT_TIME = 0.0.seconds
 

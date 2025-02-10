@@ -21,7 +21,7 @@ object ElevatorConstants {
   val HOMING_APPLIED_VOLTAGE = -1.0.volts
   val HOMING_STALL_CURRENT = 20.0.amps
   val HOMING_STALL_TIME_THRESHOLD = 0.15.seconds
-  val UPWARDS_EXTENSION_LIMIT = 30.0.inches
+  val UPWARDS_EXTENSION_LIMIT = 70.0.inches
   val DOWNWARDS_EXTENSION_LIMIT = -0.5.inches
 
   val SPOOL_DIAMETER = 2.0051.inches
@@ -46,13 +46,13 @@ object ElevatorConstants {
 
   val IDLE_HEIGHT = 0.0.inches
   val IDLE_CORAL_HEIGHT = 0.0.inches
+  val IDLE_CORAL_L1_HEIGHT = 0.0.inches
   val IDLE_ALGAE_HEIGHT = 0.0.inches
 
-  val PASS_THROUGH_HEIGHT = 0.0.inches
-  val INTAKE_CORAL_HEIGHT = 18.448.inches
+  val INTAKE_CORAL_HEIGHT = 2.inches
+  val INTAKE_L1_HEIGHT = 18.448.inches
 
-  val SAFE_ARM_PASS_THROUGH_HEIGHT = 10.inches
-  val SAFE_ARM_PASS_UNDER_CARRIAGE_HEIGHT = 4.inches
+  val PASS_THROUGH_HEIGHT = 0.inches
 
   val INTAKE_ALGAE_GROUND_HEIGHT = 0.0.inches
   val INTAKE_ALGAE_L2_HEIGHT = 0.0.inches
@@ -81,7 +81,7 @@ object ElevatorConstants {
     val REAL_KI = 0.0.volts / (1.inches * 1.seconds)
     val REAL_KD = 0.2.volts / (1.inches.perSecond)
 
-    val SIM_KP = 10.volts / 1.inches
+    val SIM_KP = 5.volts / 1.inches
     val SIM_KI = 0.0.volts / (1.inches * 1.seconds)
     val SIM_KD = 0.0.volts / (1.inches.perSecond)
 

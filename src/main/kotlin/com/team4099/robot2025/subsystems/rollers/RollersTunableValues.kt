@@ -20,6 +20,13 @@ object RollersTunableValues {
       Pair({ it.inVolts }, { it.volts })
     )
 
+  val idleCoralL1Voltage =
+    LoggedTunableValue(
+      "Rollers/idleCoralL1Voltage",
+      RollersConstants.IDLE_CORAL_L1_VOLTAGE,
+      Pair({ it.inVolts }, { it.volts })
+    )
+
   val idleAlgaeVoltage =
     LoggedTunableValue(
       "Rollers/idleAlgaeVoltage",
@@ -27,10 +34,24 @@ object RollersTunableValues {
       Pair({ it.inVolts }, { it.volts })
     )
 
-  val intakeCoralVoltage =
+  val intakeCoralVoltageFast =
     LoggedTunableValue(
-      "Rollers/intakeCoralVoltage",
-      RollersConstants.INTAKE_CORAL_VOLTAGE,
+      "Rollers/intakeCoralVoltageFast",
+      RollersConstants.INTAKE_CORAL_VOLTAGE_FAST,
+      Pair({ it.inVolts }, { it.volts })
+    )
+
+  val intakeCoralVoltageSlow =
+    LoggedTunableValue(
+      "Rollers/intakeCoralVoltageSlow",
+      RollersConstants.INTAKE_CORAL_VOLTAGE_SLOW,
+      Pair({ it.inVolts }, { it.volts })
+    )
+
+  val intakeL1Voltage =
+    LoggedTunableValue(
+      "Rollers/intakeL1Voltage",
+      RollersConstants.INTAKE_L1_VOLTAGE,
       Pair({ it.inVolts }, { it.volts })
     )
 
@@ -62,10 +83,24 @@ object RollersTunableValues {
       Pair({ it.inVolts }, { it.volts })
     )
 
+  val scoreCoralL1Voltage =
+    LoggedTunableValue(
+      "Rollers/scoreCoralL1Voltage",
+      RollersConstants.SCORE_CORAL_L1_VOLTAGE,
+      Pair({ it.inVolts }, { it.volts })
+    )
+
   val coralSpitTime =
     LoggedTunableValue(
       "Rollers/coralSpitTime",
       RollersConstants.CORAL_SPIT_TIME,
+      Pair({ it.inSeconds }, { it.seconds })
+    )
+
+  val coralL1SpitTime =
+    LoggedTunableValue(
+      "Rollers/coralL1SpitTime",
+      RollersConstants.CORAL_L1_SPIT_TIME,
       Pair({ it.inSeconds }, { it.seconds })
     )
 

@@ -16,6 +16,7 @@ import com.team4099.robot2025.subsystems.limelight.LimelightVision
 import com.team4099.robot2025.subsystems.rollers.Ramp
 import com.team4099.robot2025.subsystems.rollers.RampTunableValues
 import com.team4099.robot2025.subsystems.rollers.Rollers
+import com.team4099.robot2025.subsystems.rollers.RollersTunableValues
 import com.team4099.robot2025.util.CustomLogger
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
@@ -26,8 +27,11 @@ import org.team4099.lib.geometry.Translation3d
 import org.team4099.lib.units.base.Length
 import org.team4099.lib.units.base.inMilliseconds
 import org.team4099.lib.units.base.inches
+import org.team4099.lib.units.base.meters
 import org.team4099.lib.units.derived.Angle
+import org.team4099.lib.units.derived.cos
 import org.team4099.lib.units.derived.degrees
+import org.team4099.lib.units.derived.sin
 import org.team4099.lib.units.derived.volts
 
 class Superstructure(
@@ -42,6 +46,13 @@ class Superstructure(
 ) : SubsystemBase() {
 
   private var theoreticalGamePiece: GamePiece = GamePiece.NONE
+    get() {
+      if (rollers.hasCoralVertical || ramp.hasCoral) {
+        return GamePiece.CORAL
+      } else {
+        return field
+      }
+    }
 
   private var lastCoralScoringLevel: CoralLevel = CoralLevel.NONE
   private var coralScoringLevel: CoralLevel = CoralLevel.NONE
@@ -49,7 +60,7 @@ class Superstructure(
   private var lastAlgaeIntakeLevel: AlgaeLevel = AlgaeLevel.NONE
   private var algaeIntakeLevel: AlgaeLevel = AlgaeLevel.NONE
 
-  var currentRequest: Request.SuperstructureRequest = Request.SuperstructureRequest.Tuning()
+  var currentRequest: Request.SuperstructureRequest = Request.SuperstructureRequest.Idle()
     set(value) {
       when (value) {
         is Request.SuperstructureRequest.IntakeAlgae -> {
@@ -101,11 +112,19 @@ class Superstructure(
       (Clock.realTimestamp - rollersLoopStartTime).inMilliseconds
     )
 
+    val rampLoopStartTime = Clock.realTimestamp
+    ramp.periodic()
+    CustomLogger.recordOutput(
+      "LoggedRobot/Subsystems/RampLoopTimeMS",
+      (Clock.realTimestamp - rampLoopStartTime).inMilliseconds
+    )
+
     CustomLogger.recordOutput("Superstructure/currentRequest", currentRequest.javaClass.simpleName)
     CustomLogger.recordOutput("Superstructure/currentState", currentState.name)
     CustomLogger.recordOutput("Superstructure/isAtAllTargetedPositions", isAtRequestedState)
 
     val elevatorPosition = elevator.inputs.elevatorPosition
+    val armAngle = arm.inputs.armPosition
     // Firsts Stage
     CustomLogger.recordOutput(
       "SimulatedMechanisms/0",
@@ -155,17 +174,22 @@ class Superstructure(
     )
 
     // Arm
-    CustomLogger.recordOutput(
-      "SimulatedMechanisms/3",
+    CustomLogger.recordOutput("SimulatedMechanisms/3",
       Pose3d()
         .transformBy(
-          Transform3d(
-            Translation3d(8.5.inches, 0.0.inches, 15.3125.inches + elevatorPosition),
-            Rotation3d(0.0.degrees, -arm.inputs.armPosition, 0.0.degrees)
-          )
+          Transform3d(Translation3d(0.21.meters, 0.meters, 0.38.meters + elevatorPosition), Rotation3d(0.degrees, -armAngle, 0.degrees))
         )
         .pose3d
     )
+
+    // Manipulator
+    CustomLogger.recordOutput("SimulatedMechanisms/4",
+      Pose3d()
+        .transformBy(
+          Transform3d(Translation3d(0.21.meters + 0.2775.meters * armAngle.cos, 0.meters, 0.38.meters + 0.2775.meters * armAngle.sin + elevatorPosition), Rotation3d())
+        )
+        .pose3d
+      )
 
     var nextState = currentState
     when (currentState) {
@@ -194,8 +218,10 @@ class Superstructure(
         }
       }
       SuperstructureStates.IDLE -> {
-        rollers.currentRequest =
-          Request.RollersRequest.OpenLoop(RampTunableValues.idleVoltage.get())
+
+        climber.currentRequest =
+          Request.ClimberRequest.ClosedLoop(ClimberTunableValues.climbIdleAngle.get())
+        ramp.currentRequest = Request.RampRequest.OpenLoop(RampTunableValues.idleVoltage.get())
 
         // mechanism idle positions based on which game piece robot has
         when (theoreticalGamePiece) {
@@ -203,7 +229,7 @@ class Superstructure(
             arm.currentRequest =
               Request.ArmRequest.ClosedLoop(ArmTunableValues.ArmAngles.idleCoralAngle.get())
             rollers.currentRequest =
-              Request.RollersRequest.OpenLoop(RampTunableValues.idleCoralVoltage.get())
+              Request.RollersRequest.OpenLoop(RollersTunableValues.idleCoralVoltage.get())
 
             if (arm.isAtTargetedPosition) {
               elevator.currentRequest =
@@ -212,11 +238,24 @@ class Superstructure(
                 )
             }
           }
+          GamePiece.CORAL_L1 -> {
+            arm.currentRequest =
+              Request.ArmRequest.ClosedLoop(ArmTunableValues.ArmAngles.idleCoralL1Angle.get())
+            rollers.currentRequest =
+              Request.RollersRequest.OpenLoop(RollersTunableValues.idleCoralL1Voltage.get())
+
+            if (arm.isAtTargetedPosition) {
+              elevator.currentRequest =
+                Request.ElevatorRequest.ClosedLoop(
+                  ElevatorTunableValues.ElevatorHeights.idleCoralL1Height.get()
+                )
+            }
+          }
           GamePiece.ALGAE -> {
             arm.currentRequest =
               Request.ArmRequest.ClosedLoop(ArmTunableValues.ArmAngles.idleAlgaeAngle.get())
             rollers.currentRequest =
-              Request.RollersRequest.OpenLoop(RampTunableValues.idleAlgaeVoltage.get())
+              Request.RollersRequest.OpenLoop(RollersTunableValues.idleAlgaeVoltage.get())
 
             if (arm.isAtTargetedPosition)
               elevator.currentRequest =
@@ -244,116 +283,21 @@ class Superstructure(
             is Request.SuperstructureRequest.Home -> SuperstructureStates.HOME_PREP
             is Request.SuperstructureRequest.IntakeAlgae ->
               SuperstructureStates.PREP_ELEVATOR_MOVEMENT
-            is Request.SuperstructureRequest.IntakeCoral -> SuperstructureStates.PREP_INTAKE_CORAL
+            is Request.SuperstructureRequest.IntakeCoral ->
+              SuperstructureStates.PREP_ARM_PASS_THROUGH
+            is Request.SuperstructureRequest.IntakeL1 ->
+              SuperstructureStates.PREP_ELEVATOR_MOVEMENT
             is Request.SuperstructureRequest.ScorePrepCoral ->
               SuperstructureStates.PREP_ELEVATOR_MOVEMENT
             is Request.SuperstructureRequest.ScorePrepAlgaeProcessor ->
-              SuperstructureStates.SCORE_ALGAE_PROCESSOR
+              SuperstructureStates.PREP_ELEVATOR_MOVEMENT
             is Request.SuperstructureRequest.ScorePrepAlgaeBarge ->
               SuperstructureStates.PREP_ELEVATOR_MOVEMENT
-            is Request.SuperstructureRequest.EjectGamepeice ->
-              SuperstructureStates.PREP_EJECT_GAMEPIECE
             is Request.SuperstructureRequest.ClimbExtend -> SuperstructureStates.CLIMB_EXTEND
             is Request.SuperstructureRequest.ClimbRetract -> SuperstructureStates.CLIMB_RETRACT
             is Request.SuperstructureRequest.Tuning -> SuperstructureStates.TUNING
             else -> currentState
           }
-      }
-      SuperstructureStates.PREP_INTAKE_CORAL -> {
-
-        val elevatorInSafeState =
-          elevator.inputs.elevatorPosition >
-            ElevatorTunableValues.ElevatorHeights.safeArmPassUnderCarriageHeight.get()
-        val armInSafeState =
-          arm.inputs.armPosition > ArmTunableValues.ArmAngles.safeElevatorBackAngle.get()
-
-        if (!elevatorInSafeState) {
-          arm.currentRequest =
-            Request.ArmRequest.ClosedLoop(ArmTunableValues.ArmAngles.safeElevatorBackAngle.get())
-        } else {
-          arm.currentRequest =
-            Request.ArmRequest.ClosedLoop(ArmTunableValues.ArmAngles.intakeCoralAngle.get())
-        }
-
-        if (!armInSafeState) {
-          elevator.currentRequest =
-            Request.ElevatorRequest.ClosedLoop(
-              ElevatorTunableValues.ElevatorHeights.safeArmPassUnderCarriageHeight.get()
-            )
-        } else {
-          elevator.currentRequest =
-            Request.ElevatorRequest.ClosedLoop(
-              ElevatorTunableValues.ElevatorHeights.intakeCoralHeight.get()
-            )
-        }
-
-        if (armInSafeState &&
-          elevatorInSafeState &&
-          arm.isAtTargetedPosition &&
-          elevator.isAtTargetedPosition
-        ) {
-          nextState = SuperstructureStates.INTAKE_CORAL
-        }
-
-        if (currentRequest is Request.SuperstructureRequest.Idle) {
-          nextState = SuperstructureStates.INTAKE_CORAL_CLEANUP
-        }
-      }
-      SuperstructureStates.INTAKE_CORAL -> {
-        Request.RollersRequest.OpenLoop(RampTunableValues.intakeCoralVoltage.get())
-
-        if (rollers.hasCoralVertical) {
-          nextState = SuperstructureStates.INTAKE_CORAL_CLEANUP
-          theoreticalGamePiece = GamePiece.CORAL
-        }
-
-        if (currentRequest is Request.SuperstructureRequest.Idle) {
-          nextState = SuperstructureStates.INTAKE_CORAL_CLEANUP
-        }
-      }
-      SuperstructureStates.INTAKE_CORAL_CLEANUP -> {
-        rollers.currentRequest =
-          Request.RollersRequest.OpenLoop(RampTunableValues.idleCoralVoltage.get())
-
-        val elevatorInSafeState =
-          elevator.inputs.elevatorPosition <
-            ElevatorTunableValues.ElevatorHeights.safeArmPassThroughCarriageHeight.get()
-        val armInSafeState =
-          arm.inputs.armPosition < ArmTunableValues.ArmAngles.safeElevatorBackAngle.get()
-
-        if (!armInSafeState) {
-          elevator.currentRequest =
-            Request.ElevatorRequest.ClosedLoop(
-              ElevatorTunableValues.ElevatorHeights.safeArmPassUnderCarriageHeight.get()
-            )
-        } else {
-          elevator.currentRequest =
-            Request.ElevatorRequest.ClosedLoop(
-              if (theoreticalGamePiece == GamePiece.CORAL)
-                ElevatorTunableValues.ElevatorHeights.idleCoralHeight.get()
-              else ElevatorTunableValues.ElevatorHeights.idleHeight.get()
-            )
-        }
-
-        if (!elevatorInSafeState) {
-          arm.currentRequest =
-            Request.ArmRequest.ClosedLoop(ArmTunableValues.ArmAngles.safeElevatorBackAngle.get())
-        } else {
-          arm.currentRequest =
-            Request.ArmRequest.ClosedLoop(
-              if (theoreticalGamePiece == GamePiece.CORAL)
-                ArmTunableValues.ArmAngles.idleCoralAngle.get()
-              else ArmTunableValues.ArmAngles.idleAngle.get()
-            )
-        }
-
-        if (armInSafeState &&
-          elevatorInSafeState &&
-          arm.isAtTargetedPosition &&
-          elevator.isAtTargetedPosition
-        ) {
-          nextState = SuperstructureStates.IDLE
-        }
       }
       SuperstructureStates.PREP_ELEVATOR_MOVEMENT -> {
         arm.currentRequest =
@@ -363,8 +307,14 @@ class Superstructure(
             is Request.SuperstructureRequest.ScorePrepCoral -> {
               nextState = SuperstructureStates.PREP_SCORE_CORAL
             }
+            is Request.SuperstructureRequest.IntakeL1 -> {
+              nextState = SuperstructureStates.PREP_INTAKE_L1
+            }
             is Request.SuperstructureRequest.IntakeAlgae -> {
               nextState = SuperstructureStates.PREP_INTAKE_ALGAE
+            }
+            is Request.SuperstructureRequest.ScorePrepAlgaeProcessor -> {
+              nextState = SuperstructureStates.PREP_SCORE_ALGAE_PROCESSOR
             }
             is Request.SuperstructureRequest.ScorePrepAlgaeBarge -> {
               nextState = SuperstructureStates.PREP_SCORE_ALGAE_BARGE
@@ -375,8 +325,95 @@ class Superstructure(
           }
         }
       }
-      SuperstructureStates.PREP_SCORE_CORAL -> {
+      SuperstructureStates.PREP_ARM_PASS_THROUGH -> {
+        elevator.currentRequest =
+          Request.ElevatorRequest.ClosedLoop(
+            ElevatorTunableValues.ElevatorHeights.passThroughHeight.get()
+          )
+        rollers.currentRequest =
+          Request.RollersRequest.OpenLoop(RollersTunableValues.idleCoralVoltage.get())
+        ramp.currentRequest = Request.RampRequest.OpenLoop(RampTunableValues.idleVoltage.get())
 
+        if (elevator.isAtTargetedPosition) {
+          when (currentRequest) {
+            is Request.SuperstructureRequest.IntakeCoral -> {
+              nextState = SuperstructureStates.PREP_INTAKE_CORAL
+            }
+            is Request.SuperstructureRequest.Idle -> {
+              nextState = SuperstructureStates.IDLE
+            }
+          }
+        }
+      }
+      SuperstructureStates.PREP_INTAKE_CORAL -> {
+        arm.currentRequest =
+          Request.ArmRequest.ClosedLoop(ArmTunableValues.ArmAngles.intakeCoralAngle.get())
+
+        if (arm.isAtTargetedPosition) {
+          elevator.currentRequest =
+            Request.ElevatorRequest.ClosedLoop(
+              ElevatorTunableValues.ElevatorHeights.intakeCoralHeight.get()
+            )
+          if (elevator.isAtTargetedPosition) {
+            nextState = SuperstructureStates.INTAKE_CORAL
+          }
+        }
+
+        if (currentRequest is Request.SuperstructureRequest.Idle) {
+          nextState = SuperstructureStates.INTAKE_CORAL_CLEANUP
+        }
+      }
+      SuperstructureStates.INTAKE_CORAL -> {
+        if (!rollers.hasCoralVertical) {
+          ramp.currentRequest =
+            Request.RampRequest.OpenLoop(RampTunableValues.intakeCoralVoltageFast.get())
+          rollers.currentRequest =
+            Request.RollersRequest.OpenLoop(RollersTunableValues.intakeCoralVoltageFast.get())
+        } else if (ramp.hasCoral) {
+          ramp.currentRequest =
+            Request.RampRequest.OpenLoop(RampTunableValues.intakeCoralVoltageSlow.get())
+          rollers.currentRequest =
+            Request.RollersRequest.OpenLoop(RollersTunableValues.intakeCoralVoltageSlow.get())
+        } else {
+          currentRequest = Request.SuperstructureRequest.Idle()
+          theoreticalGamePiece = GamePiece.CORAL
+        }
+
+        if (currentRequest is Request.SuperstructureRequest.Idle) {
+          nextState = SuperstructureStates.PREP_ARM_PASS_THROUGH
+        }
+      }
+      SuperstructureStates.PREP_INTAKE_L1 -> {
+        elevator.currentRequest =
+          Request.ElevatorRequest.ClosedLoop(
+            ElevatorTunableValues.ElevatorHeights.intakeL1Height.get()
+          )
+
+        if (elevator.isAtTargetedPosition) {
+          arm.currentRequest =
+            Request.ArmRequest.ClosedLoop(ArmTunableValues.ArmAngles.intakeL1Angle.get())
+          if (arm.isAtTargetedPosition) {
+            nextState = SuperstructureStates.INTAKE_L1
+          }
+        }
+
+        if (currentRequest is Request.SuperstructureRequest.Idle) {
+          nextState = SuperstructureStates.FRONT_ACTION_CLEANUP
+        }
+      }
+      SuperstructureStates.INTAKE_L1 -> {
+        rollers.currentRequest =
+          Request.RollersRequest.OpenLoop(RollersTunableValues.intakeL1Voltage.get())
+        if (rollers.hasCoralHorizontal) {
+          theoreticalGamePiece = GamePiece.CORAL_L1
+          nextState = SuperstructureStates.FRONT_ACTION_CLEANUP
+        }
+
+        if (currentRequest is Request.SuperstructureRequest.Idle) {
+          nextState = SuperstructureStates.FRONT_ACTION_CLEANUP
+        }
+      }
+      SuperstructureStates.PREP_SCORE_CORAL -> {
         when (currentRequest) {
           is Request.SuperstructureRequest.ScorePrepCoral -> {
             if (coralScoringLevel != lastCoralScoringLevel) {
@@ -417,31 +454,46 @@ class Superstructure(
             nextState = SuperstructureStates.PREP_ELEVATOR_MOVEMENT
           }
           is Request.SuperstructureRequest.Idle -> {
-            nextState = SuperstructureStates.SCORE_CLEANUP
+            nextState = SuperstructureStates.FRONT_ACTION_CLEANUP
           }
         }
       }
       SuperstructureStates.SCORE_CORAL -> {
-        rollers.currentRequest =
-          Request.RollersRequest.OpenLoop(RampTunableValues.scoreCoralVoltage.get())
-
-        if ((Clock.fpgaTime - lastTransitionTime) > RampTunableValues.coralSpitTime.get()) {
-          theoreticalGamePiece = GamePiece.NONE
-          nextState = SuperstructureStates.SCORE_CLEANUP
+        if (theoreticalGamePiece == GamePiece.CORAL) {
+          rollers.currentRequest =
+            Request.RollersRequest.OpenLoop(RollersTunableValues.scoreCoralVoltage.get())
+          if ((Clock.fpgaTime - lastTransitionTime) > RollersTunableValues.coralSpitTime.get()) {
+            theoreticalGamePiece = GamePiece.NONE
+            nextState = SuperstructureStates.FRONT_ACTION_CLEANUP
+          }
+        } else if (theoreticalGamePiece == GamePiece.CORAL_L1) {
+          rollers.currentRequest =
+            Request.RollersRequest.OpenLoop(RollersTunableValues.scoreCoralL1Voltage.get())
+          if ((Clock.fpgaTime - lastTransitionTime) > RollersTunableValues.coralL1SpitTime.get()) {
+            theoreticalGamePiece = GamePiece.NONE
+            nextState = SuperstructureStates.FRONT_ACTION_CLEANUP
+          }
         }
 
         if (currentRequest is Request.SuperstructureRequest.Idle) {
-          nextState = SuperstructureStates.SCORE_CLEANUP
+          nextState = SuperstructureStates.FRONT_ACTION_CLEANUP
         }
       }
-      SuperstructureStates.SCORE_CLEANUP -> {
+      SuperstructureStates.FRONT_ACTION_CLEANUP -> {
         arm.currentRequest =
           Request.ArmRequest.ClosedLoop(ArmTunableValues.ArmAngles.safeElevatorFrontAngle.get())
+
         if (arm.isAtTargetedPosition) {
-          elevator.currentRequest =
-            Request.ElevatorRequest.ClosedLoop(
-              ElevatorTunableValues.ElevatorHeights.idleHeight.get()
-            )
+          val elevatorIdleHeight =
+            when (theoreticalGamePiece) {
+              GamePiece.CORAL -> ElevatorTunableValues.ElevatorHeights.idleCoralHeight.get()
+              GamePiece.ALGAE -> ElevatorTunableValues.ElevatorHeights.idleAlgaeHeight.get()
+              GamePiece.CORAL_L1 -> ElevatorTunableValues.ElevatorHeights.idleCoralL1Height.get()
+              GamePiece.NONE -> ElevatorTunableValues.ElevatorHeights.idleHeight.get()
+            }
+
+          elevator.currentRequest = Request.ElevatorRequest.ClosedLoop(elevatorIdleHeight)
+
           if (elevator.isAtTargetedPosition) {
             currentRequest = Request.SuperstructureRequest.Idle()
             nextState = SuperstructureStates.IDLE
@@ -449,7 +501,6 @@ class Superstructure(
         }
       }
       SuperstructureStates.PREP_INTAKE_ALGAE -> {
-
         when (currentRequest) {
           is Request.SuperstructureRequest.IntakeAlgae -> {
             if (algaeIntakeLevel != lastAlgaeIntakeLevel) {
@@ -487,38 +538,22 @@ class Superstructure(
             nextState = SuperstructureStates.PREP_ELEVATOR_MOVEMENT
           }
           is Request.SuperstructureRequest.Idle -> {
-            nextState = SuperstructureStates.IDLE
+            nextState = SuperstructureStates.FRONT_ACTION_CLEANUP
           }
         }
       }
       SuperstructureStates.INTAKE_ALGAE -> {
 
         rollers.currentRequest =
-          Request.RollersRequest.OpenLoop(RampTunableValues.intakeAlgaeVoltage.get())
+          Request.RollersRequest.OpenLoop(RollersTunableValues.intakeAlgaeVoltage.get())
 
         if (rollers.hasAlgae) {
-          nextState = SuperstructureStates.INTAKE_ALGAE_CLEANUP
+          nextState = SuperstructureStates.FRONT_ACTION_CLEANUP
           theoreticalGamePiece = GamePiece.ALGAE
         }
 
         if (currentRequest is Request.SuperstructureRequest.Idle) {
-          nextState = SuperstructureStates.INTAKE_ALGAE_CLEANUP
-        }
-      }
-      SuperstructureStates.INTAKE_ALGAE_CLEANUP -> {
-        rollers.currentRequest =
-          Request.RollersRequest.OpenLoop(RampTunableValues.idleAlgaeVoltage.get())
-        arm.currentRequest =
-          Request.ArmRequest.ClosedLoop(ArmTunableValues.ArmAngles.safeElevatorFrontAngle.get())
-        if (arm.isAtTargetedPosition) {
-          elevator.currentRequest =
-            Request.ElevatorRequest.ClosedLoop(
-              ElevatorTunableValues.ElevatorHeights.idleAlgaeHeight.get()
-            )
-          if (elevator.isAtTargetedPosition) {
-            currentRequest = Request.SuperstructureRequest.Idle()
-            nextState = SuperstructureStates.IDLE
-          }
+          nextState = SuperstructureStates.FRONT_ACTION_CLEANUP
         }
       }
       SuperstructureStates.PREP_SCORE_ALGAE_PROCESSOR -> {
@@ -538,22 +573,22 @@ class Superstructure(
         }
 
         if (currentRequest is Request.SuperstructureRequest.Idle) {
-          nextState = SuperstructureStates.IDLE
+          nextState = SuperstructureStates.FRONT_ACTION_CLEANUP
         }
       }
       SuperstructureStates.SCORE_ALGAE_PROCESSOR -> {
         rollers.currentRequest =
-          Request.RollersRequest.OpenLoop(RampTunableValues.scoreProcessorAlgaeVoltage.get())
+          Request.RollersRequest.OpenLoop(RollersTunableValues.scoreProcessorAlgaeVoltage.get())
 
         if ((Clock.fpgaTime - lastTransitionTime) >
-          RampTunableValues.algaeProcessorSpitTime.get()
+          RollersTunableValues.algaeProcessorSpitTime.get()
         ) {
           theoreticalGamePiece = GamePiece.NONE
-          nextState = SuperstructureStates.IDLE
+          nextState = SuperstructureStates.FRONT_ACTION_CLEANUP
         }
 
         if (currentRequest is Request.SuperstructureRequest.Idle) {
-          nextState = SuperstructureStates.IDLE
+          nextState = SuperstructureStates.FRONT_ACTION_CLEANUP
         }
       }
       SuperstructureStates.PREP_SCORE_ALGAE_BARGE -> {
@@ -571,61 +606,43 @@ class Superstructure(
         }
 
         if (currentRequest is Request.SuperstructureRequest.Idle) {
-          nextState = SuperstructureStates.SCORE_CLEANUP
+          nextState = SuperstructureStates.FRONT_ACTION_CLEANUP
         }
       }
       SuperstructureStates.SCORE_ALGAE_BARGE -> {
         rollers.currentRequest =
-          Request.RollersRequest.OpenLoop(RampTunableValues.scoreBargeAlgaeVoltage.get())
+          Request.RollersRequest.OpenLoop(RollersTunableValues.scoreBargeAlgaeVoltage.get())
 
-        if ((Clock.fpgaTime - lastTransitionTime) > RampTunableValues.algaeBargeSpitTime.get()) {
+        if ((Clock.fpgaTime - lastTransitionTime) > RollersTunableValues.algaeBargeSpitTime.get()) {
           theoreticalGamePiece = GamePiece.NONE
-          nextState = SuperstructureStates.SCORE_CLEANUP
+          nextState = SuperstructureStates.FRONT_ACTION_CLEANUP
         }
 
         if (currentRequest is Request.SuperstructureRequest.Idle) {
-          nextState = SuperstructureStates.SCORE_CLEANUP
+          nextState = SuperstructureStates.FRONT_ACTION_CLEANUP
         }
       }
-      SuperstructureStates.PREP_EJECT_GAMEPIECE -> {
-        elevator.currentRequest =
-          Request.ElevatorRequest.ClosedLoop(
-            ElevatorTunableValues.ElevatorHeights.ejectHeight.get()
-          )
+      SuperstructureStates.CLIMB_EXTEND -> {
+        climber.currentRequest =
+          Request.ClimberRequest.ClosedLoop(ClimberTunableValues.climbExtendAngle.get())
 
-        if (elevator.isAtTargetedPosition)
-          arm.currentRequest =
-            Request.ArmRequest.ClosedLoop(ArmTunableValues.ArmAngles.ejectAngle.get())
+        if (climber.isAtTargetedPosition &&
+          currentRequest is Request.SuperstructureRequest.ClimbRetract
+        ) {
+          currentState = SuperstructureStates.CLIMB_RETRACT
+        }
+        if (currentRequest is Request.SuperstructureRequest.Idle) {
+          currentState = SuperstructureStates.IDLE
+        }
       }
-      SuperstructureStates.EJECT_GAMEPIECE -> {
-        rollers.currentRequest =
-          Request.RollersRequest.OpenLoop(RampTunableValues.ejectVoltage.get())
+      SuperstructureStates.CLIMB_RETRACT -> {
+        climber.currentRequest =
+          Request.ClimberRequest.ClosedLoop(ClimberTunableValues.climbRetractAngle.get())
+
+        if (currentRequest is Request.SuperstructureRequest.Idle) {
+          currentState = SuperstructureStates.IDLE
+        }
       }
-      SuperstructureStates.CLEANUP_EJECT_GAMEPIECE -> {
-        arm.currentRequest =
-          Request.ArmRequest.ClosedLoop(ArmTunableValues.ArmAngles.idleAngle.get())
-      }
-      //      SuperstructureStates.CLIMB_EXTEND -> {
-      //        climber.currentRequest =
-      //          Request.ClimberRequest.ClosedLoop(ClimberTunableValues.climbExtendAngle.get())
-      //
-      //        if (climber.isAtTargetedPosition &&
-      //          currentRequest is Request.SuperstructureRequest.ClimbRetract
-      //        ) {
-      //          currentState = SuperstructureStates.CLIMB_RETRACT
-      //        }
-      //        if (currentRequest is Request.SuperstructureRequest.Idle) {
-      //          currentState = SuperstructureStates.IDLE
-      //        }
-      //      }
-      //      SuperstructureStates.CLIMB_RETRACT -> {
-      //        climber.currentRequest =
-      //          Request.ClimberRequest.ClosedLoop(ClimberTunableValues.climbRetractAngle.get())
-      //
-      //        if (currentRequest is Request.SuperstructureRequest.Idle) {
-      //          currentState = SuperstructureStates.IDLE
-      //        }
-      //      }
     }
 
     if (nextState != currentState) {
@@ -741,12 +758,6 @@ class Superstructure(
     return returnCommand
   }
 
-  fun ejectGamePieceCommand(): Command {
-    val returnCommand = runOnce { currentRequest = Request.SuperstructureRequest.EjectGamepeice() }
-    returnCommand.name = "EjectGamePiece"
-    return returnCommand
-  }
-
   fun testArmCommand(): Command {
     val returnCommand = run {
       currentRequest = Request.SuperstructureRequest.Tuning()
@@ -770,45 +781,6 @@ class Superstructure(
       }
     }
     returnCommand.name = "TestArmDownCommand"
-    return returnCommand
-  }
-
-  fun testRollersCommand(): Command {
-    val returnCommand = run {
-      currentRequest = Request.SuperstructureRequest.Tuning()
-      rollers.currentRequest =
-        Request.RollersRequest.OpenLoop(RampTunableValues.intakeCoralVoltage.get())
-    }
-    returnCommand.name = "TestRollersCommand"
-    return returnCommand
-  }
-
-  fun intakeRollersCommand(): Command {
-    val returnCommand = run {
-      currentRequest = Request.SuperstructureRequest.Tuning()
-      rollers.currentRequest =
-        Request.RollersRequest.OpenLoop(RampTunableValues.intakeCoralVoltage.get())
-    }
-    returnCommand.name = "TestRollersCommand"
-    return returnCommand
-  }
-
-  fun outtakeRollersCommand(): Command {
-    val returnCommand = run {
-      currentRequest = Request.SuperstructureRequest.Tuning()
-      rollers.currentRequest =
-        Request.RollersRequest.OpenLoop(RampTunableValues.scoreCoralVoltage.get())
-    }
-    returnCommand.name = "TestRollersCommand"
-    return returnCommand
-  }
-
-  fun stopRollersCommand(): Command {
-    val returnCommand = run {
-      currentRequest = Request.SuperstructureRequest.Tuning()
-      rollers.currentRequest = Request.RollersRequest.OpenLoop(0.0.volts)
-    }
-    returnCommand.name = "TestRollersCommand"
     return returnCommand
   }
 
@@ -858,23 +830,22 @@ class Superstructure(
       IDLE,
       HOME_PREP,
       HOME,
+      PREP_ARM_PASS_THROUGH,
       PREP_INTAKE_CORAL,
       INTAKE_CORAL,
       INTAKE_CORAL_CLEANUP,
+      PREP_INTAKE_L1,
+      INTAKE_L1,
       PREP_INTAKE_ALGAE,
       INTAKE_ALGAE,
-      INTAKE_ALGAE_CLEANUP,
       PREP_SCORE_ALGAE_PROCESSOR,
       SCORE_ALGAE_PROCESSOR,
       PREP_ELEVATOR_MOVEMENT,
       PREP_SCORE_CORAL,
       SCORE_CORAL,
-      SCORE_CLEANUP,
+      FRONT_ACTION_CLEANUP,
       CLIMB_EXTEND,
       CLIMB_RETRACT,
-      PREP_EJECT_GAMEPIECE,
-      EJECT_GAMEPIECE,
-      CLEANUP_EJECT_GAMEPIECE,
       PREP_SCORE_ALGAE_BARGE,
       SCORE_ALGAE_BARGE,
     }

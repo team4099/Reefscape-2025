@@ -48,7 +48,7 @@ object ArmIOSim : ArmIO {
       ArmConstants.PID.SIM_ARM_KI,
       ArmConstants.PID.SIM_ARM_KD,
       TrapezoidProfile.Constraints(
-        ArmConstants.MOTION_MAGIC_CRUISE_VELOCITY, ArmConstants.MOTION_MAGIC_ACCELERATION
+        ArmConstants.SIM_VELOCITY, ArmConstants.SIM_ACCELERATION
       )
     )
 

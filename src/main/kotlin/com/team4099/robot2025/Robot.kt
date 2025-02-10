@@ -176,8 +176,6 @@ object Robot : LoggedRobot() {
     // checking for logging errors
     logReceiverQueueAlert.set(Logger.getReceiverQueueFault())
 
-    RobotContainer.requestTuning()
-
     val superstructureLoopTimeMS = Clock.realTimestamp
     RobotContainer.superstructure.periodic()
     Logger.recordOutput(

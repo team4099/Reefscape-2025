@@ -39,6 +39,13 @@ object ArmTunableValues {
         Pair({ it.inDegrees }, { it.degrees })
       )
 
+    val idleCoralL1Angle =
+      LoggedTunableValue(
+        "Arm/idleCoralL1Angle",
+        ArmConstants.IDLE_CORAL_L1_ANGLE,
+        Pair({ it.inDegrees }, { it.degrees })
+      )
+
     val idleAlgaeAngle =
       LoggedTunableValue(
         "Arm/idleAlgaeAngle",
@@ -64,6 +71,13 @@ object ArmTunableValues {
       LoggedTunableValue(
         "Arm/intakeCoralAngle",
         ArmConstants.INTAKE_CORAL_ANGLE,
+        Pair({ it.inDegrees }, { it.degrees })
+      )
+
+    val intakeL1Angle =
+      LoggedTunableValue(
+        "Arm/intakeL1Angle",
+        ArmConstants.INTAKE_L1_ANGLE,
         Pair({ it.inDegrees }, { it.degrees })
       )
 

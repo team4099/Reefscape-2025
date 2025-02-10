@@ -62,6 +62,14 @@ object ClimberTunableValues {
     LoggedTunableValue(
       "Climber/kD", Pair({ it.inVoltsPerDegreePerSecond }, { it.volts.perDegreePerSecond })
     )
+
+  val climbIdleAngle =
+    LoggedTunableValue(
+      "Climber/climbIdleAngle",
+      ClimberConstants.CLIMBER_IDLE_ANGLE,
+      Pair({ it.inDegrees }, { it.degrees })
+    )
+
   val climbExtendAngle =
     LoggedTunableValue(
       "Climber/climbExtendAngle",

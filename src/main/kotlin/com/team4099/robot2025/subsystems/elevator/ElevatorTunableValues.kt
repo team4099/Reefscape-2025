@@ -86,6 +86,13 @@ object ElevatorTunableValues {
         Pair({ it.inInches }, { it.inches })
       )
 
+    val idleCoralL1Height =
+      LoggedTunableValue(
+        "Elevator/idleCoralL1Height",
+        ElevatorConstants.IDLE_CORAL_L1_HEIGHT,
+        Pair({ it.inInches }, { it.inches })
+      )
+
     val idleAlgaeHeight =
       LoggedTunableValue(
         "Elevator/idleAlgaeHeight",
@@ -93,17 +100,10 @@ object ElevatorTunableValues {
         Pair({ it.inInches }, { it.inches })
       )
 
-    val safeArmPassThroughCarriageHeight =
+    val passThroughHeight =
       LoggedTunableValue(
-        "Elevator/safeArmPassThroughHeight",
-        ElevatorConstants.SAFE_ARM_PASS_THROUGH_HEIGHT,
-        Pair({ it.inInches }, { it.inches })
-      )
-
-    val safeArmPassUnderCarriageHeight =
-      LoggedTunableValue(
-        "Elevator/safeArmPassUnderCarriageHeight",
-        ElevatorConstants.SAFE_ARM_PASS_UNDER_CARRIAGE_HEIGHT,
+        "Elevator/passThroughHeight",
+        ElevatorConstants.PASS_THROUGH_HEIGHT,
         Pair({ it.inInches }, { it.inches })
       )
 
@@ -111,6 +111,13 @@ object ElevatorTunableValues {
       LoggedTunableValue(
         "Elevator/intakeCoralHeight",
         ElevatorConstants.INTAKE_CORAL_HEIGHT,
+        Pair({ it.inInches }, { it.inches })
+      )
+
+    val intakeL1Height =
+      LoggedTunableValue(
+        "Elevator/intakeL1Height",
+        ElevatorConstants.INTAKE_L1_HEIGHT,
         Pair({ it.inInches }, { it.inches })
       )
 

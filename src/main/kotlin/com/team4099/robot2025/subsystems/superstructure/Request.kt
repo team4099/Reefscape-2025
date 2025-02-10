@@ -17,6 +17,8 @@ sealed interface Request {
 
     class IntakeCoral() : SuperstructureRequest
 
+    class IntakeL1() : SuperstructureRequest
+
     class IntakeAlgae(val level: Constants.Universal.AlgaeLevel) : SuperstructureRequest
 
     class ScorePrepCoral(val level: Constants.Universal.CoralLevel) : SuperstructureRequest
@@ -30,8 +32,6 @@ sealed interface Request {
     class ClimbRetract() : SuperstructureRequest
 
     class Tuning() : SuperstructureRequest
-
-    class EjectGamepeice() : SuperstructureRequest
   }
 
   sealed interface DrivetrainRequest : Request {

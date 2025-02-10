@@ -32,6 +32,7 @@ object ClimberConstants {
 
   // make few constants[[-;[
 
+  val CLIMBER_IDLE_ANGLE = 0.0.degrees
   val CLIMBER_EXTEND_ANGLE = 0.0.degrees
   val CLIMBER_RETRACT_ANGLE = 0.0.degrees
 
