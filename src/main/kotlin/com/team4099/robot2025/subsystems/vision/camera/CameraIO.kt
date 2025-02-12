@@ -8,15 +8,12 @@ import edu.wpi.first.math.numbers.N3
 import edu.wpi.first.math.numbers.N5
 import org.littletonrobotics.junction.LogTable
 import org.littletonrobotics.junction.inputs.LoggableInputs
-import org.photonvision.common.dataflow.structures.Packet
 import org.photonvision.targeting.PhotonTrackedTarget
 import org.photonvision.targeting.TargetCorner
 import org.team4099.lib.geometry.Pose3d
 import org.team4099.lib.geometry.Pose3dWPILIB
-import org.team4099.lib.geometry.Transform3dWPILIB
 import org.team4099.lib.units.base.inSeconds
 import org.team4099.lib.units.base.seconds
-import org.team4099.lib.units.derived.inDegrees
 
 interface CameraIO {
   class CameraInputs : LoggableInputs {
@@ -45,10 +42,16 @@ interface CameraIO {
         table?.put("cameraTargets/$targetIndex/pitch", cameraTargets[targetIndex].pitch)
         table?.put("cameraTargets/$targetIndex/area", cameraTargets[targetIndex].area)
         table?.put("cameraTargets/$targetIndex/skew", cameraTargets[targetIndex].skew)
-        for (i in 1 .. 4) {
-          table?.put("cameraTargets/$targetIndex/corners/$i", cameraTargets[targetIndex].detectedCorners[i])
+        for (i in 1..4) {
+          table?.put(
+            "cameraTargets/$targetIndex/corners/$i",
+            cameraTargets[targetIndex].detectedCorners[i]
+          )
         }
-        table?.put("cameraTargets/$targetIndex/cameraToTarget", cameraTargets[targetIndex].bestCameraToTarget)
+        table?.put(
+          "cameraTargets/$targetIndex/cameraToTarget",
+          cameraTargets[targetIndex].bestCameraToTarget
+        )
         table?.put("cameraTargets/$targetIndex/ambiguity", cameraTargets[targetIndex].poseAmbiguity)
       }
     }
@@ -78,13 +81,16 @@ interface CameraIO {
         target.area = table?.get("cameraTarget/$targetID/area", 0.0) ?: 0.0
         target.pitch = table?.get("cameraTarget/$targetID/skew", 0.0) ?: 0.0
         val corners = mutableListOf<TargetCorner>()
-        for (i in 1 .. 4) {
-          val corner: TargetCorner? = table?.get("cameraTarget/$targetID/corners/$i", TargetCorner())
+        for (i in 1..4) {
+          val corner: TargetCorner? =
+            table?.get("cameraTarget/$targetID/corners/$i", TargetCorner())
           corners.add(corner ?: TargetCorner())
         }
         target.detectedCorners = corners
 
-        target.bestCameraToTarget = table?.get("cameraTarget/$targetID/cameraToTarget", Transform3d())?.get(0) ?: Transform3d()
+        target.bestCameraToTarget =
+          table?.get("cameraTarget/$targetID/cameraToTarget", Transform3d())?.get(0)
+            ?: Transform3d()
         target.poseAmbiguity = table?.get("cameraTarget/$targetID/ambiguity", 0.0) ?: 0.0
 
         cameraTargets.add(target)

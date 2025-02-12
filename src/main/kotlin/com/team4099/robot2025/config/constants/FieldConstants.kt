@@ -7,7 +7,6 @@ import org.team4099.lib.geometry.Pose3d
 import org.team4099.lib.units.base.inches
 import java.nio.file.Path
 
-
 // Copyright (c) 2024 FRC 6328
 // http://github.com/Mechanical-Advantage
 //
@@ -42,7 +41,13 @@ object FieldConstants {
 
       val AprilTags = mutableListOf<AprilTag>()
 
-      for (tag in AprilTagFieldLayout(Path.of(Filesystem.getDeployDirectory().path, "apriltags", "$name.json")).tags) {
+      for (
+        tag in
+        AprilTagFieldLayout(
+          Path.of(Filesystem.getDeployDirectory().path, "apriltags", "$name.json")
+        )
+          .tags
+      ) {
         AprilTags.add(AprilTag(tag.ID, Pose3d(tag.pose)))
       }
 
@@ -50,7 +55,4 @@ object FieldConstants {
       layoutString = name
     }
   }
-
-
-
 }

@@ -15,7 +15,6 @@ import org.team4099.lib.units.base.seconds
 import org.team4099.lib.units.derived.degrees
 import org.team4099.lib.units.derived.inDegrees
 import org.team4099.lib.units.milli
-import kotlin.math.pow
 
 class LimelightVisionIOReal(override val cameraName: String) : LimelightVisionIO {
 
@@ -81,7 +80,6 @@ class LimelightVisionIOReal(override val cameraName: String) : LimelightVisionIO
         "LimelightVision/$cameraName/primaryTag/robotToTagDistanceBotPose",
         (inputs.robotPoseTargetSpace.translation.norm.inMeters)
       )
-
     }
 
     if (inputs.pipelineType == "pipe_neuraldetector") {

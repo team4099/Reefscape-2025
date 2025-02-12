@@ -72,7 +72,7 @@ class FieldFrameEstimator(stateStdDevs: Matrix<N3?, N1?>) {
     if (updates.containsKey(timestamp)) {
       // There was already an odometry update at this timestamp, add to it
       val odomTRobotAtVisionTimestamp = updates[timestamp]!!.odomTRobot
-      val robotTSpeaker = visionData.robotTSpeaker
+      val robotTSpeaker = visionData.robotTReefTag
       odometryTSpeaker = odomTRobotAtVisionTimestamp.transformBy(robotTSpeaker).asTransform2d()
     } else {
       // Insert a new update
@@ -92,7 +92,7 @@ class FieldFrameEstimator(stateStdDevs: Matrix<N3?, N1?>) {
 
       // Add new pose updates
       val odomTRobotAtVisionTimestamp = prevUpdate.value.odomTRobot.exp(prevToVisionTwist)
-      val robotTSpeaker = visionData.robotTSpeaker
+      val robotTSpeaker = visionData.robotTReefTag
       odometryTSpeaker = odomTRobotAtVisionTimestamp.transformBy(robotTSpeaker).asTransform2d()
     }
   }

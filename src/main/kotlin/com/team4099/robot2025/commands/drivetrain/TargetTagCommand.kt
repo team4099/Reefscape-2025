@@ -2,16 +2,13 @@ package com.team4099.robot2025.commands.drivetrain
 
 import com.team4099.lib.logging.LoggedTunableValue
 import com.team4099.robot2025.config.constants.DrivetrainConstants
-import com.team4099.robot2025.config.constants.DrivetrainConstants.DRIVE_SETPOINT_MAX
 import com.team4099.robot2025.subsystems.drivetrain.drive.Drivetrain
 import com.team4099.robot2025.subsystems.superstructure.Request
 import com.team4099.robot2025.subsystems.vision.Vision
 import com.team4099.robot2025.util.CustomLogger
 import com.team4099.robot2025.util.driver.DriverProfile
-import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.RobotBase
 import edu.wpi.first.wpilibj2.command.Command
-import org.littletonrobotics.junction.Logger
 import org.team4099.lib.controller.PIDController
 import org.team4099.lib.geometry.Transform2d
 import org.team4099.lib.geometry.Translation2d
@@ -26,14 +23,9 @@ import org.team4099.lib.units.derived.inDegrees
 import org.team4099.lib.units.derived.inDegreesPerSecondPerDegree
 import org.team4099.lib.units.derived.inDegreesPerSecondPerDegreePerSecond
 import org.team4099.lib.units.derived.inDegreesPerSecondPerDegreeSeconds
-import org.team4099.lib.units.derived.inMetersPerSecondPerDegree
-import org.team4099.lib.units.derived.inMetersPerSecondPerDegreePerSecond
-import org.team4099.lib.units.derived.inMetersPerSecondPerDegreeSeconds
-import org.team4099.lib.units.derived.inMetersPerSecondPerFootSeconds
 import org.team4099.lib.units.derived.inMetersPerSecondPerMeter
 import org.team4099.lib.units.derived.inMetersPerSecondPerMeterPerSecond
 import org.team4099.lib.units.derived.inMetersPerSecondPerMeterSeconds
-import org.team4099.lib.units.derived.inMetersPerSecondPerMetersPerSecond
 import org.team4099.lib.units.derived.perDegree
 import org.team4099.lib.units.derived.perDegreePerSecond
 import org.team4099.lib.units.derived.perDegreeSeconds
@@ -84,8 +76,7 @@ class TargetTagCommand(
 
   val ykP =
     LoggedTunableValue(
-      "TagAlign/ykP",
-      Pair({ it.inMetersPerSecondPerMeter }, { it.meters.perSecond.perMeter })
+      "TagAlign/ykP", Pair({ it.inMetersPerSecondPerMeter }, { it.meters.perSecond.perMeter })
     )
   val ykI =
     LoggedTunableValue(
@@ -96,8 +87,7 @@ class TargetTagCommand(
     LoggedTunableValue(
       "TagAlign/ykD",
       Pair(
-        { it.inMetersPerSecondPerMeterPerSecond },
-        { it.meters.perSecond.perMeterPerSecond }
+        { it.inMetersPerSecondPerMeterPerSecond }, { it.meters.perSecond.perMeterPerSecond }
       )
     )
 
@@ -168,7 +158,6 @@ class TargetTagCommand(
     thetaPID.reset() // maybe do first for x?
     yPID.reset()
 
-
     if (thetakP.hasChanged() || thetakI.hasChanged() || thetakD.hasChanged()) {
       thetaPID = PIDController(thetakP.get(), thetakI.get(), thetakD.get())
     }
@@ -176,8 +165,6 @@ class TargetTagCommand(
     if (ykP.hasChanged() || ykI.hasChanged() || ykD.hasChanged()) {
       yPID = PIDController(ykP.get(), ykI.get(), ykD.get())
     }
-
-
   }
 
   override fun execute() {
@@ -185,13 +172,16 @@ class TargetTagCommand(
     drivetrain.defaultCommand.end(true)
     CustomLogger.recordDebugOutput("ActiveCommands/TargetTagCommand", true)
 
-
     val visionData = vision.lastTrigVisionUpdate
 
-    if (visionData.targetTagID != -1 && visionData.robotTReefTag != Transform2d(Translation2d(0.meters, 0.meters), 0.degrees)) {
+    if (visionData.targetTagID != -1 &&
+      visionData.robotTReefTag != Transform2d(Translation2d(0.meters, 0.meters), 0.degrees)
+    ) {
       var thetaFeedback = thetaPID.calculate(visionData.robotTReefTag.rotation, 0.degrees)
 
-      CustomLogger.recordDebugOutput("Testing/CurrentDrivetrainRotation", drivetrain.odomTRobot.rotation.inDegrees)
+      CustomLogger.recordDebugOutput(
+        "Testing/CurrentDrivetrainRotation", drivetrain.odomTRobot.rotation.inDegrees
+      )
       CustomLogger.recordDebugOutput("Testing/thetaError", thetaPID.error.inDegrees)
       CustomLogger.recordDebugOutput("Testing/thetaFeedback", thetaFeedback.inDegreesPerSecond)
 
@@ -202,7 +192,7 @@ class TargetTagCommand(
             driver.driveSpeedClampedSupplier(driveX, driveY, slowMode),
             fieldOriented = true
           )
-      } else  {
+      } else {
 
         var yFeedback = yPID.calculate(visionData.robotTReefTag.translation.y, yTargetOffset)
 
@@ -220,9 +210,7 @@ class TargetTagCommand(
             Pair(autoDriveVector.meters.perSecond, yFeedback),
             fieldOriented = false
           )
-
       }
-
     }
   }
 

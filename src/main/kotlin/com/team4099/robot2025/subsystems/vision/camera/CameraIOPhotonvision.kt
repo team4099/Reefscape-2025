@@ -8,14 +8,15 @@ import org.photonvision.PhotonCamera
 import org.photonvision.PhotonPoseEstimator
 import org.photonvision.PhotonPoseEstimator.PoseStrategy
 import org.team4099.lib.geometry.Pose3d
-import org.team4099.lib.geometry.Transform3dWPILIB
+import org.team4099.lib.geometry.Transform3d
 import org.team4099.lib.units.base.Time
 import org.team4099.lib.units.base.inSeconds
 import org.team4099.lib.units.base.seconds
 import org.team4099.lib.units.micro
 import java.util.Optional
 
-class CameraIOPhotonvision(private val identifier: String, private val transform: Transform3dWPILIB) : CameraIO {
+class CameraIOPhotonvision(private val identifier: String, private val transform: Transform3d) :
+  CameraIO {
 
   private val photonEstimator: PhotonPoseEstimator
   private val camera: PhotonCamera
@@ -28,7 +29,7 @@ class CameraIOPhotonvision(private val identifier: String, private val transform
       PhotonPoseEstimator(
         AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile),
         PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-        transform
+        transform.transform3d
       )
 
     photonEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY)

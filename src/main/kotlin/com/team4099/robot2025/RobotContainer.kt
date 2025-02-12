@@ -1,22 +1,20 @@
 package com.team4099.robot2025
 
 import com.team4099.lib.logging.LoggedTunableValue
-import com.team4099.robot2023.subsystems.limelight.LimelightVisionIOReal
 import com.team4099.robot2023.subsystems.vision.camera.CameraIO
+import com.team4099.robot2023.subsystems.vision.camera.CameraIOPhotonvision
 import com.team4099.robot2025.auto.AutonomousSelector
 import com.team4099.robot2025.commands.drivetrain.ResetGyroYawCommand
 import com.team4099.robot2025.commands.drivetrain.TargetTagCommand
 import com.team4099.robot2025.commands.drivetrain.TeleopDriveCommand
 import com.team4099.robot2025.config.ControlBoard
 import com.team4099.robot2025.config.constants.Constants
-import com.team4099.robot2025.config.constants.VisionConstants.Limelight.LIMELIGHT_NAME
+import com.team4099.robot2025.config.constants.VisionConstants
 import com.team4099.robot2025.subsystems.drivetrain.drive.Drivetrain
 import com.team4099.robot2025.subsystems.drivetrain.drive.DrivetrainIOReal
 import com.team4099.robot2025.subsystems.drivetrain.drive.DrivetrainIOSim
 import com.team4099.robot2025.subsystems.drivetrain.gyro.GyroIO
 import com.team4099.robot2025.subsystems.drivetrain.gyro.GyroIOPigeon2
-import com.team4099.robot2025.subsystems.limelight.LimelightVision
-import com.team4099.robot2025.subsystems.limelight.LimelightVisionIOSim
 import com.team4099.robot2025.subsystems.vision.Vision
 import com.team4099.robot2025.util.driver.Jessika
 import edu.wpi.first.wpilibj.RobotBase
@@ -47,7 +45,15 @@ object RobotContainer {
       // drivetrain = Drivetrain(object: GyroIO {},object: DrivetrainIO {}
 
       drivetrain = Drivetrain(GyroIOPigeon2, DrivetrainIOReal)
-      vision = Vision(object : CameraIO {})
+      vision =
+        Vision(
+          CameraIOPhotonvision(
+            VisionConstants.CAMERA_NAMES[0], VisionConstants.CAMERA_TRANSFORMS[0]
+          ),
+          CameraIOPhotonvision(
+            VisionConstants.CAMERA_NAMES[1], VisionConstants.CAMERA_TRANSFORMS[1]
+          )
+        )
     } else {
       // Simulation implementations
       vision = Vision(object : CameraIO {})
@@ -60,7 +66,6 @@ object RobotContainer {
       { drivetrain.addSpeakerVisionData(it) }
     )
     vision.drivetrainOdometry = { drivetrain.odomTRobot }
-
   }
 
   fun mapDefaultCommands() {
@@ -126,7 +131,8 @@ object RobotContainer {
         { ControlBoard.strafe.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
         { ControlBoard.turn.smoothDeadband(Constants.Joysticks.TURN_DEADBAND) },
         { ControlBoard.slowMode },
-        drivetrain
+        drivetrain,
+        vision
       )
     )
   }
