@@ -22,12 +22,12 @@ object VisionConstants {
   val CAMERA_TRANSFORMS =
     listOf(
       Transform3d(
-        Translation3d(12.653.inches, -9.1.inches, 14.25.inches), // 18.69
-        Rotation3d(-5.3.degrees, 30.degrees, -72.77.degrees)
-      ), // left
+        Translation3d(10.49.inches, 12.325.inches, 8.195.inches), // 18.69
+        Rotation3d(0.0.degrees, -20.degrees, -30.degrees)
+      ), // l
       Transform3d(
-        Translation3d(4.8.inches, 0.inches, 17.164.inches), // 18.69
-        Rotation3d(0.degrees, 30.degrees, 0.degrees)
+        Translation3d(10.49.inches, -12.325.inches, 8.195.inches), // 18.69
+        Rotation3d(0.0.degrees, -20.degrees, 30.degrees)
       )
     )
 

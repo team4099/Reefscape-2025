@@ -37,14 +37,19 @@ class CameraIOPhotonvision(private val identifier: String, private val transform
 
   override fun updateInputs(inputs: CameraIO.CameraInputs) {
     if (camera.isConnected) {
-      inputs.cameraMatrix = camera.cameraMatrix.get()
-      inputs.distCoeff = camera.distCoeffs.get()
+      if (camera.cameraMatrix.isPresent) {
+        inputs.cameraMatrix = camera.cameraMatrix.get()
+      }
+
+      if (camera.distCoeffs.isPresent()) {
+        inputs.distCoeff = camera.distCoeffs.get()
+      }
     }
 
     val pipelineResult = camera.latestResult
 
-    Logger.recordOutput("$identifier/timestampIG", pipelineResult.timestampSeconds)
-    Logger.recordOutput("$identifier/hasTarget", pipelineResult.hasTargets())
+    Logger.recordOutput("Vision/$identifier/timestampIG", pipelineResult.timestampSeconds)
+    Logger.recordOutput("Vision/$identifier/hasTarget", pipelineResult.hasTargets())
 
     if (pipelineResult.hasTargets()) {
       inputs.timestamp = pipelineResult.timestampSeconds.seconds

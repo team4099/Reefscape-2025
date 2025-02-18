@@ -19,14 +19,18 @@ import org.team4099.lib.geometry.Pose3d
 import org.team4099.lib.geometry.Rotation3d
 import org.team4099.lib.geometry.Transform2d
 import org.team4099.lib.geometry.Transform3d
+import org.team4099.lib.geometry.Transform3dWPILIB
 import org.team4099.lib.geometry.Translation2d
 import org.team4099.lib.geometry.Translation3d
+import org.team4099.lib.units.base.inInches
 import org.team4099.lib.units.base.inMeters
 import org.team4099.lib.units.base.inMilliseconds
 import org.team4099.lib.units.base.meters
 import org.team4099.lib.units.base.seconds
+import org.team4099.lib.units.derived.cos
 import org.team4099.lib.units.derived.degrees
 import org.team4099.lib.units.derived.inRadians
+import org.team4099.lib.units.derived.sin
 import java.util.function.Consumer
 import java.util.function.Supplier
 
@@ -91,76 +95,93 @@ class Vision(vararg cameras: CameraIO) : SubsystemBase() {
       val cornerData = mutableListOf<Double>()
 
       for (tag in tagTargets) {
-        if (DriverStation.getAlliance().isPresent) {
-          if ((tag.fiducialId in VisionConstants.BLUE_REEF_TAGS && FMSData.isBlue) ||
-            (tag.fiducialId in VisionConstants.RED_REEF_TAGS && !FMSData.isBlue)
-          ) {
+        if (tag.poseAmbiguity < 0.2) {
+          if (DriverStation.getAlliance().isPresent) {
+            if ((tag.fiducialId in VisionConstants.BLUE_REEF_TAGS && FMSData.isBlue) ||
+              (tag.fiducialId in VisionConstants.RED_REEF_TAGS && !FMSData.isBlue)
+            ) {
 
-            val cameraDistanceToTarget =
-              PhotonUtils.calculateDistanceToTargetMeters(
-                cameraPoses[instance].translation.z.inMeters,
-                VisionConstants.REEF_TAG_HEIGHT.inMeters,
-                cameraPoses[instance].rotation.y.inRadians,
-                tag.pitch.degrees.inRadians
-              )
-                .meters
+              /*
+              //using camera height to find 2D distance
+              val cameraDistanceToTarget2D =
+                PhotonUtils.calculateDistanceToTargetMeters(
+                  cameraPoses[instance].translation.z.inMeters,
+                  VisionConstants.REEF_TAG_HEIGHT.inMeters,
+                  cameraPoses[instance].rotation.y.inRadians,
+                  tag.pitch.degrees.inRadians
+                )
+                  .meters
 
-            var cameraTReefTag =
-              Transform2d(
-                PhotonUtils.estimateCameraToTarget(
-                  PhotonUtils.estimateCameraToTargetTranslation(
-                    cameraDistanceToTarget.inMeters,
-                    Rotation2d(-tag.yaw.degrees.inRadians)
-                  ),
-                  FieldConstants.aprilTags.get(tag.fiducialId).pose.toPose2d().pose2d,
-                  drivetrainOdometry().pose2d.rotation
+               */
+
+              // using solve pnp 3D target distance to get 2D distance
+
+              val cameraDistanceToTarget3D = tag.bestCameraToTarget.translation.norm.meters
+              val cameraDistanceToTarget2D =
+                cameraDistanceToTarget3D *
+                  (tag.pitch.degrees).cos
+
+              var cameraTReefTagTranslation2d = Translation2d(
+                PhotonUtils.estimateCameraToTargetTranslation(
+                  cameraDistanceToTarget2D.inMeters,
+                  Rotation2d(-tag.yaw.degrees.inRadians)
                 )
               )
 
-            var robotTReefTag =
-              Pose3d()
-                .transformBy(cameraPoses[instance])
-                .transformBy(
-                  Transform3d(
-                    Translation3d(
-                      cameraTReefTag.translation.x,
-                      cameraTReefTag.translation.y,
-                      VisionConstants.REEF_TAG_HEIGHT -
-                        cameraPoses[instance].translation.z
-                    ),
-                    Rotation3d(0.degrees, 0.degrees, cameraTReefTag.rotation)
-                  )
+              var cameraTReefTagTranslation3d = Translation3d(
+                  cameraTReefTagTranslation2d.x,
+                  cameraTReefTagTranslation2d.y,
+                  cameraDistanceToTarget3D * tag.pitch.degrees.sin
                 )
-                .toTransform3d()
 
-            val distanceToTarget = robotTReefTag.translation.norm
 
-            Logger.recordOutput(
-              "Vision/${VisionConstants.CAMERA_NAMES[instance]}/${tag.fiducialId}/cameraDistanceToTarget",
-              cameraDistanceToTarget.inMeters
-            )
+              var robotTReefTag = Transform3d(
+                Pose3d()
+                  .transformBy(cameraPoses[instance])
+                  .transformBy(
+                    Transform3d(
+                        cameraTReefTagTranslation3d,
+                      Rotation3d(0.degrees, 0.degrees, 0.degrees)
+                    )
+                  ).translation,
+                Rotation3d()
+                //FieldConstants.AprilTagLayoutType.OFFICIAL.layout.getTagPose(tag.fiducialId).rotation.z - drivetrainOdometry().rotation
+              )
 
-            Logger.recordOutput(
-              "Vision/${VisionConstants.CAMERA_NAMES[instance]}/${tag.fiducialId}/robotDistanceToTarget",
-              distanceToTarget.inMeters
-            )
 
-            Logger.recordOutput(
-              "Vision/${VisionConstants.CAMERA_NAMES[instance]}/${tag.fiducialId}/cameraTReefTag",
-              cameraTReefTag.transform2d
-            )
+              val distanceToTarget = robotTReefTag.translation.norm
 
-            Logger.recordOutput(
-              "Vision/${VisionConstants.CAMERA_NAMES[instance]}/${tag.fiducialId}/robotTReefTag",
-              robotTReefTag.transform3d
-            )
+              Logger.recordOutput(
+                "Vision/${VisionConstants.CAMERA_NAMES[instance]}/${tag.fiducialId}/cameraDistanceToTarget3D",
+                cameraDistanceToTarget3D.inInches
+              )
 
-            for (corner in tag.detectedCorners) {
-              cornerData.add(corner.x)
-              cornerData.add(corner.y)
+              Logger.recordOutput(
+                "Vision/${VisionConstants.CAMERA_NAMES[instance]}/${tag.fiducialId}/cameraDistanceToTarget2D",
+                cameraDistanceToTarget2D.inInches
+              )
+
+              Logger.recordOutput(
+                "Vision/${VisionConstants.CAMERA_NAMES[instance]}/${tag.fiducialId}/robotDistanceToTarget",
+                distanceToTarget.inMeters
+              )
+
+              Logger.recordOutput(
+                "Vision/${VisionConstants.CAMERA_NAMES[instance]}/${tag.fiducialId}/cameraTReefTag", cameraTReefTagTranslation3d.translation3d
+              )
+
+              Logger.recordOutput(
+                "Vision/${VisionConstants.CAMERA_NAMES[instance]}/${tag.fiducialId}/robotTReefTag",
+                robotTReefTag.transform3d
+              )
+
+              for (corner in tag.detectedCorners) {
+                cornerData.add(corner.x)
+                cornerData.add(corner.y)
+              }
+
+              reefTags.add(Pair(tag.fiducialId, robotTReefTag))
             }
-
-            reefTags.add(Pair(tag.fiducialId, robotTReefTag))
           }
         }
       }
@@ -181,7 +202,7 @@ class Vision(vararg cameras: CameraIO) : SubsystemBase() {
 
       Logger.recordOutput(
         "Vision/${VisionConstants.CAMERA_NAMES[instance]}/closestReefTagPose}",
-        closestReefTag?.second?.transform3d
+        closestReefTag?.second?.transform3d ?: Transform3dWPILIB()
       )
     }
 
@@ -201,7 +222,7 @@ class Vision(vararg cameras: CameraIO) : SubsystemBase() {
 
     Logger.recordOutput(
       "Vision/ClosestReefTagAcrossAllCams/ReefTagPose",
-      closestReefTagAcrossCams?.value?.second?.transform3d
+      closestReefTagAcrossCams?.value?.second?.transform3d ?: Transform3dWPILIB()
     )
 
     if (closestReefTagAcrossCams?.key != null && closestReefTagAcrossCams?.value != null) {

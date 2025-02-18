@@ -34,8 +34,8 @@ object FieldConstants {
   enum class AprilTagLayoutType(name: String) {
     OFFICIAL("2025-official");
 
-    private val layout: org.team4099.lib.apriltag.AprilTagFieldLayout
-    private val layoutString: String
+    val layout: org.team4099.lib.apriltag.AprilTagFieldLayout
+    val layoutString: String
 
     init {
 

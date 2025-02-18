@@ -24,7 +24,7 @@ interface CameraIO {
     var cameraTargets = mutableListOf<PhotonTrackedTarget>()
     var indices = 0
     var cameraMatrix = MatBuilder.fill(Nat.N3(), Nat.N3(), *DoubleArray(9) { 0.0 })
-    var distCoeff = MatBuilder.fill(Nat.N8(), Nat.N1(), *DoubleArray(5) { 0.0 })
+    var distCoeff = MatBuilder.fill(Nat.N8(), Nat.N1(), *DoubleArray(8) { 0.0 })
 
     override fun toLog(table: LogTable?) {
       table?.put("timestampSeconds", timestamp.inSeconds)
@@ -42,7 +42,7 @@ interface CameraIO {
         table?.put("cameraTargets/$targetIndex/pitch", cameraTargets[targetIndex].pitch)
         table?.put("cameraTargets/$targetIndex/area", cameraTargets[targetIndex].area)
         table?.put("cameraTargets/$targetIndex/skew", cameraTargets[targetIndex].skew)
-        for (i in 1..4) {
+        for (i in 0..3) {
           table?.put(
             "cameraTargets/$targetIndex/corners/$i",
             cameraTargets[targetIndex].detectedCorners[i]
