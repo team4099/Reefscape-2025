@@ -1,6 +1,7 @@
 package com.team4099.robot2025.subsystems.superstructure
 
 import com.team4099.lib.hal.Clock
+import com.team4099.robot2025.config.constants.ArmConstants
 import com.team4099.robot2025.config.constants.Constants.Universal.AlgaeLevel
 import com.team4099.robot2025.config.constants.Constants.Universal.CoralLevel
 import com.team4099.robot2025.config.constants.Constants.Universal.GamePiece
@@ -314,6 +315,7 @@ class Superstructure(
       SuperstructureStates.PREP_ELEVATOR_MOVEMENT -> {
         arm.currentRequest =
           Request.ArmRequest.ClosedLoop(ArmTunableValues.ArmAngles.safeElevatorFrontAngle.get())
+
         if (arm.isAtTargetedPosition) {
           when (currentRequest) {
             is Request.SuperstructureRequest.ScorePrepCoral -> {
@@ -452,6 +454,7 @@ class Superstructure(
                 }
 
               elevator.currentRequest = Request.ElevatorRequest.ClosedLoop(reefLevelElevatorHeight)
+
               if (elevator.isAtTargetedPosition) {
                 arm.currentRequest = Request.ArmRequest.ClosedLoop(reefLevelArmAngle)
               }
@@ -471,7 +474,19 @@ class Superstructure(
         }
       }
       SuperstructureStates.SCORE_CORAL -> {
+        val reefLevelArmAngle: Angle =
+          when (coralScoringLevel) {
+            CoralLevel.L1 -> ArmTunableValues.ArmAngles.scoreCoralL1Angle.get()
+            CoralLevel.L2 -> ArmTunableValues.ArmAngles.scoreCoralL2Angle.get()
+            CoralLevel.L3 -> ArmTunableValues.ArmAngles.scoreCoralL3Angle.get()
+            CoralLevel.L4 -> ArmTunableValues.ArmAngles.scoreCoralL4Angle.get()
+            else -> {
+              0.0.degrees
+            }
+          }
+
         if (theoreticalGamePiece == GamePiece.CORAL) {
+          arm.currentRequest = Request.ArmRequest.ClosedLoop(reefLevelArmAngle + ArmConstants.SCORE_OFFSET)
           rollers.currentRequest =
             Request.RollersRequest.OpenLoop(RollersTunableValues.scoreCoralVoltage.get())
           if ((Clock.fpgaTime - lastTransitionTime) > RollersTunableValues.coralSpitTime.get()) {
