@@ -50,7 +50,7 @@ object ElevatorConstants {
   val IDLE_ALGAE_HEIGHT = 0.0.inches
 
   val INTAKE_CORAL_HEIGHT = 2.inches
-  val INTAKE_L1_HEIGHT = 18.448.inches
+  val INTAKE_L1_HEIGHT = 4.28.inches
 
   val PASS_THROUGH_HEIGHT = 0.inches
 
@@ -72,14 +72,14 @@ object ElevatorConstants {
   val ELEVATOR_GROUND_OFFSET = 3.829.inches
 
   // TODO: make real maxes
-  val MAX_VELOCITY = 200.0.inches.perSecond
-  val MAX_ACCELERATION = 100.0.inches.perSecond.perSecond
+  val MAX_VELOCITY = 400.0.inches.perSecond
+  val MAX_ACCELERATION = 200.0.inches.perSecond.perSecond
 
   object PID {
     // TODO: tune all
-    val REAL_KP = 1.5.volts / 1.inches
+    val REAL_KP = 5.volts / 1.inches
     val REAL_KI = 0.0.volts / (1.inches * 1.seconds)
-    val REAL_KD = 0.2.volts / (1.inches.perSecond)
+    val REAL_KD = 0.3.volts / (1.inches.perSecond)
 
     val SIM_KP = 5.volts / 1.inches
     val SIM_KI = 0.0.volts / (1.inches * 1.seconds)
@@ -91,7 +91,7 @@ object ElevatorConstants {
 
     val KG_DEFAULT = 0.16.volts
     val KG_FIRST_STAGE = 0.16.volts
-    val KG_SECOND_STAGE = 0.16.volts
-    val KG_THIRD_STAGE = 0.16.volts
+    val KG_SECOND_STAGE = 0.24.volts
+    val KG_THIRD_STAGE = 0.32.volts
   }
 }

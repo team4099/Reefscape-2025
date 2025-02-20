@@ -6,6 +6,7 @@ import com.team4099.robot2025.commands.drivetrain.TeleopDriveCommand
 import com.team4099.robot2025.config.ControlBoard
 import com.team4099.robot2025.config.constants.Constants
 import com.team4099.robot2025.subsystems.arm.Arm
+import com.team4099.robot2025.subsystems.arm.ArmIO
 import com.team4099.robot2025.subsystems.arm.ArmIOSim
 import com.team4099.robot2025.subsystems.arm.ArmIOTalonFX
 import com.team4099.robot2025.subsystems.climber.Climber
@@ -13,9 +14,12 @@ import com.team4099.robot2025.subsystems.climber.ClimberIO
 import com.team4099.robot2025.subsystems.climber.ClimberIOSim
 import com.team4099.robot2025.subsystems.drivetrain.drive.Drivetrain
 import com.team4099.robot2025.subsystems.drivetrain.drive.DrivetrainIO
+import com.team4099.robot2025.subsystems.drivetrain.drive.DrivetrainIOReal
 import com.team4099.robot2025.subsystems.drivetrain.drive.DrivetrainIOSim
 import com.team4099.robot2025.subsystems.drivetrain.gyro.GyroIO
+import com.team4099.robot2025.subsystems.drivetrain.gyro.GyroIOPigeon2
 import com.team4099.robot2025.subsystems.elevator.Elevator
+import com.team4099.robot2025.subsystems.elevator.ElevatorIO
 import com.team4099.robot2025.subsystems.elevator.ElevatorIOSim
 import com.team4099.robot2025.subsystems.elevator.ElevatorIOTalon
 import com.team4099.robot2025.subsystems.limelight.LimelightVision
@@ -50,11 +54,11 @@ object RobotContainer {
       // Real Hardware Implementations
       // drivetrain = Drivetrain(object: GyroIO {},object: DrivetrainIO {}
 
-      drivetrain = Drivetrain(object : GyroIO {}, object : DrivetrainIO {})
+      drivetrain = Drivetrain(GyroIOPigeon2, DrivetrainIOReal)
       limelight = LimelightVision(object : LimelightVisionIO {})
-      arm = Arm(ArmIOTalonFX)
+      arm = Arm(object : ArmIO {})
       climber = Climber(object : ClimberIO {})
-      elevator = Elevator(ElevatorIOTalon)
+      elevator = Elevator(object : ElevatorIO {})
       rollers = Rollers(RollersIOTalonFX)
       ramp = Ramp(RampIOTalonFX)
     } else {
@@ -160,7 +164,8 @@ object RobotContainer {
     //
     ControlBoard.prepL3.whileTrue(superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L3))
     //
-    ControlBoard.prepL4.whileTrue(superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L4))
+    // No L4 scoring in the church
+    // ControlBoard.prepL4.whileTrue(superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L4))
     ControlBoard.score.onTrue(superstructure.scoreCommand())
     ControlBoard.forceIdle.whileTrue(superstructure.requestIdleCommand())
   }

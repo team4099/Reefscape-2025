@@ -2,6 +2,7 @@ package com.team4099.robot2025.subsystems.rollers
 
 import com.team4099.lib.hal.Clock
 import com.team4099.robot2025.config.constants.RampConstants
+import com.team4099.robot2025.config.constants.RollersConstants
 import com.team4099.robot2025.subsystems.superstructure.Request
 import com.team4099.robot2025.util.CustomLogger
 import edu.wpi.first.math.filter.Debouncer
@@ -25,8 +26,17 @@ class Ramp(val io: RampIO) {
     }
 
   var lastRollerRunTime = Clock.fpgaTime
+  var lastRampTargetVoltage = 0.0.volts
 
-  var hasCoral = false
+  val hasCoral: Boolean
+    get() {
+      return (
+          inputs.statorCurrent > RollersConstants.CORAL_CURRENT_THRESHOLD &&
+          inputs.appliedVoltage.sign < 0 &&
+          (Clock.fpgaTime - lastRollerRunTime) >= RollersConstants.CORAL_DETECTION_TIME_THRESHOLD
+        )
+    }
+
 
   var debounceFilter = Debouncer(RampConstants.BEAM_BREAK_FILTER_TIME.inSeconds)
 
@@ -37,7 +47,7 @@ class Ramp(val io: RampIO) {
     CustomLogger.processInputs("Ramp", inputs)
     CustomLogger.recordOutput("Ramp/currentState", currentState.toString())
 
-    hasCoral = debounceFilter.calculate(inputs.beamBroken)
+//    hasCoral = debounceFilter.calculate(inputs.beamBroken)
 
     var nextState = currentState
     CustomLogger.recordOutput("Ramp/nextState", nextState.toString())
@@ -49,7 +59,15 @@ class Ramp(val io: RampIO) {
       RampState.OPEN_LOOP -> {
         io.setVoltage(rampTargetVoltage)
         nextState = fromRequestToState(currentRequest)
-        lastRollerRunTime = Clock.fpgaTime
+
+        CustomLogger.recordOutput("Ramp/hasCoral", hasCoral)
+
+        if (lastRampTargetVoltage != rampTargetVoltage) {
+          if (rampTargetVoltage != RampConstants.INTAKE_CORAL_VOLTAGE_SLOW) {
+            lastRampTargetVoltage = rampTargetVoltage
+            lastRollerRunTime = Clock.fpgaTime
+          }
+        }
       }
     }
 

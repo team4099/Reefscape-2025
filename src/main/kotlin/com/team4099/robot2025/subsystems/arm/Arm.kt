@@ -44,6 +44,14 @@ class Arm(private val io: ArmIO) {
           (inputs.armPosition - armTargetPosition).absoluteValue <= ArmConstants.ARM_TOLERANCE
         )
 
+  val isLooselyAtTargetedPosition: Boolean
+    get() =
+      (
+        currentState == ArmState.CLOSED_LOOP &&
+                (inputs.armPosition - armTargetPosition).absoluteValue <= ArmConstants.LOOSE_ARM_TOLERANCE
+        )
+
+
   init {
     // Initialize Arm Tunable Values
     if (RobotBase.isReal()) {

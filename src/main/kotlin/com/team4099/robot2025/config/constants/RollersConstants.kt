@@ -23,27 +23,28 @@ object RollersConstants {
   val IDLE_CORAL_L1_VOLTAGE = 0.0.volts
   val IDLE_ALGAE_VOLTAGE = 0.0.volts
   val INTAKE_ALGAE_VOLTAGE = 0.0.volts
-  val INTAKE_CORAL_VOLTAGE_FAST = -2.5.volts
-  val INTAKE_CORAL_VOLTAGE_SLOW = -1.5.volts
+  val INTAKE_CORAL_VOLTAGE_FAST = -7.volts
+  val INTAKE_CORAL_VOLTAGE_SLOW = -5.volts
 
-  val INTAKE_L1_VOLTAGE = 1.volts
+  val INTAKE_L1_VOLTAGE = -7.volts
 
   val SCORE_BARGE_ALGAE_VOLTAGE = 0.0.volts
   val SCORE_PROCESSOR_ALGAE_VOLTAGE = 0.0.volts
-  val SCORE_CORAL_VOLTAGE = 2.5.volts
-  val SCORE_CORAL_L1_VOLTAGE = 2.5.volts
+  val SCORE_CORAL_VOLTAGE = -8.volts
+  val SCORE_CORAL_L1_VOLTAGE = 4.volts
   val EJECT_VOLTAGE = 0.0.volts
 
   val CORAL_VELOCITY_THRESHOLD = 0.0.rotations.perSecond
-  val CORAL_CURRENT_THRESHOLD = 0.0.amps
+  val CORAL_CURRENT_THRESHOLD = 35.0.amps
   val ALGAE_VELOCITY_THRESHOLD = 0.0.rotations.perSecond
   val ALGAE_CURRENT_THRESHOLD = 0.0.amps
 
-  val CORAL_DETECTION_TIME_THRESHOLD = 0.0.seconds
+  val CORAL_DETECTION_TIME_THRESHOLD = 0.5.seconds
+  val CORAL_HORIZONTAL_DETECTION_TIME_THRESHOLD = 0.1.seconds
   val ALGAE_DETECTION_TIME_THRESHOLD = 0.0.seconds
 
   val CORAL_SPIT_TIME = 0.5.seconds
-  val CORAL_L1_SPIT_TIME = 0.5.seconds
+  val CORAL_L1_SPIT_TIME = 1.0.seconds
   val ALGAE_PROCESSOR_SPIT_TIME = 0.5.seconds
   val ALGAE_BARGE_SPIT_TIME = 0.0.seconds
 

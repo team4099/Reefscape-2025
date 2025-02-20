@@ -13,6 +13,7 @@ import kotlin.math.absoluteValue
  * names.
  */
 object ControlBoard {
+
   private val driver = XboxOneGamepad(Constants.Joysticks.DRIVER_PORT)
   private val operator = XboxOneGamepad(Constants.Joysticks.SHOTGUN_PORT)
   private val technician = XboxOneGamepad(Constants.Joysticks.TECHNICIAN_PORT)
@@ -57,15 +58,15 @@ object ControlBoard {
 
 
   // Single Driver Binds
-  val intakeL1 = Trigger { !driver.selectButton && driver.xButton }
-  val prepL2 = Trigger { !driver.selectButton && driver.aButton }
-  val prepL3 = Trigger { !driver.selectButton && driver.bButton }
-  val prepL4 = Trigger { !driver.selectButton && driver.yButton }
+  val intakeL1 = Trigger { !driver.rightJoystickButton && driver.xButton }
+  val prepL2 = Trigger { !driver.rightJoystickButton && driver.aButton }
+  val prepL3 = Trigger { !driver.rightJoystickButton && driver.bButton }
+  val prepL4 = Trigger { !driver.rightJoystickButton && driver.yButton }
 
-  val intakeAlgaeGround = Trigger { driver.selectButton && driver.aButton}
-  val intakeAlgaeL2 = Trigger { driver.selectButton && driver.bButton }
-  val intakeAlgaeL3 = Trigger { driver.selectButton && driver.yButton }
-  val prepAlgaeBarge = Trigger { driver.selectButton && driver.xButton }
+  val intakeAlgaeGround = Trigger { driver.rightJoystickButton && driver.aButton}
+  val intakeAlgaeL2 = Trigger { driver.rightJoystickButton && driver.bButton }
+  val intakeAlgaeL3 = Trigger { driver.rightJoystickButton && driver.yButton }
+  val prepAlgaeBarge = Trigger { driver.rightJoystickButton && driver.xButton }
 
   val score = Trigger { driver.rightTriggerAxis > 0.5 }
   val intakeCoral = Trigger { driver.leftTriggerAxis > 0.5 }

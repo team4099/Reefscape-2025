@@ -21,7 +21,6 @@ interface RampIO {
     var statorCurrent = 0.0.amps
     var supplyCurrent = 0.0.amps
     var motorTemp = 0.0.celsius
-    var beamBroken = false
     var isSimulating = false
 
     override fun toLog(table: LogTable?) {
@@ -30,7 +29,6 @@ interface RampIO {
       table?.put("statorCurrentAmps", statorCurrent.inAmperes)
       table?.put("supplyCurrentAmps", supplyCurrent.inAmperes)
       table?.put("tempCelsius", motorTemp.inCelsius)
-      table?.put("beamBroken", beamBroken)
     }
 
     override fun fromLog(table: LogTable?) {
@@ -41,7 +39,6 @@ interface RampIO {
       table?.get("statorCurrentAmps", statorCurrent.inAmperes)?.let { statorCurrent = it.amps }
       table?.get("supplyCurrentAmps", supplyCurrent.inAmperes)?.let { supplyCurrent = it.amps }
       table?.get("tempCelsius", motorTemp.inCelsius)?.let { motorTemp = it.celsius }
-      table?.get("beamroken", beamBroken)?.let { beamBroken = it }
     }
   }
 

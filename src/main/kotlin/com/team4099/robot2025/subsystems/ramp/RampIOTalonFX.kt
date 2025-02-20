@@ -4,7 +4,6 @@ import com.ctre.phoenix6.BaseStatusSignal
 import com.ctre.phoenix6.StatusSignal
 import com.ctre.phoenix6.configs.TalonFXConfiguration
 import com.ctre.phoenix6.controls.VoltageOut
-import com.ctre.phoenix6.hardware.CANdi
 import com.ctre.phoenix6.hardware.TalonFX
 import com.ctre.phoenix6.signals.InvertedValue
 import com.ctre.phoenix6.signals.NeutralModeValue
@@ -23,7 +22,7 @@ import edu.wpi.first.units.measure.Voltage as WPILibVoltage
 
 object RampIOTalonFX : RampIO {
 
-  private val rollersTalon: TalonFX = TalonFX(Constants.Rollers.ROLLERS_MOTOR_ID)
+  private val rollersTalon: TalonFX = TalonFX(Constants.Ramp.RAMP_MOTOR_ID)
   private val rollersConfiguration: TalonFXConfiguration = TalonFXConfiguration()
 
   private val rollerSensor =
@@ -35,11 +34,8 @@ object RampIOTalonFX : RampIO {
   var rollerStatorCurrentStatusSignal: StatusSignal<WPILibCurrent>
   var rollerSupplyCurrentStatusSignal: StatusSignal<WPILibCurrent>
   var rollerTempStatusSignal: StatusSignal<WPILibTemperature>
-  var beamBreakStatusSignal: StatusSignal<Boolean>
 
   val voltageControl: VoltageOut = VoltageOut(0.volts.inVolts)
-
-  val beamBreak = CANdi(Constants.Rollers.CANDI_ID)
 
   init {
 
@@ -60,7 +56,6 @@ object RampIOTalonFX : RampIO {
     rollerStatorCurrentStatusSignal = rollersTalon.statorCurrent
     rollerSupplyCurrentStatusSignal = rollersTalon.supplyCurrent
     rollerTempStatusSignal = rollersTalon.deviceTemp
-    beamBreakStatusSignal = beamBreak.s1Closed
   }
 
   fun refreshStatusSignals() {
@@ -68,8 +63,7 @@ object RampIOTalonFX : RampIO {
       rollerAppliedVoltageStatusSignal,
       rollerStatorCurrentStatusSignal,
       rollerSupplyCurrentStatusSignal,
-      rollerTempStatusSignal,
-      beamBreakStatusSignal
+      rollerTempStatusSignal
     )
   }
 
@@ -80,7 +74,6 @@ object RampIOTalonFX : RampIO {
     inputs.statorCurrent = rollerStatorCurrentStatusSignal.valueAsDouble.amps
     inputs.supplyCurrent = rollerSupplyCurrentStatusSignal.valueAsDouble.amps
     inputs.motorTemp = rollerTempStatusSignal.valueAsDouble.celsius
-    inputs.beamBroken = beamBreakStatusSignal.value
   }
 
   override fun setVoltage(voltage: ElectricalPotential) {

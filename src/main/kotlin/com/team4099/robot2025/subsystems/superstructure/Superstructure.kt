@@ -27,6 +27,7 @@ import org.team4099.lib.geometry.Transform3d
 import org.team4099.lib.geometry.Translation3d
 import org.team4099.lib.units.base.Length
 import org.team4099.lib.units.base.inMilliseconds
+import org.team4099.lib.units.base.inSeconds
 import org.team4099.lib.units.base.inches
 import org.team4099.lib.units.base.meters
 import org.team4099.lib.units.derived.Angle
@@ -70,6 +71,9 @@ class Superstructure(
         is Request.SuperstructureRequest.ScorePrepCoral -> {
           coralScoringLevel = value.level
         }
+        is Request.SuperstructureRequest.Score -> {
+          coralScoringLevel = coralScoringLevel
+        }
         else -> {
           coralScoringLevel = CoralLevel.NONE
         }
@@ -82,6 +86,9 @@ class Superstructure(
   var isAtRequestedState: Boolean = false
 
   private var lastTransitionTime = Clock.fpgaTime
+
+  private var lastLevelScoredAt = CoralLevel.NONE
+  private var lastSpitOutTime = Clock.fpgaTime
 
   override fun periodic() {
 
@@ -123,6 +130,7 @@ class Superstructure(
     CustomLogger.recordOutput("Superstructure/currentRequest", currentRequest.javaClass.simpleName)
     CustomLogger.recordOutput("Superstructure/currentState", currentState.name)
     CustomLogger.recordOutput("Superstructure/isAtAllTargetedPositions", isAtRequestedState)
+    CustomLogger.recordOutput("Superstructure/theoreticalGamePiece", theoreticalGamePiece)
 
     val elevatorPosition = elevator.inputs.elevatorPosition
     val armAngle = arm.inputs.armPosition
@@ -231,10 +239,15 @@ class Superstructure(
         }
       }
       SuperstructureStates.IDLE -> {
-
         climber.currentRequest =
           Request.ClimberRequest.ClosedLoop(ClimberTunableValues.climbIdleAngle.get())
         ramp.currentRequest = Request.RampRequest.OpenLoop(RampTunableValues.idleVoltage.get())
+
+        // fixing elevator stalling at 0
+        if (elevator.inputs.leaderStatorCurrent > ElevatorConstants.HOMING_STALL_CURRENT
+          && elevator.elevatorPositionTarget == 0.inches) {
+          elevator.currentRequest = Request.ElevatorRequest.Home()
+        }
 
         // mechanism idle positions based on which game piece robot has
         when (theoreticalGamePiece) {
@@ -364,13 +377,7 @@ class Superstructure(
           Request.ArmRequest.ClosedLoop(ArmTunableValues.ArmAngles.intakeCoralAngle.get())
 
         if (arm.isAtTargetedPosition) {
-          elevator.currentRequest =
-            Request.ElevatorRequest.ClosedLoop(
-              ElevatorTunableValues.ElevatorHeights.intakeCoralHeight.get()
-            )
-          if (elevator.isAtTargetedPosition) {
-            nextState = SuperstructureStates.INTAKE_CORAL
-          }
+          nextState = SuperstructureStates.INTAKE_CORAL
         }
 
         if (currentRequest is Request.SuperstructureRequest.Idle) {
@@ -383,11 +390,6 @@ class Superstructure(
             Request.RampRequest.OpenLoop(RampTunableValues.intakeCoralVoltageFast.get())
           rollers.currentRequest =
             Request.RollersRequest.OpenLoop(RollersTunableValues.intakeCoralVoltageFast.get())
-        } else if (ramp.hasCoral) {
-          ramp.currentRequest =
-            Request.RampRequest.OpenLoop(RampTunableValues.intakeCoralVoltageSlow.get())
-          rollers.currentRequest =
-            Request.RollersRequest.OpenLoop(RollersTunableValues.intakeCoralVoltageSlow.get())
         } else {
           currentRequest = Request.SuperstructureRequest.Idle()
           theoreticalGamePiece = GamePiece.CORAL
@@ -402,14 +404,12 @@ class Superstructure(
           Request.ElevatorRequest.ClosedLoop(
             ElevatorTunableValues.ElevatorHeights.intakeL1Height.get()
           )
-
-        if (elevator.isAtTargetedPosition) {
-          arm.currentRequest =
-            Request.ArmRequest.ClosedLoop(ArmTunableValues.ArmAngles.intakeL1Angle.get())
-          if (arm.isAtTargetedPosition) {
-            nextState = SuperstructureStates.INTAKE_L1
-          }
+        arm.currentRequest =
+          Request.ArmRequest.ClosedLoop(ArmTunableValues.ArmAngles.intakeL1Angle.get())
+        if (arm.isAtTargetedPosition) {
+          nextState = SuperstructureStates.INTAKE_L1
         }
+
 
         if (currentRequest is Request.SuperstructureRequest.Idle) {
           nextState = SuperstructureStates.FRONT_ACTION_CLEANUP
@@ -428,38 +428,37 @@ class Superstructure(
         }
       }
       SuperstructureStates.PREP_SCORE_CORAL -> {
-        when (currentRequest) {
-          is Request.SuperstructureRequest.ScorePrepCoral -> {
-            if (coralScoringLevel != lastCoralScoringLevel) {
-              nextState = SuperstructureStates.PREP_ELEVATOR_MOVEMENT
-            } else {
-              val reefLevelElevatorHeight: Length =
-                when (coralScoringLevel) {
-                  CoralLevel.L1 -> ElevatorTunableValues.ElevatorHeights.L1Height.get()
-                  CoralLevel.L2 -> ElevatorTunableValues.ElevatorHeights.L2Height.get()
-                  CoralLevel.L3 -> ElevatorTunableValues.ElevatorHeights.L3Height.get()
-                  CoralLevel.L4 -> ElevatorTunableValues.ElevatorHeights.L4Height.get()
-                  else -> 0.0.inches
-                }
+        if (coralScoringLevel != lastCoralScoringLevel) {
+          nextState = SuperstructureStates.PREP_ELEVATOR_MOVEMENT
+        } else {
+          val reefLevelElevatorHeight: Length =
+            when (coralScoringLevel) {
+              CoralLevel.L1 -> ElevatorTunableValues.ElevatorHeights.L1Height.get()
+              CoralLevel.L2 -> ElevatorTunableValues.ElevatorHeights.L2Height.get()
+              CoralLevel.L3 -> ElevatorTunableValues.ElevatorHeights.L3Height.get()
+              CoralLevel.L4 -> ElevatorTunableValues.ElevatorHeights.L4Height.get()
+              else -> 0.0.inches
+            }
 
-              val reefLevelArmAngle: Angle =
-                when (coralScoringLevel) {
-                  CoralLevel.L1 -> ArmTunableValues.ArmAngles.scoreCoralL1Angle.get()
-                  CoralLevel.L2 -> ArmTunableValues.ArmAngles.scoreCoralL2Angle.get()
-                  CoralLevel.L3 -> ArmTunableValues.ArmAngles.scoreCoralL3Angle.get()
-                  CoralLevel.L4 -> ArmTunableValues.ArmAngles.scoreCoralL4Angle.get()
-                  else -> {
-                    0.0.degrees
-                  }
-                }
-
-              elevator.currentRequest = Request.ElevatorRequest.ClosedLoop(reefLevelElevatorHeight)
-
-              if (elevator.isAtTargetedPosition) {
-                arm.currentRequest = Request.ArmRequest.ClosedLoop(reefLevelArmAngle)
+          val reefLevelArmAngle: Angle =
+            when (coralScoringLevel) {
+              CoralLevel.L1 -> ArmTunableValues.ArmAngles.scoreCoralL1Angle.get()
+              CoralLevel.L2 -> ArmTunableValues.ArmAngles.scoreCoralL2Angle.get()
+              CoralLevel.L3 -> ArmTunableValues.ArmAngles.scoreCoralL3Angle.get()
+              CoralLevel.L4 -> ArmTunableValues.ArmAngles.scoreCoralL4Angle.get()
+              else -> {
+                0.0.degrees
               }
             }
+
+          elevator.currentRequest = Request.ElevatorRequest.ClosedLoop(reefLevelElevatorHeight)
+
+          if (elevator.isAtTargetedPosition) {
+            arm.currentRequest = Request.ArmRequest.ClosedLoop(reefLevelArmAngle)
           }
+        }
+
+        when (currentRequest) {
           is Request.SuperstructureRequest.Score -> {
             if (arm.isAtTargetedPosition && elevator.isAtTargetedPosition) {
               nextState = SuperstructureStates.SCORE_CORAL
@@ -487,8 +486,12 @@ class Superstructure(
 
         if (theoreticalGamePiece == GamePiece.CORAL) {
           arm.currentRequest = Request.ArmRequest.ClosedLoop(reefLevelArmAngle + ArmConstants.SCORE_OFFSET)
-          rollers.currentRequest =
-            Request.RollersRequest.OpenLoop(RollersTunableValues.scoreCoralVoltage.get())
+
+          if (arm.isLooselyAtTargetedPosition) {
+            rollers.currentRequest =
+              Request.RollersRequest.OpenLoop(RollersTunableValues.scoreCoralVoltage.get())
+          }
+
           if ((Clock.fpgaTime - lastTransitionTime) > RollersTunableValues.coralSpitTime.get()) {
             theoreticalGamePiece = GamePiece.NONE
             nextState = SuperstructureStates.FRONT_ACTION_CLEANUP

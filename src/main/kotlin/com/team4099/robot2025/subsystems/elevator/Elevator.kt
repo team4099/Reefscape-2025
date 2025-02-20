@@ -87,7 +87,9 @@ class Elevator(val io: ElevatorIO) : SubsystemBase() {
     )
 
     io.configFF(
-      ElevatorTunableValues.kGDefault.get(),
+      ElevatorTunableValues.kGFirst.get(),
+      ElevatorTunableValues.kGSecond.get(),
+      ElevatorTunableValues.kGThird.get(),
       ElevatorTunableValues.kS.get(),
       ElevatorTunableValues.kV.get(),
       ElevatorTunableValues.kA.get()
@@ -114,7 +116,9 @@ class Elevator(val io: ElevatorIO) : SubsystemBase() {
       ElevatorTunableValues.kA.hasChanged()
     ) {
       io.configFF(
-        ElevatorTunableValues.kGDefault.get(),
+        ElevatorTunableValues.kGFirst.get(),
+        ElevatorTunableValues.kGSecond.get(),
+        ElevatorTunableValues.kGThird.get(),
         ElevatorTunableValues.kS.get(),
         ElevatorTunableValues.kV.get(),
         ElevatorTunableValues.kA.get()
@@ -124,7 +128,7 @@ class Elevator(val io: ElevatorIO) : SubsystemBase() {
     CustomLogger.processInputs("Elevator", inputs)
 
     CustomLogger.recordOutput(
-      "Elevator/elevatorHeight",
+      "Elevator/elevatorHeightWithGroundOffset",
       (inputs.elevatorPosition + ElevatorConstants.ELEVATOR_GROUND_OFFSET).inInches
     )
 

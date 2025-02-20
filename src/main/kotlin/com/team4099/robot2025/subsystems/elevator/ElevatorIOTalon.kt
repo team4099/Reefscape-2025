@@ -50,6 +50,8 @@ object ElevatorIOTalon : ElevatorIO {
 
   private val configs: TalonFXConfiguration = TalonFXConfiguration()
   private var slot0Configs = configs.Slot0
+  private var slot1Configs = configs.Slot1
+  private var slot2Configs = configs.Slot2
 
   private val voltageControl: VoltageOut = VoltageOut(-1337.volts.inVolts)
   private val motionMagicControl: MotionMagicVoltage = MotionMagicVoltage(-1337.inches.inInches)
@@ -191,41 +193,67 @@ object ElevatorIOTalon : ElevatorIO {
     slot0Configs.kI = kI.inVoltsPerInchSeconds
     slot0Configs.kD = kD.inVoltsPerInchPerSecond
 
+    slot1Configs.kP = kP.inVoltsPerInch
+    slot1Configs.kI = kI.inVoltsPerInchSeconds
+    slot1Configs.kD = kD.inVoltsPerInchPerSecond
+
+    slot2Configs.kP = kP.inVoltsPerInch
+    slot2Configs.kI = kI.inVoltsPerInchSeconds
+    slot2Configs.kD = kD.inVoltsPerInchPerSecond
+
     leaderTalon.configurator.apply(slot0Configs)
     followerTalon.configurator.apply(slot0Configs)
+    leaderTalon.configurator.apply(slot1Configs)
+    followerTalon.configurator.apply(slot1Configs)
+    leaderTalon.configurator.apply(slot2Configs)
+    followerTalon.configurator.apply(slot2Configs)
   }
 
   override fun configFF(
-    kG: ElectricalPotential,
+    kGFirstStage: ElectricalPotential,
+    kGSecondStage: ElectricalPotential,
+    kGThirdStage: ElectricalPotential,
     kS: StaticFeedforward<Volt>,
     kV: VelocityFeedforward<Meter, Volt>,
     kA: AccelerationFeedforward<Meter, Volt>
   ) {
-    slot0Configs.kG = kG.inVolts
+    slot0Configs.kG = kGFirstStage.inVolts
     slot0Configs.kS = kS.inVolts
     slot0Configs.kV = kV.inVoltsPerInchPerSecond
     slot0Configs.kA = kA.inVoltsPerMetersPerSecondPerSecond
     slot0Configs.GravityType = GravityTypeValue.Elevator_Static
+
+    slot1Configs.kG = kGSecondStage.inVolts
+    slot1Configs.kS = kS.inVolts
+    slot1Configs.kV = kV.inVoltsPerInchPerSecond
+    slot1Configs.kA = kA.inVoltsPerMetersPerSecondPerSecond
+    slot1Configs.GravityType = GravityTypeValue.Elevator_Static
+
+    slot2Configs.kG = kGThirdStage.inVolts
+    slot2Configs.kS = kS.inVolts
+    slot2Configs.kV = kV.inVoltsPerInchPerSecond
+    slot2Configs.kA = kA.inVoltsPerMetersPerSecondPerSecond
+    slot2Configs.GravityType = GravityTypeValue.Elevator_Static
+
 
     leaderTalon.configurator.apply(slot0Configs)
     followerTalon.configurator.apply(slot0Configs)
   }
 
   override fun setPosition(position: Length) {
-
-    val feedforward: ElectricalPotential =
+    val slotUsed =
       if (leaderSensor.position > ElevatorConstants.SECOND_STAGE_HEIGHT) {
-        ElevatorConstants.PID.KG_THIRD_STAGE
+        2
       } else if (leaderSensor.position > ElevatorConstants.FIRST_STAGE_HEIGHT) {
-        ElevatorConstants.PID.KG_SECOND_STAGE
+        1
       } else {
-        ElevatorConstants.PID.KG_FIRST_STAGE
+        0
       }
 
     leaderTalon.setControl(
       motionMagicControl
         .withPosition(leaderSensor.positionToRawUnits(position))
-        .withFeedForward(feedforward.inVolts)
+        .withSlot(slotUsed)
     )
   }
 

@@ -4,7 +4,6 @@ import com.ctre.phoenix6.BaseStatusSignal
 import com.ctre.phoenix6.StatusSignal
 import com.ctre.phoenix6.configs.TalonFXConfiguration
 import com.ctre.phoenix6.controls.VoltageOut
-import com.ctre.phoenix6.hardware.CANdi
 import com.ctre.phoenix6.hardware.TalonFX
 import com.ctre.phoenix6.signals.InvertedValue
 import com.ctre.phoenix6.signals.NeutralModeValue
@@ -35,11 +34,11 @@ object RollersIOTalonFX : RollersIO {
   var rollerStatorCurrentStatusSignal: StatusSignal<WPILibCurrent>
   var rollerSupplyCurrentStatusSignal: StatusSignal<WPILibCurrent>
   var rollerTempStatusSignal: StatusSignal<WPILibTemperature>
-  var beamBreakStatusSignal: StatusSignal<Boolean>
+  // var beamBreakStatusSignal: StatusSignal<Boolean>
 
   val voltageControl: VoltageOut = VoltageOut(0.volts.inVolts)
 
-  val beamBreak = CANdi(Constants.Rollers.CANDI_ID)
+//  val beamBreak = CANdi(Constants.Rollers.CANDI_ID)
 
   init {
 
@@ -50,7 +49,7 @@ object RollersIOTalonFX : RollersIO {
       RollersConstants.SUPPLY_CURRENT_LIMIT.inAmperes
     rollersConfiguration.CurrentLimits.StatorCurrentLimitEnable = true
     rollersConfiguration.CurrentLimits.SupplyCurrentLimitEnable = true
-    rollersConfiguration.MotorOutput.Inverted = InvertedValue.Clockwise_Positive
+    rollersConfiguration.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive
     rollersConfiguration.MotorOutput.NeutralMode = NeutralModeValue.Coast
 
     rollersTalon.configurator.apply(rollersConfiguration)
@@ -60,7 +59,7 @@ object RollersIOTalonFX : RollersIO {
     rollerStatorCurrentStatusSignal = rollersTalon.statorCurrent
     rollerSupplyCurrentStatusSignal = rollersTalon.supplyCurrent
     rollerTempStatusSignal = rollersTalon.deviceTemp
-    beamBreakStatusSignal = beamBreak.s1Closed
+    // beamBreakStatusSignal = beamBreak.s1Closed
   }
 
   fun refreshStatusSignals() {
@@ -69,7 +68,7 @@ object RollersIOTalonFX : RollersIO {
       rollerStatorCurrentStatusSignal,
       rollerSupplyCurrentStatusSignal,
       rollerTempStatusSignal,
-      beamBreakStatusSignal
+      // beamBreakStatusSignal
     )
   }
 
@@ -80,7 +79,7 @@ object RollersIOTalonFX : RollersIO {
     inputs.rollerStatorCurrent = rollerStatorCurrentStatusSignal.valueAsDouble.amps
     inputs.rollerSupplyCurrent = rollerSupplyCurrentStatusSignal.valueAsDouble.amps
     inputs.rollerTemp = rollerTempStatusSignal.valueAsDouble.celsius
-    inputs.beamBroken = beamBreakStatusSignal.value
+    // inputs.beamBroken = beamBreakStatusSignal.value
   }
 
   override fun setVoltage(voltage: ElectricalPotential) {

@@ -63,7 +63,7 @@ class SwerveModuleIOSim(override val label: String) : SwerveModuleIO {
       LinearSystemId.createFlywheelSystem(
         DCMotor.getFalcon500(1),
         DrivetrainConstants.STEERING_WHEEL_INERTIA.inKilogramsMeterSquared,
-        1 / DrivetrainConstants.STEERING_SENSOR_GEAR_RATIO
+        1 / DrivetrainConstants.MK4I_STEERING_SENSOR_GEAR_RATIO
       ),
       DCMotor.getFalcon500(1)
     )
@@ -137,15 +137,15 @@ class SwerveModuleIOSim(override val label: String) : SwerveModuleIO {
     // pi * d * rotations = distance travelled
     inputs.drivePosition =
       inputs.drivePosition +
-      DrivetrainConstants.WHEEL_DIAMETER *
-      Math.PI *
-      (
-        driveMotorSim.angularVelocityRadPerSec *
-          Constants.Universal.LOOP_PERIOD_TIME.inSeconds
-        )
-        .radians
-        .inRotations +
-      loopCycleDrift // adding a random amount of drift
+              DrivetrainConstants.WHEEL_DIAMETER *
+              Math.PI *
+              (
+                      driveMotorSim.angularVelocityRadPerSec *
+                              Constants.Universal.LOOP_PERIOD_TIME.inSeconds
+                      )
+                .radians
+                .inRotations +
+              loopCycleDrift // adding a random amount of drift
     inputs.steeringPosition = turnAbsolutePosition
     inputs.drift = drift
 
