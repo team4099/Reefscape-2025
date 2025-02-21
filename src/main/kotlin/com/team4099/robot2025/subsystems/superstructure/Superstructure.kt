@@ -418,6 +418,7 @@ class Superstructure(
       SuperstructureStates.INTAKE_L1 -> {
         rollers.currentRequest =
           Request.RollersRequest.OpenLoop(RollersTunableValues.intakeL1Voltage.get())
+
         if (rollers.hasCoralHorizontal) {
           theoreticalGamePiece = GamePiece.CORAL_L1
           nextState = SuperstructureStates.FRONT_ACTION_CLEANUP

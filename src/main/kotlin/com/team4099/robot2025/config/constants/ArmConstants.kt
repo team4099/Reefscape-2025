@@ -31,13 +31,14 @@ object ArmConstants {
   val SAFE_ELEVATOR_FRONT_ANGLE = 100.degrees
   val SAFE_ELEVATOR_BACK_ANGLE = 90.degrees
 
-  val INTAKE_CORAL_ANGLE = -2.degrees // hotfix for now until encoder
+  val INTAKE_CORAL_ANGLE = -10.degrees
+  // hotfix for now until encoder
   val INTAKE_L1_ANGLE = 115.degrees
-  val INTAKE_ALGAE_GROUND_ANGLE = -15.0.degrees
+  val INTAKE_ALGAE_GROUND_ANGLE = 205.degrees
   val INTAKE_ALGAE_L2_ANGLE = 60.0.degrees
   val INTAKE_ALGAE_L3_ANGLE = 60.0.degrees
 
-  val SCORE_CORAL_L1_ANGLE = 150.degrees
+  val SCORE_CORAL_L1_ANGLE = 165.degrees
   val SCORE_CORAL_L2_ANGLE = 100.degrees
   val SCORE_CORAL_L3_ANGLE = 100.degrees
   val SCORE_CORAL_L4_ANGLE = 100.degrees

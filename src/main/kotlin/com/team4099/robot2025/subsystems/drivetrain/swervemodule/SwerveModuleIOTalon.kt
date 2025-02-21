@@ -290,7 +290,9 @@ class SwerveModuleIOTalon(
 
   override fun zeroSteering(isInAutonomous: Boolean) {
     steeringFalcon.setPosition(
-      0.0
+      steeringSensor.positionToRawUnits(
+        (2 * PI).radians - (potentiometerOutput.radians - zeroOffset)
+      )
     )
 
     drivePositionQueue.clear()

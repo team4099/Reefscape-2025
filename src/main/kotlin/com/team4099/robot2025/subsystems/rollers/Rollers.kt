@@ -40,15 +40,14 @@ class Rollers(val io: RollersIO) {
 
   val hasCoralHorizontal: Boolean
     get() {
-      return inputs.rollerStatorCurrent > RollersConstants.CORAL_CURRENT_THRESHOLD &&
-        !inputs.rollerAppliedVoltage.epsilonEquals(RollersConstants.SCORE_CORAL_L1_VOLTAGE) &&// make sure score & intake are not the same voltage
+      return inputs.rollerStatorCurrent > RollersConstants.CORAL_HORIZONTAL_CURRENT_THRESHOLD &&
+        inputs.rollerAppliedVoltage.sign < 0 &&
         (Clock.fpgaTime - lastRollerRunTime) >= RollersConstants.CORAL_HORIZONTAL_DETECTION_TIME_THRESHOLD
     }
 
   val hasAlgae: Boolean
     get() {
-      return inputs.rollerVelocity.absoluteValue <= RollersConstants.ALGAE_VELOCITY_THRESHOLD &&
-        inputs.rollerStatorCurrent > RollersConstants.ALGAE_CURRENT_THRESHOLD &&
+      return inputs.rollerStatorCurrent > RollersConstants.ALGAE_CURRENT_THRESHOLD &&
         inputs.rollerAppliedVoltage.sign < 0 &&
         (Clock.fpgaTime - lastRollerRunTime) >= RollersConstants.ALGAE_DETECTION_TIME_THRESHOLD
     }

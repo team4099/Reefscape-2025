@@ -25,6 +25,7 @@ import com.team4099.robot2025.subsystems.elevator.ElevatorIOTalon
 import com.team4099.robot2025.subsystems.limelight.LimelightVision
 import com.team4099.robot2025.subsystems.limelight.LimelightVisionIO
 import com.team4099.robot2025.subsystems.rollers.Ramp
+import com.team4099.robot2025.subsystems.rollers.RampIO
 import com.team4099.robot2025.subsystems.rollers.RampIOSim
 import com.team4099.robot2025.subsystems.rollers.RampIOTalonFX
 import com.team4099.robot2025.subsystems.rollers.Rollers
@@ -56,11 +57,11 @@ object RobotContainer {
 
       drivetrain = Drivetrain(GyroIOPigeon2, DrivetrainIOReal)
       limelight = LimelightVision(object : LimelightVisionIO {})
-      arm = Arm(object : ArmIO {})
+      arm = Arm(ArmIOTalonFX)
       climber = Climber(object : ClimberIO {})
-      elevator = Elevator(object : ElevatorIO {})
+      elevator = Elevator(ElevatorIOTalon)
       rollers = Rollers(RollersIOTalonFX)
-      ramp = Ramp(RampIOTalonFX)
+      ramp = Ramp(object : RampIO {})
     } else {
       // Simulation implementations
       drivetrain = Drivetrain(object : GyroIO {}, DrivetrainIOSim)
@@ -86,7 +87,7 @@ object RobotContainer {
         { ControlBoard.strafe.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
         { ControlBoard.turn.smoothDeadband(Constants.Joysticks.TURN_DEADBAND) },
         { ControlBoard.slowMode },
-        drivetrain
+        drivetrain,
       )
     /*
     module steeing tuning

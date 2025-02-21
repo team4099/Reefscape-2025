@@ -63,9 +63,9 @@ object ElevatorConstants {
 
   // TODO: adjust scoring/intaking heights for end-effector offset
   val L1_HEIGHT = 0.0.inches
-  val L2_HEIGHT = 13.039.inches
-  val L3_HEIGHT = 28.789.inches
-  val L4_HEIGHT = 64.138.inches
+  val L2_HEIGHT = 13.039.inches - 4.inches
+  val L3_HEIGHT = 28.789.inches - 4.inches
+  val L4_HEIGHT = 60.inches
 
   val EJECT_HEIGHT = 0.0.inches
 
