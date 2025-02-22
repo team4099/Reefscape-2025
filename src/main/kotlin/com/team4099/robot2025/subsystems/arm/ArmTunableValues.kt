@@ -102,10 +102,17 @@ object ArmTunableValues {
         Pair({ it.inDegrees }, { it.degrees })
       )
 
-    val scoreCoralL1Angle =
+    val scoreCoralL1HorizontalAngle =
       LoggedTunableValue(
-        "Arm/scoreCoralL1Angle",
-        ArmConstants.SCORE_CORAL_L1_ANGLE,
+        "Arm/scoreCoralL1HorizontalAngle",
+        ArmConstants.SCORE_CORAL_L1_HORIZONTAL_ANGLE,
+        Pair({ it.inDegrees }, { it.degrees })
+      )
+
+    val scoreCoralL1VerticalAngle =
+      LoggedTunableValue(
+        "Arm/scoreCoralL1VerticalAngle",
+        ArmConstants.SCORE_CORAL_L1_VERTICAL_ANGLE,
         Pair({ it.inDegrees }, { it.degrees })
       )
 

@@ -14,8 +14,9 @@ object RampConstants {
   val STATOR_CURRENT_LIMIT = 40.0.amps
   val SUPPLY_CURRENT_LIMIT = 60.0.amps
 
-  val INTAKE_CORAL_VOLTAGE_FAST = -6.volts
-  val INTAKE_CORAL_VOLTAGE_SLOW =-3.volts
+  val CORAL_CURRENT_THRESHOLD = 40.0.amps
+  val INTAKE_CORAL_VOLTAGE_FAST = -5.volts
+  val INTAKE_CORAL_VOLTAGE_SLOW = -5.volts
   val IDLE_VOLTAGE = 0.0.volts
 
   val INVERSION_VALUE: InvertedValue = InvertedValue.Clockwise_Positive

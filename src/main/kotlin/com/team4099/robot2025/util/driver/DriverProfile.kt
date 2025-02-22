@@ -9,7 +9,8 @@ import kotlin.math.pow
 import kotlin.math.sign
 
 abstract class DriverProfile(
-  private val invertDrive: Boolean,
+  private
+  val invertDrive: Boolean,
   private val invertRotation: Boolean,
   private val sensitivityDrivePowerConstant: Int,
   private val sensitivityRotationPowerConstant: Int,

@@ -235,7 +235,6 @@ object ElevatorIOTalon : ElevatorIO {
     slot2Configs.kA = kA.inVoltsPerMetersPerSecondPerSecond
     slot2Configs.GravityType = GravityTypeValue.Elevator_Static
 
-
     leaderTalon.configurator.apply(slot0Configs)
     followerTalon.configurator.apply(slot0Configs)
   }

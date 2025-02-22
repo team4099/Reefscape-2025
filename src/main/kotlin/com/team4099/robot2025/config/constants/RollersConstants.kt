@@ -19,7 +19,7 @@ object RollersConstants {
   val INTAKE_VOLTAGE = 0.0.volts
 
   val IDLE_VOLTAGE = 0.0.volts
-  val IDLE_CORAL_VOLTAGE = 0.0.volts
+  val IDLE_CORAL_VOLTAGE = 0.25.volts
   val IDLE_CORAL_L1_VOLTAGE = 0.0.volts
   val IDLE_ALGAE_VOLTAGE = 0.0.volts
   val INTAKE_ALGAE_VOLTAGE = 6.0.volts
@@ -36,7 +36,7 @@ object RollersConstants {
 
   val CORAL_VELOCITY_THRESHOLD = 0.0.rotations.perSecond
   val CORAL_CURRENT_THRESHOLD = 35.0.amps
-  val CORAL_HORIZONTAL_CURRENT_THRESHOLD = 25.amps
+  val CORAL_HORIZONTAL_CURRENT_THRESHOLD = 30.amps
   val ALGAE_VELOCITY_THRESHOLD = 0.0.rotations.perSecond
   val ALGAE_CURRENT_THRESHOLD = 35.0.amps
 

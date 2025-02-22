@@ -48,9 +48,9 @@ class Arm(private val io: ArmIO) {
     get() =
       (
         currentState == ArmState.CLOSED_LOOP &&
-                (inputs.armPosition - armTargetPosition).absoluteValue <= ArmConstants.LOOSE_ARM_TOLERANCE
+          (inputs.armPosition - armTargetPosition).absoluteValue <=
+          ArmConstants.LOOSE_ARM_TOLERANCE
         )
-
 
   init {
     // Initialize Arm Tunable Values

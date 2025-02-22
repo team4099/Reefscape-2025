@@ -38,7 +38,8 @@ object ArmConstants {
   val INTAKE_ALGAE_L2_ANGLE = 60.0.degrees
   val INTAKE_ALGAE_L3_ANGLE = 60.0.degrees
 
-  val SCORE_CORAL_L1_ANGLE = 165.degrees
+  val SCORE_CORAL_L1_HORIZONTAL_ANGLE = 170.degrees
+  val SCORE_CORAL_L1_VERTICAL_ANGLE = 120.degrees
   val SCORE_CORAL_L2_ANGLE = 100.degrees
   val SCORE_CORAL_L3_ANGLE = 100.degrees
   val SCORE_CORAL_L4_ANGLE = 100.degrees
@@ -63,8 +64,8 @@ object ArmConstants {
   val INVERSION_VALUE: InvertedValue = InvertedValue.CounterClockwise_Positive
   val NEUTRAL_MODE_VALUE: NeutralModeValue = NeutralModeValue.Coast
 
-  val MOTION_MAGIC_ACCELERATION = (200 / 1.2).degrees.perSecond.perSecond
-  val MOTION_MAGIC_CRUISE_VELOCITY = 200.degrees.perSecond
+  val MOTION_MAGIC_ACCELERATION = 400.degrees.perSecond.perSecond
+  val MOTION_MAGIC_CRUISE_VELOCITY = 500.degrees.perSecond
 
   val SIM_VELOCITY = 400.degrees.perSecond
   val SIM_ACCELERATION = 400.degrees.perSecond.perSecond
@@ -87,8 +88,8 @@ object ArmConstants {
     val SIM_ARM_KI: IntegralGain<Radian, Volt> = 0.01.volts / (1.0.degrees * 1.0.seconds)
     val SIM_ARM_KD: DerivativeGain<Radian, Volt> = 0.004.volts / 1.0.degrees.perSecond
 
-    val REAL_ARM_KP: ProportionalGain<Radian, Volt> = 6.0.volts / 1.0.degrees
+    val REAL_ARM_KP: ProportionalGain<Radian, Volt> = 7.volts / 1.0.degrees
     val REAL_ARM_KI: IntegralGain<Radian, Volt> = 0.0.volts / (1.0.degrees * 1.0.seconds)
-    val REAL_ARM_KD: DerivativeGain<Radian, Volt> = 0.2.volts / 1.0.degrees.perSecond
+    val REAL_ARM_KD: DerivativeGain<Radian, Volt> = 0.3.volts / 1.0.degrees.perSecond
   }
 }

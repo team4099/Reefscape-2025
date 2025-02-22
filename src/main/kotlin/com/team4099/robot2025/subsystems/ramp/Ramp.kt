@@ -31,12 +31,11 @@ class Ramp(val io: RampIO) {
   val hasCoral: Boolean
     get() {
       return (
-          inputs.statorCurrent > RollersConstants.CORAL_CURRENT_THRESHOLD &&
+        inputs.statorCurrent > RampConstants.CORAL_CURRENT_THRESHOLD &&
           inputs.appliedVoltage.sign < 0 &&
           (Clock.fpgaTime - lastRollerRunTime) >= RollersConstants.CORAL_DETECTION_TIME_THRESHOLD
         )
     }
-
 
   var debounceFilter = Debouncer(RampConstants.BEAM_BREAK_FILTER_TIME.inSeconds)
 
@@ -47,7 +46,7 @@ class Ramp(val io: RampIO) {
     CustomLogger.processInputs("Ramp", inputs)
     CustomLogger.recordOutput("Ramp/currentState", currentState.toString())
 
-//    hasCoral = debounceFilter.calculate(inputs.beamBroken)
+    //    hasCoral = debounceFilter.calculate(inputs.beamBroken)
 
     var nextState = currentState
     CustomLogger.recordOutput("Ramp/nextState", nextState.toString())

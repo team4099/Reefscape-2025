@@ -5,7 +5,6 @@ import com.team4099.robot2025.config.constants.RollersConstants
 import com.team4099.robot2025.subsystems.superstructure.Request
 import com.team4099.robot2025.util.CustomLogger
 import edu.wpi.first.math.filter.Debouncer
-import org.littletonrobotics.junction.Logger
 import org.team4099.lib.units.base.inSeconds
 import org.team4099.lib.units.derived.ElectricalPotential
 import org.team4099.lib.units.derived.inVolts
@@ -34,15 +33,19 @@ class Rollers(val io: RollersIO) {
   val hasCoralVertical: Boolean
     get() {
       return inputs.rollerStatorCurrent > RollersConstants.CORAL_CURRENT_THRESHOLD &&
-          !inputs.rollerAppliedVoltage.epsilonEquals(RollersConstants.SCORE_CORAL_VOLTAGE) && // make sure score & intake are not the same voltage
-          (Clock.fpgaTime - lastRollerRunTime) >= RollersConstants.CORAL_DETECTION_TIME_THRESHOLD
+        !inputs.rollerAppliedVoltage.epsilonEquals(
+          RollersConstants
+            .SCORE_CORAL_VOLTAGE
+        ) && // make sure score & intake are not the same voltage
+        (Clock.fpgaTime - lastRollerRunTime) >= RollersConstants.CORAL_DETECTION_TIME_THRESHOLD
     }
 
   val hasCoralHorizontal: Boolean
     get() {
       return inputs.rollerStatorCurrent > RollersConstants.CORAL_HORIZONTAL_CURRENT_THRESHOLD &&
         inputs.rollerAppliedVoltage.sign < 0 &&
-        (Clock.fpgaTime - lastRollerRunTime) >= RollersConstants.CORAL_HORIZONTAL_DETECTION_TIME_THRESHOLD
+        (Clock.fpgaTime - lastRollerRunTime) >=
+        RollersConstants.CORAL_HORIZONTAL_DETECTION_TIME_THRESHOLD
     }
 
   val hasAlgae: Boolean
@@ -59,7 +62,7 @@ class Rollers(val io: RollersIO) {
     CustomLogger.processInputs("Rollers", inputs)
     CustomLogger.recordOutput("Rollers/currentState", currentState.toString())
 
-//    hasCoralVertical = debounceFilter.calculate(inputs.beamBroken)
+    //    hasCoralVertical = debounceFilter.calculate(inputs.beamBroken)
 
     var nextState = currentState
     CustomLogger.recordOutput("Rollers/nextState", nextState.toString())
