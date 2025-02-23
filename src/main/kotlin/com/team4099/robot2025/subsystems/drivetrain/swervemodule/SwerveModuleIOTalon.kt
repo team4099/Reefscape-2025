@@ -91,6 +91,8 @@ class SwerveModuleIOTalon(
   val steeringTempSignal: StatusSignal<Temperature>
   val drivePositionQueue: Queue<Double>
   val steeringPositionQueue: Queue<Double>
+  val driveVelocity: StatusSignal<edu.wpi.first.units.measure.AngularVelocity>
+  val driveAcceleration: StatusSignal<edu.wpi.first.units.measure.AngularAcceleration>
 
   init {
     driveFalcon.configurator.apply(TalonFXConfiguration())
@@ -156,6 +158,8 @@ class SwerveModuleIOTalon(
     driveTempSignal = driveFalcon.deviceTemp
     steeringTempSignal = steeringFalcon.deviceTemp
     steeringPosition = steeringFalcon.position
+    driveVelocity = driveFalcon.velocity
+    driveAcceleration = driveFalcon.acceleration
 
     drivePositionQueue =
       PhoenixOdometryThread.getInstance().registerSignal(driveFalcon, driveFalcon.position)
@@ -172,7 +176,9 @@ class SwerveModuleIOTalon(
       steeringStatorCurrentSignal,
       driveTempSignal,
       steeringTempSignal,
-      steeringPosition
+      steeringPosition,
+      driveVelocity,
+      driveAcceleration
     )
   }
 

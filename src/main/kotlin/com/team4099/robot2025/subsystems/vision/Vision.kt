@@ -105,9 +105,9 @@ class Vision(vararg cameras: CameraIO) : SubsystemBase() {
 
               val aprilTagAlignmentAngle =
                 if (FMSData.isBlue) {
-                  VisionConstants.BLUE_REEF_TAG_GYRO_ALIGNMENTS[tag.fiducialId]
+                  VisionConstants.BLUE_REEF_TAG_THETA_ALIGNMENTS[tag.fiducialId]
                 } else {
-                  VisionConstants.RED_REEF_TAG_GYRO_ALIGNMENTS[tag.fiducialId]
+                  VisionConstants.RED_REEF_TAG_THETA_ALIGNMENTS[tag.fiducialId]
                 }
 
               /*

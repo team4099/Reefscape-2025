@@ -39,7 +39,7 @@ object ControlBoard {
     }
 
   val slowMode: Boolean
-    get() = driver.leftShoulderButton || driver.rightShoulderButton
+    get() = driver.rightJoystickButton && driver.leftShoulderButton
 
   val resetGyro = Trigger { driver.startButton && driver.selectButton }
   val forceIdle = Trigger { driver.dPadDown }
@@ -62,14 +62,15 @@ object ControlBoard {
   val prepL3 = Trigger { !driver.rightJoystickButton && driver.bButton }
   val prepL4 = Trigger { !driver.rightJoystickButton && driver.yButton }
 
-  val intakeAlgaeGround = Trigger { driver.rightJoystickButton && driver.aButton }
-  val intakeAlgaeL2 = Trigger { driver.rightJoystickButton && driver.bButton }
-    val intakeAlgaeL3 = Trigger { driver.rightJoystickButton && driver.yButton }
-    val prepAlgaeBarge = Trigger { driver.rightJoystickButton && driver.xButton }
+  val intakeAlgaeGround = Trigger { driver.rightJoystickButton && driver.xButton }
+  val intakeAlgaeL2 = Trigger { driver.rightJoystickButton && driver.aButton }
+    val intakeAlgaeL3 = Trigger { driver.rightJoystickButton && driver.bButton }
+    val prepAlgaeBarge = Trigger { driver.rightJoystickButton && driver.yButton }
 
   val score = Trigger { driver.rightTriggerAxis > 0.5 }
   val intakeCoral = Trigger { driver.leftTriggerAxis > 0.5 }
 
-  val alignLeft = Trigger { driver.leftShoulderButton }
-  val alignRight = Trigger { driver.rightShoulderButton }
+  val alignLeft = Trigger { driver.leftShoulderButton && !driver.rightShoulderButton && !driver.rightJoystickButton }
+  val alignRight = Trigger { driver.rightShoulderButton && !driver.leftShoulderButton }
+  val alignAlgae = Trigger { driver.leftShoulderButton && driver.rightShoulderButton && !driver.rightJoystickButton}
 }

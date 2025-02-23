@@ -52,11 +52,12 @@ object ElevatorConstants {
   val INTAKE_CORAL_HEIGHT = 2.inches
   val INTAKE_L1_HEIGHT = 4.28.inches
 
-  val PASS_THROUGH_HEIGHT = 0.inches
+     val PASS_THROUGH_HEIGHT = 0.inches
 
   val INTAKE_ALGAE_GROUND_HEIGHT = 0.0.inches
-  val INTAKE_ALGAE_L2_HEIGHT = 20.0.inches
-  val INTAKE_ALGAE_L3_HEIGHT = 30.0.inches
+  val INTAKE_ALGAE_L2_HEIGHT = 4.inches
+  val INTAKE_ALGAE_L3_HEIGHT = 18.inches
+
 
   val SCORE_PROCESSOR_HEIGHT = 0.0.inches
   val SCORE_BARGE_HEIGHT = 60.inches
@@ -66,7 +67,7 @@ object ElevatorConstants {
   val L1_VERTICAL_HEIGHT = 0.0.inches
   val L2_HEIGHT = 13.039.inches - 4.inches
   val L3_HEIGHT = 28.789.inches - 4.inches
-  val L4_HEIGHT = 60.inches
+  val L4_HEIGHT = 49.5.inches
 
   val EJECT_HEIGHT = 0.0.inches
 
@@ -84,6 +85,7 @@ object ElevatorConstants {
 
     val SIM_KP = 5.volts / 1.inches
     val SIM_KI = 0.0.volts / (1.inches * 1.seconds)
+
     val SIM_KD = 0.0.volts / (1.inches.perSecond)
 
     val KS = 0.1.volts

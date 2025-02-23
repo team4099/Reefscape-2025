@@ -1,6 +1,7 @@
 package com.team4099.robot2025.commands.drivetrain
 
 import com.team4099.lib.logging.LoggedTunableValue
+import com.team4099.robot2025.config.constants.Constants
 import com.team4099.robot2025.config.constants.DrivetrainConstants
 import com.team4099.robot2025.subsystems.drivetrain.drive.Drivetrain
 import com.team4099.robot2025.subsystems.superstructure.Request
@@ -16,6 +17,7 @@ import org.team4099.lib.units.Velocity
 import org.team4099.lib.units.base.Length
 import org.team4099.lib.units.base.Meter
 import org.team4099.lib.units.base.inMeters
+import org.team4099.lib.units.base.inches
 import org.team4099.lib.units.base.meters
 import org.team4099.lib.units.derived.Radian
 import org.team4099.lib.units.derived.degrees
@@ -52,6 +54,7 @@ class TargetTagCommand(
 
   private var thetaPID: PIDController<Radian, Velocity<Radian>>
   private var yPID: PIDController<Meter, Velocity<Meter>>
+  private var xPID: PIDController<Meter, Velocity<Meter>>
 
   val thetakP =
     LoggedTunableValue(
@@ -103,6 +106,7 @@ class TargetTagCommand(
       )
 
     yPID = PIDController(ykP.get(), ykI.get(), ykD.get())
+    xPID = PIDController(ykP.get(), ykI.get(), ykD.get())
 
     if (!(RobotBase.isSimulation())) {
 
@@ -127,10 +131,18 @@ class TargetTagCommand(
           DrivetrainConstants.PID.TELEOP_Y_PID_KI,
           DrivetrainConstants.PID.TELEOP_Y_PID_KD
         )
+
+      xPID =
+        PIDController(
+          DrivetrainConstants.PID.TELEOP_Y_PID_KP,
+          DrivetrainConstants.PID.TELEOP_Y_PID_KI,
+          DrivetrainConstants.PID.TELEOP_Y_PID_KD
+        )
     } else {
       thetakP.initDefault(DrivetrainConstants.PID.SIM_AUTO_THETA_PID_KP)
       thetakI.initDefault(DrivetrainConstants.PID.SIM_AUTO_THETA_PID_KI)
       thetakD.initDefault(DrivetrainConstants.PID.SIM_AUTO_THETA_PID_KD)
+
 
       thetaPID =
         PIDController(
@@ -149,14 +161,26 @@ class TargetTagCommand(
           DrivetrainConstants.PID.SIM_TELEOP_Y_PID_KI,
           DrivetrainConstants.PID.SIM_TELEOP_Y_PID_KD
         )
+
+      xPID =
+        PIDController(
+          DrivetrainConstants.PID.SIM_TELEOP_Y_PID_KP,
+          DrivetrainConstants.PID.SIM_TELEOP_Y_PID_KI,
+          DrivetrainConstants.PID.SIM_TELEOP_Y_PID_KD
+        )
     }
 
     thetaPID.enableContinuousInput(-PI.radians, PI.radians)
   }
 
+  fun isAtSepoint(): Boolean {
+    return (thetaPID.error < 3.degrees && yPID.error < 2.inches && xPID.error < 4.inches)
+  }
+
   override fun initialize() {
     thetaPID.reset() // maybe do first for x?
     yPID.reset()
+    xPID.reset()
 
     if (thetakP.hasChanged() || thetakI.hasChanged() || thetakD.hasChanged()) {
       thetaPID = PIDController(thetakP.get(), thetakI.get(), thetakD.get())
@@ -164,6 +188,7 @@ class TargetTagCommand(
 
     if (ykP.hasChanged() || ykI.hasChanged() || ykD.hasChanged()) {
       yPID = PIDController(ykP.get(), ykI.get(), ykD.get())
+      xPID = PIDController(ykP.get(), ykI.get(), ykD.get())
     }
   }
 
@@ -182,7 +207,7 @@ class TargetTagCommand(
       CustomLogger.recordDebugOutput(
         "Testing/CurrentDrivetrainRotation", drivetrain.odomTRobot.rotation.inDegrees
       )
-      CustomLogger.recordDebugOutput("Testing/thetaError", thetaPID.error.inDegrees)
+      CustomLogger.recordOutput("TargetTag/thetaError", thetaPID.error.inDegrees)
       CustomLogger.recordDebugOutput("Testing/thetaFeedback", thetaFeedback.inDegreesPerSecond)
 
 
@@ -196,6 +221,10 @@ class TargetTagCommand(
       } else {
 
         var yFeedback = yPID.calculate(-visionData.robotTReefTag.translation.y, yTargetOffset)
+        var xFeedBack = xPID.calculate(-visionData.robotTReefTag.translation.x, -(19.5).inches)
+
+        CustomLogger.recordOutput("TargetTag/xError", thetaPID.error.inDegrees)
+        CustomLogger.recordOutput("TargetTag/yError", thetaPID.error.inDegrees)
 
         CustomLogger.recordDebugOutput("TagAlignment/yError", yPID.error.inMeters)
         CustomLogger.recordDebugOutput("TagAlignment/yFeedback", yFeedback.inMetersPerSecond,)
@@ -208,9 +237,10 @@ class TargetTagCommand(
         drivetrain.currentRequest =
           Request.DrivetrainRequest.OpenLoop(
             thetaFeedback,
-            Pair(autoDriveVector.meters.perSecond, yFeedback),
+            Pair(xFeedBack, yFeedback),
             fieldOriented = false
           )
+
       }
 
 
@@ -224,6 +254,7 @@ class TargetTagCommand(
 
   override fun end(interrupted: Boolean) {
     CustomLogger.recordDebugOutput("ActiveCommands/TargetTagCommand", false)
+
     drivetrain.currentRequest =
       Request.DrivetrainRequest.OpenLoop(
         driver.rotationSpeedClampedSupplier(turn, slowMode),

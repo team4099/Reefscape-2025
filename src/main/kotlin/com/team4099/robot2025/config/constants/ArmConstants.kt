@@ -35,8 +35,8 @@ object ArmConstants {
   // hotfix for now until encoder
   val INTAKE_L1_ANGLE = 115.degrees
   val INTAKE_ALGAE_GROUND_ANGLE = 205.degrees
-  val INTAKE_ALGAE_L2_ANGLE = 60.0.degrees
-  val INTAKE_ALGAE_L3_ANGLE = 60.0.degrees
+  val INTAKE_ALGAE_L2_ANGLE = 120.0.degrees
+  val INTAKE_ALGAE_L3_ANGLE = 120.0.degrees
 
   val SCORE_CORAL_L1_HORIZONTAL_ANGLE = 170.degrees
   val SCORE_CORAL_L1_VERTICAL_ANGLE = 120.degrees

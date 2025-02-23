@@ -17,24 +17,44 @@ object VisionConstants {
   val BLUE_REEF_TAGS = arrayOf(17, 18, 19, 20, 21, 22)
   val RED_REEF_TAGS = arrayOf(6, 7, 8, 9, 10, 11)
 
-  val BLUE_REEF_TAG_GYRO_ALIGNMENTS =
+  val BLUE_REEF_TAG_THETA_ALIGNMENTS =
     mapOf(
-      17 to 0.degrees,
+      17 to 60.degrees,
       18 to 0.degrees,
-      19 to 0.degrees,
-      20 to 0.degrees,
-      21 to 60.degrees,
+      19 to 300.degrees,
+      20 to 240.degrees,
+      21 to 180.degrees,
       22 to 120.degrees
     )
 
-  val RED_REEF_TAG_GYRO_ALIGNMENTS =
+  val BLUE_REEF_TAG_Y_ALIGNMENTS =
+    mapOf(
+      17 to Pair(6.5.inches, -6.5.inches),
+      18 to Pair(6.5.inches, -6.5.inches),
+      19 to Pair(6.5.inches, -6.5.inches),
+      20 to Pair(-6.5.inches, 6.5.inches),
+      21 to Pair(-6.5.inches, 6.5.inches),
+      22 to Pair(-6.5.inches, 6.5.inches),
+    )
+
+  val RED_REEF_TAG_THETA_ALIGNMENTS =
     mapOf(
       6 to 0.degrees,
-      6 to 0.degrees,
+      7 to 0.degrees,
       8 to 0.degrees,
       9 to 0.degrees,
       10 to 0.degrees,
       11 to 0.degrees
+    )
+
+  val RED_REEF_TAG_Y_ALIGNMENTS =
+    mapOf(
+      6 to Pair(6.5.inches, -6.5.inches),
+      7 to Pair(6.5.inches, -6.5.inches),
+      8 to Pair(6.5.inches, -6.5.inches),
+      9 to Pair(-6.5.inches, 6.5.inches),
+      10 to Pair(-6.5.inches, 6.5.inches),
+      11 to Pair(-6.5.inches, 6.5.inches),
     )
 
   val TRUSTED_CAMERA_ORDER = arrayOf<Int>(1, 0)

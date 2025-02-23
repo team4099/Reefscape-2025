@@ -44,8 +44,8 @@ object RampIOTalonFX : RampIO {
       RollersConstants.STATOR_CURRENT_LIMIT.inAmperes
     rollersConfiguration.CurrentLimits.SupplyCurrentLimit =
       RollersConstants.SUPPLY_CURRENT_LIMIT.inAmperes
-    rollersConfiguration.CurrentLimits.StatorCurrentLimitEnable = true
-    rollersConfiguration.CurrentLimits.SupplyCurrentLimitEnable = true
+    rollersConfiguration.CurrentLimits.StatorCurrentLimitEnable = false
+    rollersConfiguration.CurrentLimits.SupplyCurrentLimitEnable = false
     rollersConfiguration.MotorOutput.Inverted = InvertedValue.Clockwise_Positive
     rollersConfiguration.MotorOutput.NeutralMode = NeutralModeValue.Coast
 

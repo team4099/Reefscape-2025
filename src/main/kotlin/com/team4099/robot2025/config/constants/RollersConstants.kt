@@ -20,9 +20,9 @@ object RollersConstants {
 
   val IDLE_VOLTAGE = 0.0.volts
   val IDLE_CORAL_VOLTAGE = 0.25.volts
-  val IDLE_CORAL_L1_VOLTAGE = 0.0.volts
+  val IDLE_CORAL_L1_VOLTAGE = 1.0.volts
   val IDLE_ALGAE_VOLTAGE = 0.0.volts
-  val INTAKE_ALGAE_VOLTAGE = 6.0.volts
+  val INTAKE_ALGAE_VOLTAGE = -8.volts
   val INTAKE_CORAL_VOLTAGE_FAST = -7.volts
   val INTAKE_CORAL_VOLTAGE_SLOW = -5.volts
 

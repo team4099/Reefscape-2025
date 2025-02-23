@@ -6,6 +6,7 @@ import com.team4099.robot2025.config.constants.Constants.Universal.AlgaeLevel
 import com.team4099.robot2025.config.constants.Constants.Universal.CoralLevel
 import com.team4099.robot2025.config.constants.Constants.Universal.GamePiece
 import com.team4099.robot2025.config.constants.ElevatorConstants
+import com.team4099.robot2025.config.constants.RollersConstants
 import com.team4099.robot2025.subsystems.arm.Arm
 import com.team4099.robot2025.subsystems.arm.ArmTunableValues
 import com.team4099.robot2025.subsystems.climber.Climber
@@ -29,6 +30,7 @@ import org.team4099.lib.units.base.Length
 import org.team4099.lib.units.base.inMilliseconds
 import org.team4099.lib.units.base.inches
 import org.team4099.lib.units.base.meters
+import org.team4099.lib.units.base.seconds
 import org.team4099.lib.units.derived.Angle
 import org.team4099.lib.units.derived.cos
 import org.team4099.lib.units.derived.degrees
@@ -80,7 +82,7 @@ class Superstructure(
       field = value
     }
 
-  private var currentState: SuperstructureStates = SuperstructureStates.UNINITIALIZED
+  var currentState: SuperstructureStates = SuperstructureStates.UNINITIALIZED
 
   var isAtRequestedState: Boolean = false
 
@@ -479,6 +481,18 @@ class Superstructure(
         }
       }
       SuperstructureStates.SCORE_CORAL -> {
+        val reefLevelElevatorHeight: Length =
+          when (coralScoringLevel) {
+            CoralLevel.L1 -> {
+              if (theoreticalGamePiece == GamePiece.CORAL) ElevatorTunableValues.ElevatorHeights.L1VerticalHeight.get() else
+                ElevatorTunableValues.ElevatorHeights.L1HorizontalHeight.get()
+            }
+            CoralLevel.L2 -> ElevatorTunableValues.ElevatorHeights.L2Height.get()
+            CoralLevel.L3 -> ElevatorTunableValues.ElevatorHeights.L3Height.get()
+            CoralLevel.L4 -> ElevatorTunableValues.ElevatorHeights.L4Height.get()
+            else -> 0.0.inches
+          }
+
         val reefLevelArmAngle: Angle =
           when (coralScoringLevel) {
             CoralLevel.L1 -> {
@@ -494,17 +508,33 @@ class Superstructure(
           }
 
         if (theoreticalGamePiece == GamePiece.CORAL) {
-          if (coralScoringLevel != CoralLevel.L1) {
-            arm.currentRequest =
-              Request.ArmRequest.ClosedLoop(reefLevelArmAngle + ArmConstants.SCORE_OFFSET)
+          if (coralScoringLevel == CoralLevel.L4) {
+            elevator.currentRequest = Request.ElevatorRequest.ClosedLoop(reefLevelElevatorHeight)
           }
 
-          if (arm.isAtTargetedPosition) {
+          if (coralScoringLevel != CoralLevel.L1) {
+            arm.currentRequest =
+              Request.ArmRequest.ClosedLoop(reefLevelArmAngle + (
+                  if (coralScoringLevel == CoralLevel.L4)  -ArmConstants.SCORE_OFFSET else ArmConstants.SCORE_OFFSET
+              ))
+
+            if (coralScoringLevel == CoralLevel.L4) {
+              elevator.currentRequest = Request.ElevatorRequest.ClosedLoop(reefLevelElevatorHeight + 3.inches)
+            }
+          }
+
+          val isReadyToScore = if (coralScoringLevel == CoralLevel.L4)
+            elevator.isAtTargetedPosition && arm.isAtTargetedPosition else arm.isAtTargetedPosition
+
+          if (isReadyToScore) {
             rollers.currentRequest =
               Request.RollersRequest.OpenLoop(RollersTunableValues.scoreCoralVoltage.get())
           }
 
-          if ((Clock.fpgaTime - lastTransitionTime) > RollersTunableValues.coralSpitTime.get()) {
+          val spitOutTime = if (coralScoringLevel == CoralLevel.L4)
+            (RollersTunableValues.coralSpitTime.get() + 0.4.seconds) else RollersTunableValues.coralSpitTime.get()
+
+          if ((Clock.fpgaTime - lastTransitionTime) > spitOutTime) {
             theoreticalGamePiece = GamePiece.NONE
             nextState = SuperstructureStates.FRONT_ACTION_CLEANUP
           }
@@ -588,11 +618,6 @@ class Superstructure(
 
         rollers.currentRequest =
           Request.RollersRequest.OpenLoop(RollersTunableValues.intakeAlgaeVoltage.get())
-
-        if (rollers.hasAlgae) {
-          nextState = SuperstructureStates.FRONT_ACTION_CLEANUP
-          theoreticalGamePiece = GamePiece.ALGAE
-        }
 
         if (currentRequest is Request.SuperstructureRequest.Idle) {
           nextState = SuperstructureStates.FRONT_ACTION_CLEANUP
