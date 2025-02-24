@@ -163,7 +163,6 @@ object RobotContainer {
   }
 
   fun mapTeleopControls() {
-
     ControlBoard.resetGyro.whileTrue(ResetGyroYawCommand(drivetrain))
 
     // tuning commands
@@ -249,8 +248,6 @@ object RobotContainer {
         0.inches
       )
     )
-
-
   }
 
   fun mapTestControls() {}

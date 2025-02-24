@@ -53,9 +53,6 @@ object ControlBoard {
   val testIntakeBind = Trigger { driver.rightTriggerAxis > 0.5 }
   val testOuttakeBind = Trigger { driver.leftTriggerAxis > 0.5 }
 
-  val testArmBind = Trigger { driver.yButton }
-  val testArmDownBind = Trigger { driver.xButton }
-
   // Single Driver Binds
   val intakeL1 = Trigger { !driver.rightJoystickButton && driver.xButton }
   val prepL2 = Trigger { !driver.rightJoystickButton && driver.aButton }

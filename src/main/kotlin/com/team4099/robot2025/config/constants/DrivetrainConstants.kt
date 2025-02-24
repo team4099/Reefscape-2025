@@ -38,9 +38,9 @@ object DrivetrainConstants {
   const val OMOMETRY_UPDATE_FREQUENCY = 250.0
 
   const val WHEEL_COUNT = 4
-  val WHEEL_DIAMETER = (2.083 * 2).inches
-  val DRIVETRAIN_LENGTH = 22.750.inches
-  val DRIVETRAIN_WIDTH = 22.750.inches
+  val WHEEL_DIAMETER = (1.9496 * 2).inches // todo: might need to change, but we tested and odometry reads well (<0.1 inch accuracy over a foot)
+  val DRIVETRAIN_LENGTH = 29.5.inches
+  val DRIVETRAIN_WIDTH = 29.5.inches
 
   val DOCKING_GYRO_SETPOINT = 0.0.degrees
   val DOCKING_GYRO_TOLERANCE = 2.5.degrees
