@@ -86,17 +86,10 @@ object DrivetrainConstants {
   val DRIVE_STATOR_THRESHOLD_CURRENT_LIMIT = 80.0.amps
   val DRIVE_STATOR_TRIGGER_THRESHOLD_TIME = 1.0.seconds
 
-<<<<<<< HEAD
   val FRONT_LEFT_MODULE_ZERO = 5.617.radians - Math.PI.radians // good
   val FRONT_RIGHT_MODULE_ZERO = 6.251.radians // good
   val BACK_LEFT_MODULE_ZERO = 4.361.radians // good
   val BACK_RIGHT_MODULE_ZERO = 2.245.radians // good
-=======
-  val FRONT_LEFT_MODULE_ZERO = 5.626.radians // good
-  val FRONT_RIGHT_MODULE_ZERO = 3.077.radians // good
-  val BACK_LEFT_MODULE_ZERO = 4.355.radians // good
-  val BACK_RIGHT_MODULE_ZERO = 2.258.radians // good
->>>>>>> f1923c0 (get dt running)
 
   val STEERING_COMPENSATION_VOLTAGE = 10.volts
   val DRIVE_COMPENSATION_VOLTAGE = 12.volts
@@ -166,8 +159,8 @@ object DrivetrainConstants {
     val SIM_AUTO_THETA_PID_KD =
       (0.degrees.perSecond / (1.degrees / 1.seconds)).radiansPerSecondPerRadiansPerSecond
 
-    val MAX_AUTO_ANGULAR_VEL = 270.0.degrees.perSecond
-    val MAX_AUTO_ANGULAR_ACCEL = 600.0.degrees.perSecond.perSecond
+    val MAX_AUTO_ANGULAR_VEL = 40.radians.perSecond
+    val MAX_AUTO_ANGULAR_ACCEL = 40.radians.perSecond
 
     val STEERING_KP = 10.0.volts / 45.degrees
     val STEERING_KI = 0.0.volts.perDegreeSeconds

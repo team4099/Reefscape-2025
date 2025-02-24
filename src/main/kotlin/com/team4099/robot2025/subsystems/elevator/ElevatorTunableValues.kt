@@ -57,7 +57,7 @@ object ElevatorTunableValues {
       Pair({ it.inVolts }, { it.volts })
     )
 
-  object TunableElevatorHeights {
+  object ElevatorHeights {
     val minPosition =
       LoggedTunableValue(
         "Elevator/minPosition",
