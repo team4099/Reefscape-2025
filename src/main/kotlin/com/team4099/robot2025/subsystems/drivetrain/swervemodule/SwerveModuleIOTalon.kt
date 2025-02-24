@@ -122,7 +122,7 @@ class SwerveModuleIOTalon(
 
     steeringConfiguration.MotorOutput.NeutralMode =
       NeutralModeValue.Brake // change back to coast maybe?
-    steeringFalcon.inverted = true
+    steeringConfiguration.MotorOutput.Inverted = InvertedValue.Clockwise_Positive
 
     steeringFalcon.configurator.apply(steeringConfiguration)
 
@@ -377,9 +377,9 @@ class SwerveModuleIOTalon(
     } else {
       motorOutputConfig.NeutralMode = NeutralModeValue.Coast
     }
+
+    motorOutputConfig.Inverted = InvertedValue.Clockwise_Positive
     steeringFalcon.configurator.apply(motorOutputConfig)
-    // motor output configs might overwrite invert?
-    steeringFalcon.inverted = true
   }
 
   override fun runCharacterization(input: ElectricalPotential) {

@@ -142,12 +142,30 @@ class CustomHolonomicDriveController(
     currentPose: Pose2d,
     trajectoryState: SwerveSample
   ): ChassisSpeeds {
-    return calculate(
-      currentPose,
-      trajectoryState.pose,
-      (trajectoryState.vx.pow(2) + trajectoryState.vy.pow(2)).pow(0.5),
-      trajectoryState.pose.rotation,
-      trajectoryState.omega
+    // Calculate feedforward velocities (field-relative).
+    val xFF = trajectoryState.vx
+    val yFF = trajectoryState.vy
+
+    m_poseError = trajectoryState.pose.relativeTo(currentPose)
+    m_rotationError = trajectoryState.pose.rotation.minus(currentPose.rotation)
+
+    if (!m_enabled) {
+      return ChassisSpeeds.fromFieldRelativeSpeeds(
+        xFF, yFF, trajectoryState.omega, currentPose.rotation
+      )
+    }
+
+    // Calculate feedback velocities (based on position error).
+    val xFeedback = m_xController.calculate(currentPose.x, trajectoryState.pose.x)
+    val yFeedback = m_yController.calculate(currentPose.y, trajectoryState.pose.y)
+    val thetaFeedback = m_thetaController.calculate(currentPose.rotation.radians, trajectoryState.pose.rotation.radians)
+
+    // Return next output.
+    return ChassisSpeeds.fromFieldRelativeSpeeds(
+      xFF + xFeedback,
+      yFF + yFeedback,
+      trajectoryState.omega + thetaFeedback,
+      currentPose.rotation
     )
   }
 
