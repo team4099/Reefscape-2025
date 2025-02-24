@@ -53,16 +53,16 @@ object DrivetrainConstants {
       .perSecond // 648
 
   // cruise velocity and accel for steering motor
-  val STEERING_VEL_MAX = 151.degrees.perSecond
-  val STEERING_ACCEL_MAX = 302.degrees.perSecond.perSecond
+  val STEERING_VEL_MAX = 1000.degrees.perSecond
+  val STEERING_ACCEL_MAX = 1000.degrees.perSecond.perSecond
 
   const val GYRO_RATE_COEFFICIENT = 0.0 // TODO: Change this value
 
   val SLOW_AUTO_VEL = 2.meters.perSecond
   val SLOW_AUTO_ACCEL = 2.0.meters.perSecond.perSecond
 
-  val MAX_AUTO_VEL = 3.5.meters.perSecond // 4
-  val MAX_AUTO_ACCEL = 3.5.meters.perSecond.perSecond // 3
+  val MAX_AUTO_VEL = 10.meters.perSecond // 4
+  val MAX_AUTO_ACCEL = 10.meters.perSecond.perSecond // 3
 
   val MAX_AUTO_BRAKE_VEL = 0.5.meters.perSecond // 4
   val MAX_AUTO_BRAKE_ACCEL = 0.5.meters.perSecond.perSecond // 3
@@ -108,7 +108,7 @@ object DrivetrainConstants {
         if (RobotBase.isReal()) {
           return 3.3.meters.perSecond / 1.0.meters // todo:4
         } else {
-          return 10.0.meters.perSecond / 1.0.meters
+          return 30.0.meters.perSecond / 1.0.meters
         }
       }
     val AUTO_POS_KI: IntegralGain<Meter, Velocity<Meter>>
@@ -126,7 +126,7 @@ object DrivetrainConstants {
           return (0.6.meters.perSecond / (1.0.meters.perSecond))
             .metersPerSecondPerMetersPerSecond // todo: 0.25
         } else {
-          return (0.0.meters.perSecond / (1.0.meters.perSecond)).metersPerSecondPerMetersPerSecond
+          return (0.5.meters.perSecond / (1.0.meters.perSecond)).metersPerSecondPerMetersPerSecond
         }
       }
 

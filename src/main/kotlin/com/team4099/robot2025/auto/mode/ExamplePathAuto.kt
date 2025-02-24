@@ -10,6 +10,7 @@ import org.team4099.lib.geometry.Pose2d
 import org.team4099.lib.geometry.Translation2d
 import org.team4099.lib.units.base.meters
 import org.team4099.lib.units.derived.degrees
+import org.team4099.lib.units.derived.radians
 
 class ExamplePathAuto(val drivetrain: Drivetrain) : SequentialCommandGroup() {
   init {
@@ -19,12 +20,12 @@ class ExamplePathAuto(val drivetrain: Drivetrain) : SequentialCommandGroup() {
       DrivePathCommand.createPathInFieldFrame(
         drivetrain,
         TrajectoryTypes.Choreo(
-          Choreo.loadTrajectory<SwerveSample>("exampleTraj").get()
+          Choreo.loadTrajectory<SwerveSample>("examplePath").get()
         )
       )
     )
   }
   companion object {
-    val startingPose = Pose2d(Translation2d(1.42.meters, 5.535.meters), 180.degrees)
+    val startingPose = Pose2d(Translation2d(7.261556148529053.meters, 4.551422595977783.meters), 3.1145838845027867.radians)
   }
 }
