@@ -32,6 +32,7 @@ import org.team4099.lib.units.derived.StaticFeedforward
 import org.team4099.lib.units.derived.VelocityFeedforward
 import org.team4099.lib.units.derived.Volt
 import org.team4099.lib.units.derived.inVolts
+
 import org.team4099.lib.units.derived.inVoltsPerInch
 import org.team4099.lib.units.derived.inVoltsPerInchPerSecond
 import org.team4099.lib.units.derived.inVoltsPerInchSeconds
@@ -39,7 +40,6 @@ import org.team4099.lib.units.derived.inVoltsPerMetersPerSecondPerSecond
 import org.team4099.lib.units.derived.volts
 import org.team4099.lib.units.inInchesPerSecond
 import org.team4099.lib.units.inInchesPerSecondPerSecond
-import kotlin.time.times
 import edu.wpi.first.units.measure.Current as WPILibCurrent
 import edu.wpi.first.units.measure.Temperature as WPILibTemperature
 import edu.wpi.first.units.measure.Voltage as WPILibVoltage

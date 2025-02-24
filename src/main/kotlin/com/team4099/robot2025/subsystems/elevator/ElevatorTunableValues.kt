@@ -57,8 +57,8 @@ object ElevatorTunableValues {
       Pair({ it.inVolts }, { it.volts })
     )
 
-  object ElevatorHeights {
-    val minHeight =
+  object TunableElevatorHeights {
+    val minPosition =
       LoggedTunableValue(
         "Elevator/minPosition",
         ElevatorConstants.DOWNWARDS_EXTENSION_LIMIT,
