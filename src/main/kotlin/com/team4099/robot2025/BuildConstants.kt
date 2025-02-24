@@ -12,4 +12,3 @@ const val GIT_DATE = "2025-02-22T10:17:09Z"
 const val GIT_BRANCH = "superstructure"
 const val BUILD_DATE = "2025-02-22T18:37:30Z"
 const val BUILD_UNIX_TIME = 1740267450857L
-const val DIRTY = 1

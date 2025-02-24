@@ -67,7 +67,7 @@ object AllianceFlipUtil {
   ): Pose2d { // flipToRed is a hacky way to get it to flip when the driver station is empty
     return if (shouldFlip()) {
       Pose2d(
-        FieldConstants.fieldLength - pose.x, FieldConstants.fieldWidth - pose.y, Angle(-pose.rotation.cos, pose.rotation.sin)
+        FieldConstants.fieldLength - pose.x, FieldConstants.fieldWidth - pose.y, Angle(-pose.rotation.cos, -pose.rotation.sin)
       )
     } else {
       pose
