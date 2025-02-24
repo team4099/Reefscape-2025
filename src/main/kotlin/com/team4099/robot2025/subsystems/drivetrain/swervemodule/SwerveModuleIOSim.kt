@@ -137,15 +137,15 @@ class SwerveModuleIOSim(override val label: String) : SwerveModuleIO {
     // pi * d * rotations = distance travelled
     inputs.drivePosition =
       inputs.drivePosition +
-      DrivetrainConstants.WHEEL_DIAMETER *
-      Math.PI *
-      (
-        driveMotorSim.angularVelocityRadPerSec *
-          Constants.Universal.LOOP_PERIOD_TIME.inSeconds
-        )
-        .radians
-        .inRotations +
-      loopCycleDrift // adding a random amount of drift
+              DrivetrainConstants.WHEEL_DIAMETER *
+              Math.PI *
+              (
+                      driveMotorSim.angularVelocityRadPerSec *
+                              Constants.Universal.LOOP_PERIOD_TIME.inSeconds
+                      )
+                .radians
+                .inRotations +
+              loopCycleDrift // adding a random amount of drift
     inputs.steeringPosition = turnAbsolutePosition
     inputs.drift = drift
 

@@ -1,5 +1,5 @@
 {
- "name":"newDrop",
+ "name":"examplePath",
  "version":1,
  "type":"Swerve",
  "variables":{
@@ -9,47 +9,47 @@
  "config":{
   "frontLeft":{
    "x":{
-    "exp":"11 in",
-    "val":0.2794
+    "exp":"15 in",
+    "val":0.381
    },
    "y":{
-    "exp":"11 in",
-    "val":0.2794
+    "exp":"15 in",
+    "val":0.381
    }
   },
   "backLeft":{
    "x":{
-    "exp":"-11 in",
-    "val":-0.2794
+    "exp":"-15 in",
+    "val":-0.381
    },
    "y":{
-    "exp":"11 in",
-    "val":0.2794
+    "exp":"15 in",
+    "val":0.381
    }
   },
   "mass":{
-   "exp":"150 lbs",
-   "val":68.0388555
+   "exp":"129.49 lbs",
+   "val":58.735675991300006
   },
   "inertia":{
-   "exp":"6 kg m ^ 2",
-   "val":6.0
+   "exp":"5.9601353419 kg m ^ 2",
+   "val":5.9601353419
   },
   "gearing":{
-   "exp":"6.5",
-   "val":6.5
+   "exp":"6.75",
+   "val":6.75
   },
   "radius":{
    "exp":"2 in",
    "val":0.0508
   },
   "vmax":{
-   "exp":"6000 RPM",
-   "val":628.3185307179587
+   "exp":"4800 RPM",
+   "val":502.6548245743669
   },
   "tmax":{
-   "exp":"1.2 N * m",
-   "val":1.2
+   "exp":"1.134 N * m",
+   "val":1.134
   },
   "cof":{
    "exp":"1.5",
@@ -57,16 +57,16 @@
   },
   "bumper":{
    "front":{
-    "exp":"16 in",
-    "val":0.4064
+    "exp":"17.75 in",
+    "val":0.45085
    },
    "side":{
-    "exp":"16 in",
-    "val":0.4064
+    "exp":"17.75 in",
+    "val":0.45085
    },
    "back":{
-    "exp":"16 in",
-    "val":0.4064
+    "exp":"17.75 in",
+    "val":0.45085
    }
   },
   "differentialTrackWidth":{

@@ -288,7 +288,7 @@ class Drivetrain(val gyroIO: GyroIO, swerveModuleIOs: DrivetrainIO) : SubsystemB
       "Drivetrain/xRobotVelocityMetersPerSecond", robotVelocity.x.inMetersPerSecond
     )
     Logger.recordOutput(
-      "Drivetrain/xRobotVelocityMetersPerSecond", robotVelocity.x.inMetersPerSecond
+      "Drivetrain/yRobotVelocityMetersPerSecond", robotVelocity.y.inMetersPerSecond
     )
     Logger.recordOutput(
       "Drivetrain/xFieldVelocityMetersPerSecond", fieldVelocity.x.inMetersPerSecond

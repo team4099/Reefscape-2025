@@ -38,9 +38,9 @@ object DrivetrainConstants {
   const val OMOMETRY_UPDATE_FREQUENCY = 250.0
 
   const val WHEEL_COUNT = 4
-  val WHEEL_DIAMETER = (2.083 * 2).inches
-  val DRIVETRAIN_LENGTH = 22.750.inches
-  val DRIVETRAIN_WIDTH = 22.750.inches
+  val WHEEL_DIAMETER = (2 * 2).inches
+  val DRIVETRAIN_LENGTH = 30.inches
+  val DRIVETRAIN_WIDTH = 30.inches
 
   val DOCKING_GYRO_SETPOINT = 0.0.degrees
   val DOCKING_GYRO_TOLERANCE = 2.5.degrees
@@ -53,8 +53,8 @@ object DrivetrainConstants {
       .perSecond // 648
 
   // cruise velocity and accel for steering motor
-  val STEERING_VEL_MAX = 151.degrees.perSecond
-  val STEERING_ACCEL_MAX = 302.degrees.perSecond.perSecond
+  val STEERING_VEL_MAX = 1000.degrees.perSecond
+  val STEERING_ACCEL_MAX = 1000.degrees.perSecond.perSecond
 
   const val GYRO_RATE_COEFFICIENT = 0.0 // TODO: Change this value
 
@@ -62,7 +62,7 @@ object DrivetrainConstants {
   val SLOW_AUTO_ACCEL = 2.0.meters.perSecond.perSecond
 
   val MAX_AUTO_VEL = 3.5.meters.perSecond // 4
-  val MAX_AUTO_ACCEL = 3.5.meters.perSecond.perSecond // 3
+  val MAX_AUTO_ACCEL = 7.meters.perSecond.perSecond // 3
 
   val MAX_AUTO_BRAKE_VEL = 0.5.meters.perSecond // 4
   val MAX_AUTO_BRAKE_ACCEL = 0.5.meters.perSecond.perSecond // 3
@@ -74,6 +74,7 @@ object DrivetrainConstants {
   const val MK4I_STEERING_SENSOR_GEAR_RATIO = 7.0 / 150.0
   const val MK4N_STEERING_SENSOR_GEAR_RATIO = 1 / 18.75
 
+
   val ALLOWED_STEERING_ANGLE_ERROR = 1.degrees
 
   val STEERING_SUPPLY_CURRENT_LIMIT = 20.0.amps
@@ -82,14 +83,13 @@ object DrivetrainConstants {
   val DRIVE_TRIGGER_THRESHOLD_TIME = 0.1.seconds
 
   val DRIVE_STATOR_CURRENT_LIMIT = 80.0.amps
-
   val DRIVE_STATOR_THRESHOLD_CURRENT_LIMIT = 80.0.amps
   val DRIVE_STATOR_TRIGGER_THRESHOLD_TIME = 1.0.seconds
 
-  val FRONT_LEFT_MODULE_ZERO = 5.617.radians - Math.PI.radians // good
-  val FRONT_RIGHT_MODULE_ZERO = 6.251.radians // good
-  val BACK_LEFT_MODULE_ZERO = 4.361.radians // good
-  val BACK_RIGHT_MODULE_ZERO = 2.245.radians // good
+  val FRONT_LEFT_MODULE_ZERO = 0.19.radians // good
+  val FRONT_RIGHT_MODULE_ZERO = 6.016.radians // good
+  val BACK_LEFT_MODULE_ZERO = 2.538.radians // good
+  val BACK_RIGHT_MODULE_ZERO = 1.25.radians // good
 
   val STEERING_COMPENSATION_VOLTAGE = 10.volts
   val DRIVE_COMPENSATION_VOLTAGE = 12.volts
@@ -108,7 +108,7 @@ object DrivetrainConstants {
         if (RobotBase.isReal()) {
           return 3.3.meters.perSecond / 1.0.meters // todo:4
         } else {
-          return 10.0.meters.perSecond / 1.0.meters
+          return 30.0.meters.perSecond / 1.0.meters
         }
       }
     val AUTO_POS_KI: IntegralGain<Meter, Velocity<Meter>>
@@ -126,7 +126,7 @@ object DrivetrainConstants {
           return (0.6.meters.perSecond / (1.0.meters.perSecond))
             .metersPerSecondPerMetersPerSecond // todo: 0.25
         } else {
-          return (0.0.meters.perSecond / (1.0.meters.perSecond)).metersPerSecondPerMetersPerSecond
+          return (0.5.meters.perSecond / (1.0.meters.perSecond)).metersPerSecondPerMetersPerSecond
         }
       }
 
@@ -159,8 +159,8 @@ object DrivetrainConstants {
     val SIM_AUTO_THETA_PID_KD =
       (0.degrees.perSecond / (1.degrees / 1.seconds)).radiansPerSecondPerRadiansPerSecond
 
-    val MAX_AUTO_ANGULAR_VEL = 270.0.degrees.perSecond
-    val MAX_AUTO_ANGULAR_ACCEL = 600.0.degrees.perSecond.perSecond
+    val MAX_AUTO_ANGULAR_VEL = 7.radians.perSecond
+    val MAX_AUTO_ANGULAR_ACCEL = 54.4.radians.perSecond.perSecond
 
     val STEERING_KP = 10.0.volts / 45.degrees
     val STEERING_KI = 0.0.volts.perDegreeSeconds
@@ -168,7 +168,7 @@ object DrivetrainConstants {
 
     val STEERING_KFF = 0.0.volts / 1.0.radians.perSecond // 0.0375
 
-    val DRIVE_KP = 0.0.volts / 1.meters.perSecond
+    val DRIVE_KP = 1.52.volts / 1.meters.perSecond
     val DRIVE_KI = 0.0.volts / (1.meters.perSecond * 1.seconds)
     val DRIVE_KD = 0.1.volts / 1.meters.perSecond.perSecond
 
@@ -186,11 +186,11 @@ object DrivetrainConstants {
     val SIM_DRIVE_KV = 2.7.volts / 1.0.meters.perSecond
     val SIM_DRIVE_KA = 0.0.volts / 1.0.meters.perSecond.perSecond
 
-    val SIM_DRIVE_KP = 0.volts / 1.meters.perSecond
+    val SIM_DRIVE_KP = 1.5.volts / 1.meters.perSecond
     val SIM_DRIVE_KI = 0.0.volts / (1.meters.perSecond * 1.seconds)
     val SIM_DRIVE_KD = 0.0.volts / 1.meters.perSecond.perSecond
 
-    val SIM_STEERING_KP = 0.volts.perDegree
+    val SIM_STEERING_KP = 0.3.volts.perDegree
     val SIM_STEERING_KI = 0.0.volts.perDegreeSeconds
     val SIM_STEERING_KD = 0.0.volts.perDegreePerSecond
   }

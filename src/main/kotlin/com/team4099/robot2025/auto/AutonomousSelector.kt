@@ -56,18 +56,19 @@ object AutonomousSelector {
     get() = secondaryWaitInAuto.getDouble(0.0).seconds
 
   fun getCommand(drivetrain: Drivetrain): Command {
-    val mode = autonomousModeChooser.get()
+    val mode = AutonomousMode.EXAMPLE_PATH_AUTO
 
     when (mode) {
       // Delete this when real autos are made
       AutonomousMode.EXAMPLE_PATH_AUTO ->
         return WaitCommand(waitTime.inSeconds)
           .andThen({
-            drivetrain.tempZeroGyroYaw(ExamplePathAuto.startingPose.rotation)
+            drivetrain.tempZeroGyroYaw(AllianceFlipUtil.apply(ExamplePathAuto.startingPose).rotation)
             drivetrain.resetFieldFrameEstimator(
               AllianceFlipUtil.apply(ExamplePathAuto.startingPose)
             )
           })
+          .andThen(ExamplePathAuto(drivetrain))
       else -> println("ERROR: unexpected auto mode: $mode")
     }
     return InstantCommand()
