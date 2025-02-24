@@ -118,7 +118,8 @@ class SwerveModuleIOTalon(
 
     steeringConfiguration.ClosedLoopGeneral.ContinuousWrap = true
     steeringConfiguration.CurrentLimits.SupplyCurrentLimitEnable = true
-    steeringConfiguration.Feedback.SensorToMechanismRatio = 1 / steeringRatio
+    steeringConfiguration.Feedback.SensorToMechanismRatio =
+      1 / steeringRatio
 
     steeringConfiguration.MotorOutput.NeutralMode =
       NeutralModeValue.Brake // change back to coast maybe?
