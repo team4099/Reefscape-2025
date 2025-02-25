@@ -2,6 +2,8 @@ package com.team4099.robot2025.auto
 
 import com.team4099.robot2025.auto.mode.ExamplePathAuto
 import com.team4099.robot2025.subsystems.drivetrain.drive.Drivetrain
+import com.team4099.robot2025.subsystems.superstructure.Superstructure
+import com.team4099.robot2025.subsystems.vision.Vision
 import com.team4099.robot2025.util.AllianceFlipUtil
 import edu.wpi.first.networktables.GenericEntry
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets
@@ -55,7 +57,7 @@ object AutonomousSelector {
   val secondaryWaitTime: Time
     get() = secondaryWaitInAuto.getDouble(0.0).seconds
 
-  fun getCommand(drivetrain: Drivetrain): Command {
+  fun getCommand(drivetrain: Drivetrain, superstructure: Superstructure, vision: Vision): Command {
     val mode = AutonomousMode.EXAMPLE_PATH_AUTO
 
     when (mode) {
@@ -68,14 +70,14 @@ object AutonomousSelector {
               AllianceFlipUtil.apply(ExamplePathAuto.startingPose)
             )
           })
-          .andThen(ExamplePathAuto(drivetrain))
+          .andThen(ExamplePathAuto(drivetrain, superstructure, vision))
       else -> println("ERROR: unexpected auto mode: $mode")
     }
     return InstantCommand()
   }
 
-  fun getLoadingCommand(drivetrain: Drivetrain): Command {
-    return ExamplePathAuto(drivetrain)
+  fun getLoadingCommand(drivetrain: Drivetrain, superstructure: Superstructure, vision: Vision): Command {
+    return ExamplePathAuto(drivetrain, superstructure, vision)
   }
 
   private enum class AutonomousMode {

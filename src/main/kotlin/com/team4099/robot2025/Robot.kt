@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.simulation.DriverStationSim
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.CommandScheduler
 import edu.wpi.first.wpilibj2.command.Commands.runOnce
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
 import org.ejml.EjmlVersion.BUILD_DATE
 import org.ejml.EjmlVersion.DIRTY
 import org.ejml.EjmlVersion.GIT_BRANCH
@@ -150,7 +151,12 @@ object Robot : LoggedRobot() {
     RobotContainer.setSteeringCoastMode()
 
     val autonCommandWithWait =
-      runOnce({ RobotContainer.zeroSensors(isInAutonomous = true) }).andThen(autonomousCommand)
+      runOnce({ RobotContainer.zeroSensors(isInAutonomous = true) }).andThen(
+        ParallelCommandGroup(
+          runOnce({ RobotContainer.requestIdle() }),
+          autonomousCommand
+        )
+      )
     autonCommandWithWait?.schedule()
   }
 
@@ -160,7 +166,7 @@ object Robot : LoggedRobot() {
   }
 
   override fun disabledInit() {
-    RobotContainer.requestIdle()
+    // RobotContainer.requestIdle()
     // autonomousCommand.cancel()
   }
 
@@ -200,6 +206,7 @@ object Robot : LoggedRobot() {
   }
 
   override fun teleopInit() {
+    RobotContainer.requestIdle()
     RobotContainer.zeroSensors(isInAutonomous = false)
     RobotContainer.mapTeleopControls()
     RobotContainer.getAutonomousCommand().cancel()

@@ -14,7 +14,6 @@ import edu.wpi.first.math.trajectory.TrajectoryParameterizer
 import edu.wpi.first.math.trajectory.constraint.CentripetalAccelerationConstraint
 import edu.wpi.first.math.trajectory.constraint.TrajectoryConstraint
 import edu.wpi.first.wpilibj.DriverStation
-import org.littletonrobotics.junction.Logger
 import org.team4099.lib.geometry.Pose2d
 import org.team4099.lib.kinematics.ChassisAccels
 import org.team4099.lib.units.base.Time
@@ -58,6 +57,14 @@ class CustomTrajectory(
             return when (trajectory) {
                 is TrajectoryTypes.WPILib -> trajectory.rawTrajectory.totalTimeSeconds.seconds
                 is TrajectoryTypes.Choreo -> trajectory.rawTrajectory.totalTime.seconds
+            }
+        }
+
+    val endPose: Pose2d
+        get() {
+            return when (trajectory) {
+                is TrajectoryTypes.WPILib -> Pose2d(trajectory.rawTrajectory.states.lastOrNull()!!.poseMeters)
+                is TrajectoryTypes.Choreo -> Pose2d(trajectory.rawTrajectory.poses.last())
             }
         }
 

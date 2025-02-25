@@ -255,9 +255,9 @@ object RobotContainer {
 
   fun mapTestControls() {}
 
-  fun getAutonomousCommand() = AutonomousSelector.getCommand(drivetrain)
+  fun getAutonomousCommand() = AutonomousSelector.getCommand(drivetrain, superstructure, vision)
 
-  fun getAutonomousLoadingCommand() = AutonomousSelector.getLoadingCommand(drivetrain)
+  fun getAutonomousLoadingCommand() = AutonomousSelector.getLoadingCommand(drivetrain, superstructure, vision)
 
   fun resetGyroYawCommand(angle: Angle): Command = ResetGyroYawCommand(drivetrain, angle)
 

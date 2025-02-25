@@ -65,6 +65,7 @@ private constructor(
     val flipForAlliances: Boolean = true,
     val endPathOnceAtReference: Boolean = true,
     val leaveOutYAdjustment: Boolean = false,
+    val keepTrapping: Boolean = true,
     val endVelocity: Velocity2d = Velocity2d(),
     var stateFrame: FrameType = FrameType.ODOMETRY,
     var pathFrame: FrameType = FrameType.FIELD,
@@ -313,11 +314,17 @@ private constructor(
 
     override fun isFinished(): Boolean {
         trajCurTime = Clock.fpgaTime - trajStartTime
+
+        if (!keepTrapping) {
+            return endPathOnceAtReference && trajCurTime > generatedTrajectory.totalTime
+        }
+
         return endPathOnceAtReference &&
-                (
-                        (swerveDriveController.atReference()) &&
-                                trajCurTime > generatedTrajectory.totalTime
-                        )
+        (
+                swerveDriveController.atReference()
+                    && (drivePoseSupplier().rotation - generatedTrajectory.endPose.rotation).absoluteValue < 5.degrees
+                    && trajCurTime > generatedTrajectory.totalTime
+            )
     }
 
     override fun end(interrupted: Boolean) {
@@ -349,6 +356,7 @@ private constructor(
             flipForAlliances: Boolean = true,
             endPathOnceAtReference: Boolean = true,
             leaveOutYAdjustment: Boolean = false,
+            keepTrapping: Boolean = false,
             endVelocity: Velocity2d = Velocity2d(),
             stateFrame: FrameType = FrameType.ODOMETRY,
         ): DrivePathCommand<OdometryWaypoint> =
@@ -360,6 +368,7 @@ private constructor(
                 flipForAlliances,
                 endPathOnceAtReference,
                 leaveOutYAdjustment,
+                keepTrapping,
                 endVelocity,
                 stateFrame,
                 FrameType.ODOMETRY
@@ -373,6 +382,7 @@ private constructor(
             flipForAlliances: Boolean = true,
             endPathOnceAtReference: Boolean = true,
             leaveOutYAdjustment: Boolean = false,
+            keepTrapping: Boolean = false,
             endVelocity: Velocity2d = Velocity2d(),
             stateFrame: FrameType = FrameType.ODOMETRY,
         ): DrivePathCommand<FieldWaypoint> =
@@ -384,6 +394,7 @@ private constructor(
                 flipForAlliances,
                 endPathOnceAtReference,
                 leaveOutYAdjustment,
+                keepTrapping,
                 endVelocity,
                 stateFrame,
                 FrameType.ODOMETRY,
@@ -398,6 +409,7 @@ private constructor(
             flipForAlliances: Boolean = true,
             endPathOnceAtReference: Boolean = true,
             leaveOutYAdjustment: Boolean = false,
+            keepTrapping: Boolean = true,
             endVelocity: Velocity2d = Velocity2d(),
             stateFrame: FrameType = FrameType.ODOMETRY,
         ): DrivePathCommand<FieldWaypoint> =
@@ -409,6 +421,7 @@ private constructor(
                 flipForAlliances,
                 endPathOnceAtReference,
                 leaveOutYAdjustment,
+                keepTrapping,
                 endVelocity,
                 stateFrame,
                 FrameType.FIELD
@@ -421,6 +434,7 @@ private constructor(
             useLowerTolerance: Boolean = false,
             flipForAlliances: Boolean = true,
             endPathOnceAtReference: Boolean = true,
+            keepTrapping: Boolean = true,
             leaveOutYAdjustment: Boolean = false,
             endVelocity: Velocity2d = Velocity2d(),
             stateFrame: FrameType = FrameType.ODOMETRY,
@@ -433,6 +447,7 @@ private constructor(
                 flipForAlliances,
                 endPathOnceAtReference,
                 leaveOutYAdjustment,
+                keepTrapping,
                 endVelocity,
                 stateFrame,
                 FrameType.FIELD,
