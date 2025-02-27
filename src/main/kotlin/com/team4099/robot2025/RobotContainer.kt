@@ -1,5 +1,6 @@
 package com.team4099.robot2025
 
+import com.team4099.robot2023.subsystems.led.Leds
 import com.team4099.robot2023.subsystems.vision.camera.CameraIO
 import com.team4099.robot2023.subsystems.vision.camera.CameraIOPhotonvision
 import com.team4099.robot2025.auto.AutonomousSelector
@@ -25,6 +26,8 @@ import com.team4099.robot2025.subsystems.drivetrain.gyro.GyroIOPigeon2
 import com.team4099.robot2025.subsystems.elevator.Elevator
 import com.team4099.robot2025.subsystems.elevator.ElevatorIOSim
 import com.team4099.robot2025.subsystems.elevator.ElevatorIOTalon
+import com.team4099.robot2025.subsystems.led.LedIO
+import com.team4099.robot2025.subsystems.led.LedIOCandle
 import com.team4099.robot2025.subsystems.limelight.LimelightVision
 import com.team4099.robot2025.subsystems.limelight.LimelightVisionIO
 import com.team4099.robot2025.subsystems.rollers.Ramp
@@ -55,6 +58,7 @@ object RobotContainer {
   private val rollers: Rollers
   private val ramp: Ramp
   private val vision: Vision
+  private val leds: Leds
   val superstructure: Superstructure
 
   init {
@@ -69,6 +73,7 @@ object RobotContainer {
       elevator = Elevator(ElevatorIOTalon)
       rollers = Rollers(RollersIOTalonFX)
       ramp = Ramp(RampIOTalonFX)
+      leds = Leds(LedIOCandle)
 
       vision =
         Vision(
@@ -88,6 +93,7 @@ object RobotContainer {
       elevator = Elevator(ElevatorIOSim)
       rollers = Rollers(RollersIOSim)
       ramp = Ramp(RampIOSim)
+      leds = Leds(object : LedIO {})
 
       vision = Vision(object : CameraIO {})
     }
@@ -99,7 +105,7 @@ object RobotContainer {
     )
     vision.drivetrainOdometry = { drivetrain.odomTRobot }
 
-    superstructure = Superstructure(drivetrain, elevator, rollers, ramp, arm, climber, limelight)
+    superstructure = Superstructure(drivetrain, elevator, rollers, ramp, arm, climber, leds, vision, limelight)
 
     limelight.poseSupplier = { drivetrain.odomTRobot }
   }

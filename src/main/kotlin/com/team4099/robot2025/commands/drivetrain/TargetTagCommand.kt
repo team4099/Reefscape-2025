@@ -174,7 +174,9 @@ class TargetTagCommand(
   }
 
   fun isAtSepoint(): Boolean {
-    return (thetaPID.error < 3.degrees && yPID.error < 2.inches && xPID.error < 4.inches)
+    val atSetPoint = (thetaPID.error < 3.degrees && yPID.error < 2.inches && xPID.error < 4.inches)
+    vision.isAligned = atSetPoint
+    return atSetPoint
   }
 
   override fun initialize() {
@@ -190,6 +192,8 @@ class TargetTagCommand(
       yPID = PIDController(ykP.get(), ykI.get(), ykD.get())
       xPID = PIDController(ykP.get(), ykI.get(), ykD.get())
     }
+
+    vision.isAligned = true
   }
 
   override fun execute() {
@@ -254,6 +258,9 @@ class TargetTagCommand(
 
   override fun end(interrupted: Boolean) {
     CustomLogger.recordDebugOutput("ActiveCommands/TargetTagCommand", false)
+
+    vision.isAutoAligning = false
+    vision.isAligned = false
 
     drivetrain.currentRequest =
       Request.DrivetrainRequest.OpenLoop(

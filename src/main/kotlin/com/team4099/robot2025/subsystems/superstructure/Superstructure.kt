@@ -1,11 +1,13 @@
 package com.team4099.robot2025.subsystems.superstructure
 
 import com.team4099.lib.hal.Clock
+import com.team4099.robot2023.subsystems.led.Leds
 import com.team4099.robot2025.config.constants.ArmConstants
 import com.team4099.robot2025.config.constants.Constants.Universal.AlgaeLevel
 import com.team4099.robot2025.config.constants.Constants.Universal.CoralLevel
 import com.team4099.robot2025.config.constants.Constants.Universal.GamePiece
 import com.team4099.robot2025.config.constants.ElevatorConstants
+import com.team4099.robot2025.config.constants.LEDConstants
 import com.team4099.robot2025.config.constants.RollersConstants
 import com.team4099.robot2025.subsystems.arm.Arm
 import com.team4099.robot2025.subsystems.arm.ArmTunableValues
@@ -19,6 +21,7 @@ import com.team4099.robot2025.subsystems.rollers.Ramp
 import com.team4099.robot2025.subsystems.rollers.RampTunableValues
 import com.team4099.robot2025.subsystems.rollers.Rollers
 import com.team4099.robot2025.subsystems.rollers.RollersTunableValues
+import com.team4099.robot2025.subsystems.vision.Vision
 import com.team4099.robot2025.util.CustomLogger
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
@@ -36,6 +39,7 @@ import org.team4099.lib.units.derived.cos
 import org.team4099.lib.units.derived.degrees
 import org.team4099.lib.units.derived.sin
 import org.team4099.lib.units.derived.volts
+import org.team4099.lib.units.milli
 
 class Superstructure(
   private val drivetrain: Drivetrain,
@@ -44,7 +48,8 @@ class Superstructure(
   private val ramp: Ramp,
   private val arm: Arm,
   private val climber: Climber,
-  // private val climber: Climber,
+  private val leds: Leds,
+  private val vision: Vision,
   private val limelight: LimelightVision
 ) : SubsystemBase() {
 
@@ -92,6 +97,13 @@ class Superstructure(
   private var lastSpitOutTime = Clock.fpgaTime
 
   override fun periodic() {
+
+
+    //led updates
+    leds.hasCoral = theoreticalGamePiece == GamePiece.CORAL || theoreticalGamePiece == GamePiece.CORAL_L1
+    var isAutoAligning = vision.isAutoAligning
+    var isAligned = vision.isAligned
+    var seesTag = Clock.fpgaTime - vision.lastTrigVisionUpdate.timestamp < 100.milli.seconds
 
     val armLoopStartTime = Clock.realTimestamp
     arm.periodic()

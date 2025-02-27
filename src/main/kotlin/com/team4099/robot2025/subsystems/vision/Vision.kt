@@ -36,13 +36,15 @@ class Vision(vararg cameras: CameraIO) : SubsystemBase() {
   val io: List<CameraIO> = cameras.toList()
   val inputs = List(io.size) { CameraIO.CameraInputs() }
 
+  var isAutoAligning = false
+  var isAligned = false
+
   var drivetrainOdometry: () -> Pose2d = { Pose2d() }
 
   companion object {
     val ambiguityThreshold = 0.7
     val targetLogTime = 0.05.seconds
     val cameraPoses = VisionConstants.CAMERA_TRANSFORMS
-
     val xyStdDevCoeffecient = 0.05
     val thetaStdDevCoefficient = 1.5
   }
