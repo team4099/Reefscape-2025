@@ -269,7 +269,7 @@ object RobotContainer {
   fun getAutonomousCommand() = AutonomousSelector.getCommand(drivetrain, superstructure, vision)
 
   fun getAutonomousLoadingCommand() =
-    AutonomousSelector.getLoadingCommand(drivetrain, superstructure, vision)
+    AutonomousSelector.getLoadingCommand(drivetrain)
 
   fun resetGyroYawCommand(angle: Angle): Command = ResetGyroYawCommand(drivetrain, angle)
 

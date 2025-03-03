@@ -350,7 +350,9 @@ class Superstructure(
               nextState = SuperstructureStates.PREP_SCORE_CORAL
             }
             is Request.SuperstructureRequest.IntakeCoral -> {
-              nextState = SuperstructureStates.PREP_INTAKE_CORAL
+              if (arm.inputs.armPosition < ArmTunableValues.ArmAngles.safeElevatorBackAngle.get()) {
+                nextState = SuperstructureStates.PREP_INTAKE_CORAL
+              }
             }
             is Request.SuperstructureRequest.IntakeL1 -> {
               nextState = SuperstructureStates.PREP_INTAKE_L1
