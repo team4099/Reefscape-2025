@@ -56,7 +56,6 @@ class CameraIOPhotonvision(private val identifier: String, private val transform
 
     if (pipelineResult.hasTargets()) {
 
-
       if ((inputs.timestamp - lastEstTimestamp).absoluteValue > 10.micro.seconds) {
         inputs.fps = 1 / (inputs.timestamp - lastEstTimestamp).inSeconds
         lastEstTimestamp = inputs.timestamp

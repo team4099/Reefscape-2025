@@ -54,14 +54,11 @@ class Leds(val io: LedIO) {
       } else {
         if (isAligned) {
           state = LEDConstants.CandleState.CAN_SCORE
-        } else
-          if(!seesTag) {
-            state = LEDConstants.CandleState.NO_REEF_TAG
-          } else {
-            state = LEDConstants.CandleState.IS_ALIGNING
-          }
-
-
+        } else if (!seesTag) {
+          state = LEDConstants.CandleState.NO_REEF_TAG
+        } else {
+          state = LEDConstants.CandleState.IS_ALIGNING
+        }
       }
     }
 

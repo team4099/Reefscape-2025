@@ -29,7 +29,9 @@ object AllianceFlipUtil {
   /** Flips a translation to the correct side of the field based on the current alliance color. */
   fun apply(translation: Translation2d, force: Boolean = false): Translation2d {
     return if (shouldFlip() || force) {
-      Translation2d(FieldConstants.fieldLength - translation.x, FieldConstants.fieldWidth - translation.y)
+      Translation2d(
+        FieldConstants.fieldLength - translation.x, FieldConstants.fieldWidth - translation.y
+      )
     } else {
       translation
     }
@@ -37,7 +39,10 @@ object AllianceFlipUtil {
 
   fun apply(translation: Translation2dWPILIB): Translation2dWPILIB {
     return if (shouldFlip()) {
-      Translation2dWPILIB(FieldConstants.fieldLength.inMeters - translation.x, FieldConstants.fieldWidth.inMeters - translation.y)
+      Translation2dWPILIB(
+        FieldConstants.fieldLength.inMeters - translation.x,
+        FieldConstants.fieldWidth.inMeters - translation.y
+      )
     } else {
       translation
     }
@@ -67,7 +72,9 @@ object AllianceFlipUtil {
   ): Pose2d { // flipToRed is a hacky way to get it to flip when the driver station is empty
     return if (shouldFlip()) {
       Pose2d(
-        FieldConstants.fieldLength - pose.x, FieldConstants.fieldWidth - pose.y, Angle(-pose.rotation.cos, -pose.rotation.sin)
+        FieldConstants.fieldLength - pose.x,
+        FieldConstants.fieldWidth - pose.y,
+        Angle(-pose.rotation.cos, -pose.rotation.sin)
       )
     } else {
       pose

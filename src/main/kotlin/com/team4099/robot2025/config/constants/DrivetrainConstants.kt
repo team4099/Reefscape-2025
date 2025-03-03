@@ -74,7 +74,6 @@ object DrivetrainConstants {
   const val MK4I_STEERING_SENSOR_GEAR_RATIO = 7.0 / 150.0
   const val MK4N_STEERING_SENSOR_GEAR_RATIO = 1 / 18.75
 
-
   val ALLOWED_STEERING_ANGLE_ERROR = 1.degrees
 
   val STEERING_SUPPLY_CURRENT_LIMIT = 20.0.amps
@@ -136,17 +135,17 @@ object DrivetrainConstants {
       (0.1.degrees.perSecond / (1.degrees / 1.seconds)).radiansPerSecondPerRadiansPerSecond
 
     val AUTO_THETA_ALLOWED_ERROR = 3.degrees
-    val AUTO_THETA_PID_KP = (3.3.radians.perSecond / 1.radians)
+    val AUTO_THETA_PID_KP = (1.9.radians.perSecond / 1.radians)
     val AUTO_THETA_PID_KI = (0.0.radians.perSecond / (1.radians * 1.seconds))
     val AUTO_THETA_PID_KD =
-      (0.4.degrees.perSecond / (1.degrees / 1.seconds)).radiansPerSecondPerRadiansPerSecond
+      (0.2.degrees.perSecond / (1.degrees / 1.seconds)).radiansPerSecondPerRadiansPerSecond
 
-    val TELEOP_THETA_PID_KP = 3.8.degrees.perSecond / 1.degrees
+    val TELEOP_THETA_PID_KP = 3.9.degrees.perSecond / 1.degrees
     val TELEOP_THETA_PID_KI = 0.0.degrees.perSecond / (1.degrees * 1.seconds)
     val TELEOP_THETA_PID_KD =
       (0.3.degrees.perSecond / (1.degrees / 1.seconds)).radiansPerSecondPerRadiansPerSecond
 
-    val TELEOP_Y_PID_KP = 2.0.meters.perSecond / 1.meters
+    val TELEOP_Y_PID_KP = 4.0.meters.perSecond / 1.meters
     val TELEOP_Y_PID_KI = 0.0.meters.perSecond / (1.meters * 1.seconds)
     val TELEOP_Y_PID_KD = 0.0.meters.perSecond.perMeterPerSecond
 
@@ -159,8 +158,8 @@ object DrivetrainConstants {
     val SIM_AUTO_THETA_PID_KD =
       (0.degrees.perSecond / (1.degrees / 1.seconds)).radiansPerSecondPerRadiansPerSecond
 
-    val MAX_AUTO_ANGULAR_VEL = 4.5.radians.perSecond
-    val MAX_AUTO_ANGULAR_ACCEL = 54.4.radians.perSecond.perSecond
+    val MAX_AUTO_ANGULAR_VEL = 5.radians.perSecond
+    val MAX_AUTO_ANGULAR_ACCEL = 10.radians.perSecond.perSecond
 
     val STEERING_KP = 10.0.volts / 45.degrees
     val STEERING_KI = 0.0.volts.perDegreeSeconds

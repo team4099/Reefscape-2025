@@ -87,8 +87,6 @@ class Vision(vararg cameras: CameraIO) : SubsystemBase() {
       closestReefTags[i] = null
     }
 
-
-
     for (instance in io.indices) {
 
       var reefTags = mutableListOf<Pair<Int, Transform3d>>()
@@ -156,12 +154,7 @@ class Vision(vararg cameras: CameraIO) : SubsystemBase() {
                       )
                     )
                     .translation,
-                  Rotation3d(
-                    0.degrees,
-                    0.degrees,
-                        aprilTagAlignmentAngle
-                          ?: 0.degrees
-                  )
+                  Rotation3d(0.degrees, 0.degrees, aprilTagAlignmentAngle ?: 0.degrees)
                 )
 
               val distanceToTarget = robotTReefTag.translation.norm
@@ -222,13 +215,17 @@ class Vision(vararg cameras: CameraIO) : SubsystemBase() {
       )
     }
 
-    Logger.recordOutput("Vision/viewingSameTag", closestReefTags[0]?.first == closestReefTags[1]?.first)
-    closestReefTagAcrossCams = if (closestReefTags[0]?.first != closestReefTags[1]?.first) {
+    Logger.recordOutput(
+      "Vision/viewingSameTag", closestReefTags[0]?.first == closestReefTags[1]?.first
+    )
+    closestReefTagAcrossCams =
+      if (closestReefTags[0]?.first != closestReefTags[1]?.first) {
         closestReefTags.minByOrNull { it.value?.second?.translation?.norm ?: 1000000.meters }
-    } else {
-        mapOf(cameraPreference to closestReefTags[cameraPreference]).minByOrNull { it.value?.second?.translation?.norm ?: 1000000.meters }
-    }
-
+      } else {
+        mapOf(cameraPreference to closestReefTags[cameraPreference]).minByOrNull {
+          it.value?.second?.translation?.norm ?: 1000000.meters
+        }
+      }
 
     Logger.recordOutput(
       "Vision/ClosestReefTagAcrossAllCams/CameraID",

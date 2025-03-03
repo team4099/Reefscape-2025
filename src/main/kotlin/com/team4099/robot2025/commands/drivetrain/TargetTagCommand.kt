@@ -1,7 +1,6 @@
 package com.team4099.robot2025.commands.drivetrain
 
 import com.team4099.lib.logging.LoggedTunableValue
-import com.team4099.robot2025.config.constants.Constants
 import com.team4099.robot2025.config.constants.DrivetrainConstants
 import com.team4099.robot2025.subsystems.drivetrain.drive.Drivetrain
 import com.team4099.robot2025.subsystems.superstructure.Request
@@ -143,7 +142,6 @@ class TargetTagCommand(
       thetakI.initDefault(DrivetrainConstants.PID.SIM_AUTO_THETA_PID_KI)
       thetakD.initDefault(DrivetrainConstants.PID.SIM_AUTO_THETA_PID_KD)
 
-
       thetaPID =
         PIDController(
           DrivetrainConstants.PID.SIM_AUTO_THETA_PID_KP,
@@ -206,14 +204,14 @@ class TargetTagCommand(
     if (visionData.targetTagID != -1 &&
       visionData.robotTReefTag != Transform2d(Translation2d(0.meters, 0.meters), 0.degrees)
     ) {
-      var thetaFeedback = thetaPID.calculate(drivetrain.odomTRobot.rotation , visionData.robotTReefTag.rotation)
+      var thetaFeedback =
+        thetaPID.calculate(drivetrain.odomTRobot.rotation, visionData.robotTReefTag.rotation)
 
       CustomLogger.recordDebugOutput(
         "Testing/CurrentDrivetrainRotation", drivetrain.odomTRobot.rotation.inDegrees
       )
       CustomLogger.recordOutput("TargetTag/thetaError", thetaPID.error.inDegrees)
       CustomLogger.recordDebugOutput("Testing/thetaFeedback", thetaFeedback.inDegreesPerSecond)
-
 
       if (thetaPID.error > 5.degrees) {
         drivetrain.currentRequest =
@@ -231,7 +229,10 @@ class TargetTagCommand(
         CustomLogger.recordOutput("TargetTag/yError", thetaPID.error.inDegrees)
 
         CustomLogger.recordDebugOutput("TagAlignment/yError", yPID.error.inMeters)
-        CustomLogger.recordDebugOutput("TagAlignment/yFeedback", yFeedback.inMetersPerSecond,)
+        CustomLogger.recordDebugOutput(
+          "TagAlignment/yFeedback",
+          yFeedback.inMetersPerSecond,
+        )
 
         val driveVector = driver.driveSpeedClampedSupplier(driveX, driveY, slowMode)
 
@@ -240,15 +241,9 @@ class TargetTagCommand(
 
         drivetrain.currentRequest =
           Request.DrivetrainRequest.OpenLoop(
-            thetaFeedback,
-            Pair(xFeedBack, yFeedback),
-            fieldOriented = false
+            thetaFeedback, Pair(xFeedBack, yFeedback), fieldOriented = false
           )
-
       }
-
-
-
     }
   }
 

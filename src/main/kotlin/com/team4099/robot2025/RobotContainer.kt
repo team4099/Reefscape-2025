@@ -24,6 +24,7 @@ import com.team4099.robot2025.subsystems.drivetrain.drive.DrivetrainIOSim
 import com.team4099.robot2025.subsystems.drivetrain.gyro.GyroIO
 import com.team4099.robot2025.subsystems.drivetrain.gyro.GyroIOPigeon2
 import com.team4099.robot2025.subsystems.elevator.Elevator
+import com.team4099.robot2025.subsystems.elevator.ElevatorIO
 import com.team4099.robot2025.subsystems.elevator.ElevatorIOSim
 import com.team4099.robot2025.subsystems.elevator.ElevatorIOTalon
 import com.team4099.robot2025.subsystems.led.LedIO
@@ -105,7 +106,8 @@ object RobotContainer {
     )
     vision.drivetrainOdometry = { drivetrain.odomTRobot }
 
-    superstructure = Superstructure(drivetrain, elevator, rollers, ramp, arm, climber, leds, vision, limelight)
+    superstructure =
+      Superstructure(drivetrain, elevator, rollers, ramp, arm, climber, leds, vision, limelight)
 
     limelight.poseSupplier = { drivetrain.odomTRobot }
   }
@@ -164,6 +166,10 @@ object RobotContainer {
     superstructure.currentRequest = Request.SuperstructureRequest.Idle()
   }
 
+  fun intakeCoral() {
+    superstructure.currentRequest = Request.SuperstructureRequest.IntakeCoral()
+  }
+
   fun requestTuning() {
     superstructure.currentRequest = Request.SuperstructureRequest.Tuning()
   }
@@ -197,7 +203,7 @@ object RobotContainer {
     ControlBoard.intakeAlgaeL2.whileTrue(
       superstructure.intakeAlgaeCommand(Constants.Universal.AlgaeLevel.L2)
     )
-    ControlBoard.prepAlgaeBarge.whileTrue(superstructure.prepScoreAlgaeBargeCommand())
+    // ControlBoard.prepAlgaeBarge.whileTrue(superstructure.prepScoreAlgaeBargeCommand())
     //
     ControlBoard.prepL2.whileTrue(
       superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L2)
@@ -208,7 +214,9 @@ object RobotContainer {
     )
     //
     // No L4 scoring in the church
-    ControlBoard.prepL4.whileTrue(superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L4))
+     ControlBoard.prepL4.whileTrue(
+      superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L4)
+    )
 
     ControlBoard.score.onTrue(superstructure.prepScoreDefaultCommand())
     ControlBoard.score.onFalse(superstructure.scoreCommand())
@@ -239,7 +247,6 @@ object RobotContainer {
         drivetrain,
         superstructure,
         vision,
-
         1
       )
     )
@@ -255,15 +262,14 @@ object RobotContainer {
         0.inches
       )
     )
-
-
   }
 
   fun mapTestControls() {}
 
   fun getAutonomousCommand() = AutonomousSelector.getCommand(drivetrain, superstructure, vision)
 
-  fun getAutonomousLoadingCommand() = AutonomousSelector.getLoadingCommand(drivetrain, superstructure, vision)
+  fun getAutonomousLoadingCommand() =
+    AutonomousSelector.getLoadingCommand(drivetrain, superstructure, vision)
 
   fun resetGyroYawCommand(angle: Angle): Command = ResetGyroYawCommand(drivetrain, angle)
 

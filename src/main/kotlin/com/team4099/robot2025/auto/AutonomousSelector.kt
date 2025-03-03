@@ -65,7 +65,9 @@ object AutonomousSelector {
       AutonomousMode.EXAMPLE_PATH_AUTO ->
         return WaitCommand(waitTime.inSeconds)
           .andThen({
-            drivetrain.tempZeroGyroYaw(AllianceFlipUtil.apply(ExamplePathAuto.startingPose).rotation)
+            drivetrain.tempZeroGyroYaw(
+              AllianceFlipUtil.apply(ExamplePathAuto.startingPose).rotation
+            )
             drivetrain.resetFieldFrameEstimator(
               AllianceFlipUtil.apply(ExamplePathAuto.startingPose)
             )
@@ -76,7 +78,11 @@ object AutonomousSelector {
     return InstantCommand()
   }
 
-  fun getLoadingCommand(drivetrain: Drivetrain, superstructure: Superstructure, vision: Vision): Command {
+  fun getLoadingCommand(
+    drivetrain: Drivetrain,
+    superstructure: Superstructure,
+    vision: Vision
+  ): Command {
     return ExamplePathAuto(drivetrain, superstructure, vision)
   }
 

@@ -151,12 +151,8 @@ object Robot : LoggedRobot() {
     RobotContainer.setSteeringCoastMode()
 
     val autonCommandWithWait =
-      runOnce({ RobotContainer.zeroSensors(isInAutonomous = true) }).andThen(
-        ParallelCommandGroup(
-          runOnce({ RobotContainer.requestIdle() }),
-          autonomousCommand
-        )
-      )
+      runOnce({ RobotContainer.zeroSensors(isInAutonomous = true) })
+        .andThen(autonomousCommand)
     autonCommandWithWait?.schedule()
   }
 

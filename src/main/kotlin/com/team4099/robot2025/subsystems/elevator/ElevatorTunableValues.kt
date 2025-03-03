@@ -93,7 +93,6 @@ object ElevatorTunableValues {
         Pair({ it.inInches }, { it.inches })
       )
 
-
     val idleAlgaeHeight =
       LoggedTunableValue(
         "Elevator/idleAlgaeHeight",

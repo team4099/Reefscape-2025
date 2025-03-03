@@ -6,7 +6,6 @@ import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.math.trajectory.Trajectory
-import kotlin.math.pow
 
 /**
  * This holonomic drive controller can be used to follow trajectories using a holonomic drivetrain
@@ -51,8 +50,8 @@ class CustomHolonomicDriveController(
     val tolTranslate = m_poseTolerance.translation
     val tolRotate = m_poseTolerance.rotation
     return Math.abs(eTranslate.x) < tolTranslate.x &&
-            Math.abs(eTranslate.y) < tolTranslate.y &&
-            Math.abs(eRotate.radians) < tolRotate.radians
+      Math.abs(eTranslate.y) < tolTranslate.y &&
+      Math.abs(eRotate.radians) < tolRotate.radians
   }
 
   /**
@@ -136,17 +135,17 @@ class CustomHolonomicDriveController(
    * @param trajectoryState The desired trajectory state with both drive and rotation from Choreo.
    * @return The next output of the holonomic drive controller.
    */
-  fun calculate(
-    currentPose: Pose2d,
-    trajectoryState: SwerveSample
-  ): ChassisSpeeds {
+  fun calculate(currentPose: Pose2d, trajectoryState: SwerveSample): ChassisSpeeds {
     val xFF = trajectoryState.vx
-    val yFF =  trajectoryState.vy
+    val yFF = trajectoryState.vy
 
     // Calculate feedback velocities (based on position error).
     val xFeedback = m_xController.calculate(currentPose.x, trajectoryState.pose.x)
     val yFeedback = m_yController.calculate(currentPose.y, trajectoryState.pose.y)
-    val thetaFeedback = m_thetaController.calculate(currentPose.rotation.radians, trajectoryState.pose.rotation.radians)
+    val thetaFeedback =
+      m_thetaController.calculate(
+        currentPose.rotation.radians, trajectoryState.pose.rotation.radians
+      )
 
     return ChassisSpeeds.fromFieldRelativeSpeeds(
       xFF + xFeedback,
@@ -155,7 +154,6 @@ class CustomHolonomicDriveController(
       currentPose.rotation
     )
   }
-
 
   /**
    * Enables and disables the controller for troubleshooting problems. When calculate() is called on

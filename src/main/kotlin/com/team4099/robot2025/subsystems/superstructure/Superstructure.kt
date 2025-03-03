@@ -7,7 +7,6 @@ import com.team4099.robot2025.config.constants.Constants.Universal.AlgaeLevel
 import com.team4099.robot2025.config.constants.Constants.Universal.CoralLevel
 import com.team4099.robot2025.config.constants.Constants.Universal.GamePiece
 import com.team4099.robot2025.config.constants.ElevatorConstants
-import com.team4099.robot2025.config.constants.LEDConstants
 import com.team4099.robot2025.config.constants.RollersConstants
 import com.team4099.robot2025.subsystems.arm.Arm
 import com.team4099.robot2025.subsystems.arm.ArmTunableValues
@@ -23,6 +22,7 @@ import com.team4099.robot2025.subsystems.rollers.Rollers
 import com.team4099.robot2025.subsystems.rollers.RollersTunableValues
 import com.team4099.robot2025.subsystems.vision.Vision
 import com.team4099.robot2025.util.CustomLogger
+import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import org.team4099.lib.geometry.Pose3d
@@ -40,6 +40,7 @@ import org.team4099.lib.units.derived.degrees
 import org.team4099.lib.units.derived.sin
 import org.team4099.lib.units.derived.volts
 import org.team4099.lib.units.milli
+import org.team4099.lib.units.perSecond
 
 class Superstructure(
   private val drivetrain: Drivetrain,
@@ -93,14 +94,14 @@ class Superstructure(
 
   private var lastTransitionTime = Clock.fpgaTime
 
-  private var lastLevelScoredAt = CoralLevel.NONE
-  private var lastSpitOutTime = Clock.fpgaTime
+  private var readyForCleanup: Boolean = true
+  private var lastCleanupTime = Clock.fpgaTime
 
   override fun periodic() {
 
-
-    //led updates
-    leds.hasCoral = theoreticalGamePiece == GamePiece.CORAL || theoreticalGamePiece == GamePiece.CORAL_L1
+    // led updates
+    leds.hasCoral =
+      theoreticalGamePiece == GamePiece.CORAL || theoreticalGamePiece == GamePiece.CORAL_L1
     var isAutoAligning = vision.isAutoAligning
     var isAligned = vision.isAligned
     var seesTag = Clock.fpgaTime - vision.lastTrigVisionUpdate.timestamp < 100.milli.seconds
@@ -256,20 +257,20 @@ class Superstructure(
           Request.ClimberRequest.ClosedLoop(ClimberTunableValues.climbIdleAngle.get())
         ramp.currentRequest = Request.RampRequest.OpenLoop(RampTunableValues.idleVoltage.get())
 
-        // fixing elevator stalling at 0
-        if (elevator.inputs.leaderStatorCurrent > ElevatorConstants.HOMING_STALL_CURRENT &&
-          elevator.elevatorPositionTarget == 0.inches
-        ) {
-          elevator.currentRequest = Request.ElevatorRequest.Home()
-        }
-
         // mechanism idle positions based on which game piece robot has
         when (theoreticalGamePiece) {
           GamePiece.CORAL -> {
             arm.currentRequest =
               Request.ArmRequest.ClosedLoop(ArmTunableValues.ArmAngles.idleCoralAngle.get())
-            rollers.currentRequest =
-              Request.RollersRequest.OpenLoop(RollersTunableValues.idleCoralVoltage.get())
+
+            if ((Clock.fpgaTime - lastTransitionTime) >= 0.5.seconds && (Clock.fpgaTime - lastTransitionTime) <= 0.7.seconds && !DriverStation.isAutonomous()) {
+              rollers.currentRequest =
+                Request.RollersRequest.OpenLoop(RollersConstants.CLEANUP_CORAL_VOLTAGE)
+            }
+            else {
+              rollers.currentRequest =
+                Request.RollersRequest.OpenLoop(RollersTunableValues.idleCoralVoltage.get())
+            }
 
             if (arm.isAtTargetedPosition) {
               elevator.currentRequest =
@@ -282,7 +283,7 @@ class Superstructure(
             arm.currentRequest =
               Request.ArmRequest.ClosedLoop(ArmTunableValues.ArmAngles.idleCoralL1Angle.get())
             rollers.currentRequest =
-              Request.RollersRequest.OpenLoop(RollersTunableValues.idleCoralL1Voltage.get())
+                Request.RollersRequest.OpenLoop(RollersTunableValues.idleCoralL1Voltage.get())
 
             if (arm.isAtTargetedPosition) {
               elevator.currentRequest =
@@ -348,6 +349,9 @@ class Superstructure(
             is Request.SuperstructureRequest.ScorePrepCoral -> {
               nextState = SuperstructureStates.PREP_SCORE_CORAL
             }
+            is Request.SuperstructureRequest.IntakeCoral -> {
+              nextState = SuperstructureStates.PREP_INTAKE_CORAL
+            }
             is Request.SuperstructureRequest.IntakeL1 -> {
               nextState = SuperstructureStates.PREP_INTAKE_L1
             }
@@ -395,7 +399,7 @@ class Superstructure(
         }
 
         if (currentRequest is Request.SuperstructureRequest.Idle) {
-          nextState = SuperstructureStates.INTAKE_CORAL_CLEANUP
+          nextState = SuperstructureStates.IDLE
         }
       }
       SuperstructureStates.INTAKE_CORAL -> {
@@ -448,8 +452,9 @@ class Superstructure(
           val reefLevelElevatorHeight: Length =
             when (coralScoringLevel) {
               CoralLevel.L1 -> {
-                if (theoreticalGamePiece == GamePiece.CORAL) ElevatorTunableValues.ElevatorHeights.L1VerticalHeight.get() else
-                    ElevatorTunableValues.ElevatorHeights.L1HorizontalHeight.get()
+                if (theoreticalGamePiece == GamePiece.CORAL)
+                  ElevatorTunableValues.ElevatorHeights.L1VerticalHeight.get()
+                else ElevatorTunableValues.ElevatorHeights.L1HorizontalHeight.get()
               }
               CoralLevel.L2 -> ElevatorTunableValues.ElevatorHeights.L2Height.get()
               CoralLevel.L3 -> ElevatorTunableValues.ElevatorHeights.L3Height.get()
@@ -460,8 +465,9 @@ class Superstructure(
           val reefLevelArmAngle: Angle =
             when (coralScoringLevel) {
               CoralLevel.L1 -> {
-                if (theoreticalGamePiece == GamePiece.CORAL) ArmTunableValues.ArmAngles.scoreCoralL1VerticalAngle.get() else
-                  ArmTunableValues.ArmAngles.scoreCoralL1HorizontalAngle.get()
+                if (theoreticalGamePiece == GamePiece.CORAL)
+                  ArmTunableValues.ArmAngles.scoreCoralL1VerticalAngle.get()
+                else ArmTunableValues.ArmAngles.scoreCoralL1HorizontalAngle.get()
               }
               CoralLevel.L2 -> ArmTunableValues.ArmAngles.scoreCoralL2Angle.get()
               CoralLevel.L3 -> ArmTunableValues.ArmAngles.scoreCoralL3Angle.get()
@@ -496,8 +502,9 @@ class Superstructure(
         val reefLevelElevatorHeight: Length =
           when (coralScoringLevel) {
             CoralLevel.L1 -> {
-              if (theoreticalGamePiece == GamePiece.CORAL) ElevatorTunableValues.ElevatorHeights.L1VerticalHeight.get() else
-                ElevatorTunableValues.ElevatorHeights.L1HorizontalHeight.get()
+              if (theoreticalGamePiece == GamePiece.CORAL)
+                ElevatorTunableValues.ElevatorHeights.L1VerticalHeight.get()
+              else ElevatorTunableValues.ElevatorHeights.L1HorizontalHeight.get()
             }
             CoralLevel.L2 -> ElevatorTunableValues.ElevatorHeights.L2Height.get()
             CoralLevel.L3 -> ElevatorTunableValues.ElevatorHeights.L3Height.get()
@@ -508,8 +515,9 @@ class Superstructure(
         val reefLevelArmAngle: Angle =
           when (coralScoringLevel) {
             CoralLevel.L1 -> {
-              if (theoreticalGamePiece == GamePiece.CORAL) ArmTunableValues.ArmAngles.scoreCoralL1VerticalAngle.get() else
-                ArmTunableValues.ArmAngles.scoreCoralL1HorizontalAngle.get()
+              if (theoreticalGamePiece == GamePiece.CORAL)
+                ArmTunableValues.ArmAngles.scoreCoralL1VerticalAngle.get()
+              else ArmTunableValues.ArmAngles.scoreCoralL1HorizontalAngle.get()
             }
             CoralLevel.L2 -> ArmTunableValues.ArmAngles.scoreCoralL2Angle.get()
             CoralLevel.L3 -> ArmTunableValues.ArmAngles.scoreCoralL3Angle.get()
@@ -519,32 +527,47 @@ class Superstructure(
             }
           }
 
-        if (theoreticalGamePiece == GamePiece.CORAL) {
-          if (coralScoringLevel == CoralLevel.L4) {
-            elevator.currentRequest = Request.ElevatorRequest.ClosedLoop(reefLevelElevatorHeight)
-          }
+        if (theoreticalGamePiece == GamePiece.CORAL || theoreticalGamePiece == GamePiece.NONE) {
+//          if (coralScoringLevel == CoralLevel.L4) {
+//            elevator.currentRequest = Request.ElevatorRequest.ClosedLoop(reefLevelElevatorHeight)
+//          }
 
-          if (coralScoringLevel != CoralLevel.L1) {
+//          if (elevator.isAtTargetedPosition
+//            && elevator.elevatorPositionTarget == ElevatorTunableValues.ElevatorHeights.L4Height.get()) {
+//            elevator.currentRequest = Request.ElevatorRequest.ClosedLoop(reefLevelElevatorHeight + 3.inches)
+//            rollers.currentRequest = Request.RollersRequest.OpenLoop(RollersTunableValues.scoreCoralVoltage.get())
+//          }
+
+          if (coralScoringLevel != CoralLevel.L1 && elevator.isAtTargetedPosition) {
             arm.currentRequest =
-              Request.ArmRequest.ClosedLoop(reefLevelArmAngle + (
-                  if (coralScoringLevel == CoralLevel.L4)  -ArmConstants.SCORE_OFFSET else ArmConstants.SCORE_OFFSET
-              ))
+              Request.ArmRequest.ClosedLoop(
+                reefLevelArmAngle +
+                  (
+                    if (coralScoringLevel == CoralLevel.L4) ArmConstants.SCORE_OFFSET // 0.degrees
+                    else ArmConstants.SCORE_OFFSET
+                    )
+              )
 
-            if (coralScoringLevel == CoralLevel.L4) {
-              elevator.currentRequest = Request.ElevatorRequest.ClosedLoop(reefLevelElevatorHeight + 3.inches)
-            }
+//            if (coralScoringLevel == CoralLevel.L4 && elevator.isAtTargetedPosition) {
+//              elevator.currentRequest =
+//                Request.ElevatorRequest.ClosedLoop(reefLevelElevatorHeight + 3.inches)
+//            }
           }
 
-          val isReadyToScore = if (coralScoringLevel == CoralLevel.L4)
-            elevator.isAtTargetedPosition && arm.isAtTargetedPosition else arm.isAtTargetedPosition
+          val isReadyToScore =
+            if (coralScoringLevel == CoralLevel.L4)
+              elevator.isAtTargetedPosition && arm.isAtTargetedPosition
+            else arm.isAtTargetedPosition
 
           if (isReadyToScore) {
             rollers.currentRequest =
               Request.RollersRequest.OpenLoop(RollersTunableValues.scoreCoralVoltage.get())
           }
 
-          val spitOutTime = if (coralScoringLevel == CoralLevel.L4)
-            (RollersTunableValues.coralSpitTime.get() + 0.4.seconds) else RollersTunableValues.coralSpitTime.get()
+          val spitOutTime =
+            if (coralScoringLevel == CoralLevel.L4)
+              (RollersTunableValues.coralSpitTime.get() + 0.4.seconds) // 0.5.seconds
+            else RollersTunableValues.coralSpitTime.get()
 
           if ((Clock.fpgaTime - lastTransitionTime) > spitOutTime) {
             theoreticalGamePiece = GamePiece.NONE
@@ -570,9 +593,11 @@ class Superstructure(
         if (arm.isAtTargetedPosition) {
           val elevatorIdleHeight =
             when (theoreticalGamePiece) {
-              GamePiece.CORAL -> ElevatorTunableValues.ElevatorHeights.idleCoralHorizontalHeight.get()
+              GamePiece.CORAL ->
+                ElevatorTunableValues.ElevatorHeights.idleCoralHorizontalHeight.get()
               GamePiece.ALGAE -> ElevatorTunableValues.ElevatorHeights.idleAlgaeHeight.get()
-              GamePiece.CORAL_L1 -> ElevatorTunableValues.ElevatorHeights.idleCoralVerticalHeight.get()
+              GamePiece.CORAL_L1 ->
+                ElevatorTunableValues.ElevatorHeights.idleCoralVerticalHeight.get()
               GamePiece.NONE -> ElevatorTunableValues.ElevatorHeights.idleHeight.get()
             }
 
@@ -844,7 +869,9 @@ class Superstructure(
             GamePiece.ALGAE ->
               currentRequest = Request.SuperstructureRequest.ScorePrepAlgaeProcessor()
           }
-        } else if (currentState == SuperstructureStates.PREP_SCORE_CORAL && coralScoringLevel != CoralLevel.L1) {
+        } else if (currentState == SuperstructureStates.PREP_SCORE_CORAL &&
+          coralScoringLevel != CoralLevel.L1
+        ) {
           currentRequest = Request.SuperstructureRequest.Score()
         }
       }

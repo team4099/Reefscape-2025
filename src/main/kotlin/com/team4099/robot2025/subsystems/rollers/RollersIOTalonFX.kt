@@ -50,7 +50,7 @@ object RollersIOTalonFX : RollersIO {
     rollersConfiguration.CurrentLimits.StatorCurrentLimitEnable = true
     rollersConfiguration.CurrentLimits.SupplyCurrentLimitEnable = true
     rollersConfiguration.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive
-    rollersConfiguration.MotorOutput.NeutralMode = NeutralModeValue.Coast
+    rollersConfiguration.MotorOutput.NeutralMode = NeutralModeValue.Brake
 
     rollersTalon.configurator.apply(rollersConfiguration)
 

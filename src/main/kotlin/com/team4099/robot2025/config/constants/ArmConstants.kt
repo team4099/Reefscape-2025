@@ -19,7 +19,7 @@ import org.team4099.lib.units.perSecond
 
 object ArmConstants {
 
-  val ZERO_OFFSET = -12.7.degrees
+  val ZERO_OFFSET = -24.09.degrees
   val ARM_GEAR_RATIO = 1 / 33.0
   val ARM_ENCODER_TO_MECHANISM_RATIO = 1.0
 
@@ -31,9 +31,9 @@ object ArmConstants {
   val SAFE_ELEVATOR_FRONT_ANGLE = 100.degrees
   val SAFE_ELEVATOR_BACK_ANGLE = 90.degrees
 
-  val INTAKE_CORAL_ANGLE = -10.degrees
+  val INTAKE_CORAL_ANGLE = -4.degrees
   // hotfix for now until encoder
-  val INTAKE_L1_ANGLE = 115.degrees
+  val INTAKE_L1_ANGLE = 100.degrees
   val INTAKE_ALGAE_GROUND_ANGLE = 205.degrees
   val INTAKE_ALGAE_L2_ANGLE = 120.0.degrees
   val INTAKE_ALGAE_L3_ANGLE = 120.0.degrees

@@ -78,11 +78,13 @@ class Rollers(val io: RollersIO) {
         nextState = fromRequestToState(currentRequest)
 
         if (lastRollerVoltageTarget != rollersTargetVoltage) {
-          if (rollersTargetVoltage != RollersConstants.INTAKE_CORAL_VOLTAGE_SLOW) {
-            lastRollerVoltageTarget = rollersTargetVoltage
-            lastRollerRunTime = Clock.fpgaTime
-          }
+          lastRollerVoltageTarget = rollersTargetVoltage
+          lastRollerRunTime = Clock.fpgaTime
         }
+
+        CustomLogger.recordOutput("Rollers/lastRollerRunTime", lastRollerRunTime.inSeconds)
+        CustomLogger.recordOutput("Rollers/delta", (Clock.fpgaTime - lastRollerRunTime).inSeconds)
+        CustomLogger.recordOutput("Rollers/surpassThreshold", (Clock.fpgaTime - lastRollerRunTime) >= RollersConstants.CORAL_DETECTION_TIME_THRESHOLD)
       }
     }
 

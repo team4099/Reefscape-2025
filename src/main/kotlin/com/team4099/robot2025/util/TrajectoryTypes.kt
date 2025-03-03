@@ -5,7 +5,6 @@ import choreo.trajectory.Trajectory as ChoreoTrajectory
 import edu.wpi.first.math.trajectory.Trajectory as WPILibTrajectory
 
 sealed interface TrajectoryTypes {
-    class WPILib(val rawTrajectory: WPILibTrajectory) : TrajectoryTypes
-    class Choreo(val rawTrajectory: ChoreoTrajectory<SwerveSample>) : TrajectoryTypes {
-    }
+  class WPILib(val rawTrajectory: WPILibTrajectory) : TrajectoryTypes
+  class Choreo(val rawTrajectory: ChoreoTrajectory<SwerveSample>) : TrajectoryTypes
 }

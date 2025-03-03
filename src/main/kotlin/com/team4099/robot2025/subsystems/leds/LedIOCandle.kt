@@ -4,8 +4,6 @@ import com.ctre.phoenix.led.CANdle
 import com.team4099.robot2025.config.constants.Constants
 import com.team4099.robot2025.config.constants.LEDConstants
 import org.littletonrobotics.junction.Logger
-import org.team4099.lib.units.derived.ElectricalPotential
-import org.team4099.lib.units.derived.volts
 import kotlin.math.absoluteValue
 
 object LedIOCandle : LedIO {

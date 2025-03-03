@@ -27,7 +27,7 @@ object ElevatorConstants {
   val SPOOL_DIAMETER = 2.0051.inches
   val VOLTAGE_COMPENSATION = 12.0.volts
 
-  val ELEVATOR_TOLERANCE = 0.5.inches
+  val ELEVATOR_TOLERANCE = 1.inches
 
   val LEADER_STATOR_CURRENT_LIMIT = 60.0.amps
   val LEADER_SUPPLY_CURRENT_LIMIT = 60.0.amps
@@ -50,14 +50,13 @@ object ElevatorConstants {
   val IDLE_ALGAE_HEIGHT = 0.0.inches
 
   val INTAKE_CORAL_HEIGHT = 2.inches
-  val INTAKE_L1_HEIGHT = 4.28.inches
+  val INTAKE_L1_HEIGHT = 3.inches
 
-     val PASS_THROUGH_HEIGHT = 0.inches
+  val PASS_THROUGH_HEIGHT = 0.inches
 
   val INTAKE_ALGAE_GROUND_HEIGHT = 0.0.inches
-  val INTAKE_ALGAE_L2_HEIGHT = 4.inches
-  val INTAKE_ALGAE_L3_HEIGHT = 18.inches
-
+  val INTAKE_ALGAE_L2_HEIGHT = 11.inches
+  val INTAKE_ALGAE_L3_HEIGHT = 28.inches
 
   val SCORE_PROCESSOR_HEIGHT = 0.0.inches
   val SCORE_BARGE_HEIGHT = 60.inches
@@ -65,9 +64,9 @@ object ElevatorConstants {
   // TODO: adjust scoring/intaking heights for end-effector offset
   val L1_HORIZONTAL_HEIGHT = 0.0.inches
   val L1_VERTICAL_HEIGHT = 0.0.inches
-  val L2_HEIGHT = 13.039.inches - 4.inches
-  val L3_HEIGHT = 28.789.inches - 4.inches
-  val L4_HEIGHT = 49.5.inches
+  val L2_HEIGHT = 13.039.inches - 2.inches - 2.inches
+  val L3_HEIGHT = 28.789.inches - 2.inches - 2.inches
+  val L4_HEIGHT = 26.789.inches + (28.789.inches - 13.039.inches) - 2.inches  // 51.inches
 
   val EJECT_HEIGHT = 0.0.inches
 
@@ -75,7 +74,7 @@ object ElevatorConstants {
 
   // TODO: make real maxes
   val MAX_VELOCITY = 400.0.inches.perSecond
-  val MAX_ACCELERATION = 200.0.inches.perSecond.perSecond
+  val MAX_ACCELERATION = 100.0.inches.perSecond.perSecond
 
   object PID {
     // TODO: tune all
@@ -91,6 +90,8 @@ object ElevatorConstants {
     val KS = 0.1.volts
     val KV = (0.32.volts) / 1.0.meters.perSecond //  0.037
     val KA = (0.03.volts) / 1.0.meters.perSecond.perSecond // 0.0025
+
+    val KV_ADD = (0.1.volts) / 1.0.meters.perSecond //  0.037
 
     val KG_DEFAULT = 0.16.volts
     val KG_FIRST_STAGE = 0.16.volts
