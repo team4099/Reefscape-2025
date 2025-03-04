@@ -951,6 +951,17 @@ class Superstructure(
     return returnCommand
   }
 
+  fun ejectCommand(): Command {
+    val returnCommand = run {
+      currentRequest = Request.SuperstructureRequest.Eject()
+      elevator.currentRequest = Request.ElevatorRequest.Home()
+      arm.currentRequest = Request.ArmRequest.ClosedLoop(ArmTunableValues.ArmAngles.intakeCoralAngle.get());
+      rollers.currentRequest = Request.RollersRequest.OpenLoop(8.0.volts)
+    }
+    returnCommand.name = "EjectCommand"
+    return returnCommand
+  }
+
   companion object {
     enum class SuperstructureStates {
       UNINITIALIZED,
@@ -976,6 +987,7 @@ class Superstructure(
       CLIMB_RETRACT,
       PREP_SCORE_ALGAE_BARGE,
       SCORE_ALGAE_BARGE,
+      EJECT
     }
   }
 }

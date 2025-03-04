@@ -32,6 +32,8 @@ sealed interface Request {
     class ClimbRetract() : SuperstructureRequest
 
     class Tuning() : SuperstructureRequest
+
+    class Eject() : SuperstructureRequest
   }
 
   sealed interface DrivetrainRequest : Request {

@@ -223,6 +223,8 @@ object RobotContainer {
 
     ControlBoard.forceIdle.whileTrue(superstructure.requestIdleCommand())
 
+    ControlBoard.eject.whileTrue(superstructure.ejectCommand())
+
     ControlBoard.alignLeft.whileTrue(
       ReefAlignCommand(
         driver = Jessika(),

@@ -77,4 +77,6 @@ object ControlBoard {
   val alignAlgae = Trigger {
     driver.leftShoulderButton && driver.rightShoulderButton && !driver.rightJoystickButton
   }
+
+  val eject = Trigger { driver.dPadLeft }
 }
