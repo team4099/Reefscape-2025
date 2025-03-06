@@ -164,12 +164,12 @@ object ElevatorIOTalon : ElevatorIO {
     inputs.leaderTemperature = leaderTempSignal.valueAsDouble.celsius
     inputs.leaderSupplyCurrent = leaderSupplyCurrentSignal.valueAsDouble.amps
     inputs.leaderStatorCurrent = leaderStatorCurrentSignal.valueAsDouble.amps
-    inputs.leaderAppliedVoltage = (leaderDutyCycle.valueAsDouble*12).volts
+    inputs.leaderAppliedVoltage = (leaderDutyCycle.valueAsDouble * 12).volts
 
     inputs.followerTemperature = followerTempSignal.valueAsDouble.celsius
     inputs.followerStatorCurrent = followerStatorCurrentSignal.valueAsDouble.amps
     inputs.followerSupplyCurrent = followerSupplyCurrentSignal.valueAsDouble.amps
-    inputs.followerAppliedVoltage = (followerDutyCycle.valueAsDouble*12).volts
+    inputs.followerAppliedVoltage = (followerDutyCycle.valueAsDouble * 12).volts
 
     Logger.recordOutput(
       "Elevator/motionMagicPositon",
@@ -232,7 +232,8 @@ object ElevatorIOTalon : ElevatorIO {
 
     slot2Configs.kG = kGThirdStage.inVolts
     slot2Configs.kS = kS.inVolts
-    slot2Configs.kV = kV.inVoltsPerInchPerSecond + ElevatorConstants.PID.KV_ADD.inVoltsPerMetersPerSecond
+    slot2Configs.kV =
+      kV.inVoltsPerInchPerSecond + ElevatorConstants.PID.KV_ADD.inVoltsPerMetersPerSecond
     slot2Configs.kA = kA.inVoltsPerMetersPerSecondPerSecond
     slot2Configs.GravityType = GravityTypeValue.Elevator_Static
 

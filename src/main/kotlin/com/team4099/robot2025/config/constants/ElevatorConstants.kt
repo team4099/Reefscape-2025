@@ -66,7 +66,7 @@ object ElevatorConstants {
   val L1_VERTICAL_HEIGHT = 0.0.inches
   val L2_HEIGHT = 13.039.inches - 2.inches - 2.inches
   val L3_HEIGHT = 28.789.inches - 2.inches - 2.inches
-  val L4_HEIGHT = 26.789.inches + (28.789.inches - 13.039.inches) - 2.inches  // 51.inches
+  val L4_HEIGHT = 26.789.inches + (28.789.inches - 13.039.inches) - 2.inches // 51.inches
 
   val EJECT_HEIGHT = 0.0.inches
 
@@ -74,7 +74,7 @@ object ElevatorConstants {
 
   // TODO: make real maxes
   val MAX_VELOCITY = 400.0.inches.perSecond
-  val MAX_ACCELERATION = 100.0.inches.perSecond.perSecond
+  val MAX_ACCELERATION = 200.0.inches.perSecond.perSecond
 
   object PID {
     // TODO: tune all

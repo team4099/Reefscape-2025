@@ -83,4 +83,9 @@ sealed interface Request {
     class OpenLoop(val voltage: ElectricalPotential) : ElevatorRequest
     class Home() : ElevatorRequest
   }
+
+  sealed interface VisionRequest : Request {
+    class TargetReef() : VisionRequest
+    class TargetTag(val tags: Array<Int> ) : VisionRequest
+  }
 }

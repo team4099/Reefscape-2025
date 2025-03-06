@@ -4,7 +4,9 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout
 import edu.wpi.first.wpilibj.Filesystem
 import org.team4099.lib.apriltag.AprilTag
 import org.team4099.lib.geometry.Pose3d
+import org.team4099.lib.geometry.Translation2d
 import org.team4099.lib.units.base.inches
+import org.team4099.lib.units.base.meters
 import java.nio.file.Path
 
 // Copyright (c) 2024 FRC 6328
@@ -23,8 +25,6 @@ import java.nio.file.Path
  * Width refers to the *y* direction (as described by wpilib)
  */
 object FieldConstants {
-  var fieldLength = 690.876.inches
-  var fieldWidth = 317.inches
 
   val aprilTags: List<AprilTag> = listOf()
   val homeAprilTags: List<AprilTag> = listOf()
@@ -41,18 +41,28 @@ object FieldConstants {
 
       val AprilTags = mutableListOf<AprilTag>()
 
-      for (
-        tag in
+      val wpiLayout =
         AprilTagFieldLayout(
           Path.of(Filesystem.getDeployDirectory().path, "apriltags", "$name.json")
         )
-          .tags
-      ) {
+
+      for (tag in wpiLayout.tags) {
         AprilTags.add(AprilTag(tag.ID, Pose3d(tag.pose)))
       }
 
-      layout = org.team4099.lib.apriltag.AprilTagFieldLayout(AprilTags, fieldLength, fieldWidth)
+      layout =
+        org.team4099.lib.apriltag.AprilTagFieldLayout(
+          AprilTags, wpiLayout.fieldLength.meters, wpiLayout.fieldWidth.meters
+        )
       layoutString = name
     }
+  }
+
+  val fieldLength = AprilTagLayoutType.OFFICIAL.layout.fieldLength
+  val fieldWidth = AprilTagLayoutType.OFFICIAL.layout.fieldWidth
+
+  object REEF {
+    val blue_center: Translation2d = Translation2d(176.746.inches, fieldWidth / 2.0)
+    val red_center: Translation2d = Translation2d(fieldLength - 176.746.inches, fieldWidth / 2.0)
   }
 }

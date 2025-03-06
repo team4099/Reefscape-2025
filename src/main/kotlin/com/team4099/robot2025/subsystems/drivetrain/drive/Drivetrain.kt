@@ -203,8 +203,8 @@ class Drivetrain(val gyroIO: GyroIO, swerveModuleIOs: DrivetrainIO) : SubsystemB
   val odomTField: Transform2d
     get() = fieldFrameEstimator.getLatestOdometryTField()
 
-  val odomTSpeaker: Transform2d
-    get() = fieldFrameEstimator.getLatestOdometryTSpeaker()
+  val odomTReef: Transform2d
+    get() = fieldFrameEstimator.getLatestOdometryTReef()
 
   private var undriftedPose: Pose2d
     get() = Pose2d(undriftedSwerveDriveOdometry.poseMeters)
@@ -279,7 +279,7 @@ class Drivetrain(val gyroIO: GyroIO, swerveModuleIOs: DrivetrainIO) : SubsystemB
 
     Logger.recordOutput(
       "FieldFrameEstimator/odomTSpeaker",
-      fieldFrameEstimator.getLatestOdometryTSpeaker().transform2d
+      fieldFrameEstimator.getLatestOdometryTReef().transform2d
     )
 
     Logger.recordOutput("Drivetrain/OdometryGyroRotationValue", odomTRobot.rotation.inDegrees)
@@ -467,8 +467,8 @@ class Drivetrain(val gyroIO: GyroIO, swerveModuleIOs: DrivetrainIO) : SubsystemB
     } else {
       desiredChassisSpeeds =
         ChassisSpeeds(
-          allianceFlippedDriveVector.first,
-          allianceFlippedDriveVector.second,
+          driveVector.first,
+          driveVector.second,
           angularVelocity,
         )
     }
@@ -753,7 +753,7 @@ class Drivetrain(val gyroIO: GyroIO, swerveModuleIOs: DrivetrainIO) : SubsystemB
   }
 
   fun addSpeakerVisionData(visionData: TimestampedTrigVisionUpdate) {
-    fieldFrameEstimator.addSpeakerVisionData(visionData)
+    fieldFrameEstimator.addReefVisionData(visionData)
   }
 
   fun lockWheels() {

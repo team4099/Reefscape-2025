@@ -1,5 +1,7 @@
 package com.team4099.robot2025.commands.drivetrain
 
+import com.team4099.lib.hal.Clock
+import com.team4099.robot2025.config.constants.RollersConstants
 import com.team4099.robot2025.config.constants.VisionConstants
 import com.team4099.robot2025.subsystems.drivetrain.drive.Drivetrain
 import com.team4099.robot2025.subsystems.superstructure.Request
@@ -10,7 +12,9 @@ import com.team4099.robot2025.util.FMSData
 import com.team4099.robot2025.util.driver.DriverProfile
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj2.command.Command
+import org.team4099.lib.units.base.Time
 import org.team4099.lib.units.base.inches
+import org.team4099.lib.units.base.seconds
 
 class ReefAlignCommand(
   val driver: DriverProfile,
@@ -25,6 +29,9 @@ class ReefAlignCommand(
 ) : Command() {
 
   lateinit var command: TargetTagCommand
+  var scored = false
+  var timeScored: Time = -1337.seconds
+  var tagID = -1
 
   init {
     addRequirements(drivetrain)
@@ -32,7 +39,7 @@ class ReefAlignCommand(
   }
 
   override fun initialize() {
-    val tagID = vision.lastTrigVisionUpdate.targetTagID
+    tagID = vision.lastTrigVisionUpdate.targetTagID
     var horizontalOffset = 0.inches
     if (DriverStation.getAlliance().isPresent) {
       if (FMSData.isBlue) {
@@ -54,8 +61,10 @@ class ReefAlignCommand(
 
     command =
       TargetTagCommand(
-        driver, driveX, driveY, turn, slowMode, drivetrain, vision, horizontalOffset
+        driver, driveX, driveY, turn, slowMode, drivetrain, vision, horizontalOffset, tagID
       )
+
+    command.initialize()
   }
 
   override fun execute() {
@@ -66,11 +75,19 @@ class ReefAlignCommand(
       Superstructure.Companion.SuperstructureStates.PREP_SCORE_CORAL
     ) {
       superstructure.currentRequest = Request.SuperstructureRequest.Score()
+
+      if (DriverStation.isAutonomous()) {
+        scored = true
+
+        if (timeScored == -1337.seconds) {
+          timeScored = Clock.fpgaTime
+        }
+      }
     }
   }
 
   override fun isFinished(): Boolean {
-    return false
+    return scored && Clock.fpgaTime - timeScored > RollersConstants.CORAL_SPIT_TIME && DriverStation.isAutonomous()
   }
 
   override fun end(interrupted: Boolean) {
@@ -78,11 +95,14 @@ class ReefAlignCommand(
     command.end(interrupted)
 
     CustomLogger.recordDebugOutput("ActiveCommands/TargetReefCommand", false)
-    drivetrain.currentRequest =
-      Request.DrivetrainRequest.OpenLoop(
-        driver.rotationSpeedClampedSupplier(turn, slowMode),
-        driver.driveSpeedClampedSupplier(driveX, driveY, slowMode),
-        fieldOriented = true
-      )
+
+    if (!DriverStation.isAutonomous()) {
+      drivetrain.currentRequest =
+        Request.DrivetrainRequest.OpenLoop(
+          driver.rotationSpeedClampedSupplier(turn, slowMode),
+          driver.driveSpeedClampedSupplier(driveX, driveY, slowMode),
+          fieldOriented = true
+        )
+    }
   }
 }

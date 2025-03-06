@@ -6,13 +6,13 @@ import com.team4099.robot2023.subsystems.vision.camera.CameraIOPhotonvision
 import com.team4099.robot2025.auto.AutonomousSelector
 import com.team4099.robot2025.commands.drivetrain.ReefAlignCommand
 import com.team4099.robot2025.commands.drivetrain.ResetGyroYawCommand
+import com.team4099.robot2025.commands.drivetrain.StationAlignCommand
 import com.team4099.robot2025.commands.drivetrain.TargetTagCommand
 import com.team4099.robot2025.commands.drivetrain.TeleopDriveCommand
 import com.team4099.robot2025.config.ControlBoard
 import com.team4099.robot2025.config.constants.Constants
 import com.team4099.robot2025.config.constants.VisionConstants
 import com.team4099.robot2025.subsystems.arm.Arm
-import com.team4099.robot2025.subsystems.arm.ArmIO
 import com.team4099.robot2025.subsystems.arm.ArmIOSim
 import com.team4099.robot2025.subsystems.arm.ArmIOTalonFX
 import com.team4099.robot2025.subsystems.climber.Climber
@@ -24,7 +24,6 @@ import com.team4099.robot2025.subsystems.drivetrain.drive.DrivetrainIOSim
 import com.team4099.robot2025.subsystems.drivetrain.gyro.GyroIO
 import com.team4099.robot2025.subsystems.drivetrain.gyro.GyroIOPigeon2
 import com.team4099.robot2025.subsystems.elevator.Elevator
-import com.team4099.robot2025.subsystems.elevator.ElevatorIO
 import com.team4099.robot2025.subsystems.elevator.ElevatorIOSim
 import com.team4099.robot2025.subsystems.elevator.ElevatorIOTalon
 import com.team4099.robot2025.subsystems.led.LedIO
@@ -32,11 +31,9 @@ import com.team4099.robot2025.subsystems.led.LedIOCandle
 import com.team4099.robot2025.subsystems.limelight.LimelightVision
 import com.team4099.robot2025.subsystems.limelight.LimelightVisionIO
 import com.team4099.robot2025.subsystems.rollers.Ramp
-import com.team4099.robot2025.subsystems.rollers.RampIO
 import com.team4099.robot2025.subsystems.rollers.RampIOSim
 import com.team4099.robot2025.subsystems.rollers.RampIOTalonFX
 import com.team4099.robot2025.subsystems.rollers.Rollers
-import com.team4099.robot2025.subsystems.rollers.RollersIO
 import com.team4099.robot2025.subsystems.rollers.RollersIOSim
 import com.team4099.robot2025.subsystems.rollers.RollersIOTalonFX
 import com.team4099.robot2025.subsystems.superstructure.Request
@@ -123,16 +120,21 @@ object RobotContainer {
         { ControlBoard.slowMode },
         drivetrain,
       )
+
     /*
-    module steeing tuning
 
-    drivetrain.defaultCommand =
-      SwerveModuleTuningCommand(
-        drivetrain,
-        { (ControlBoard.forward.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) * 180).degrees },
-      )
 
-     */
+       ReefAimCommand(
+         driver = Jessika(),
+         { ControlBoard.forward.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
+         { ControlBoard.strafe.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
+         { ControlBoard.turn.smoothDeadband(Constants.Joysticks.TURN_DEADBAND) },
+         { ControlBoard.slowMode },
+         drivetrain,
+         superstructure
+       )
+
+    */
   }
 
   fun zeroSteering() {
@@ -214,7 +216,7 @@ object RobotContainer {
     )
     //
     // No L4 scoring in the church
-     ControlBoard.prepL4.whileTrue(
+    ControlBoard.prepL4.whileTrue(
       superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L4)
     )
 
@@ -264,6 +266,30 @@ object RobotContainer {
         0.inches
       )
     )
+
+//    ControlBoard.intakeCoral.whileTrue(
+//      StationAlignCommand(
+//        driver = Jessika(),
+//        { ControlBoard.forward.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
+//        { ControlBoard.strafe.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
+//        { ControlBoard.turn.smoothDeadband(Constants.Joysticks.TURN_DEADBAND) },
+//        { ControlBoard.slowMode },
+//        drivetrain,
+//        Constants.Universal.GamePiece.CORAL
+//      )
+//    )
+//
+//    ControlBoard.intakeL1.whileTrue(
+//      StationAlignCommand(
+//        driver = Jessika(),
+//        { ControlBoard.forward.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
+//        { ControlBoard.strafe.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
+//        { ControlBoard.turn.smoothDeadband(Constants.Joysticks.TURN_DEADBAND) },
+//        { ControlBoard.slowMode },
+//        drivetrain,
+//        Constants.Universal.GamePiece.CORAL_L1
+//      )
+//    )
   }
 
   fun mapTestControls() {}

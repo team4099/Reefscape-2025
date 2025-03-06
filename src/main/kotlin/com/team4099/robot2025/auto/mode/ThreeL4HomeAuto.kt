@@ -43,15 +43,14 @@ class ThreeL4HomeAuto(
                     vision,
                     1
                 ),
-                superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L3)
-            ).withTimeout(3.0),
-            runOnce({ drivetrain.resetFieldFrameEstimator(AllianceFlipUtil.apply(secondPose)) }), // reset pose after scoring
-            ParallelCommandGroup(
+                superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L4)
+            ),
+            WaitCommand(0.3).andThen(ParallelCommandGroup(
                 DrivePathCommand.createPathInFieldFrame(
                     drivetrain, TrajectoryTypes.Choreo(secondTrajectory), keepTrapping = false
                 ),
-                WaitCommand(0.75).andThen(superstructure.intakeCoralCommand())
-            ),
+                WaitCommand(1.4).andThen(superstructure.intakeCoralCommand())
+            )),
             ParallelCommandGroup(
                 ReefAlignCommand(
                     driver = Jessika(),
@@ -64,15 +63,14 @@ class ThreeL4HomeAuto(
                     vision,
                     1
                 ),
-                superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L3)
-            ).withTimeout(3.0),
-            runOnce({ drivetrain.resetFieldFrameEstimator(AllianceFlipUtil.apply(thirdPose)) }),
-            ParallelCommandGroup(
+                superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L4)
+            ),
+            WaitCommand(0.3).andThen(ParallelCommandGroup(
                 DrivePathCommand.createPathInFieldFrame(
                     drivetrain, TrajectoryTypes.Choreo(thirdTrajectory), keepTrapping = false
                 ),
-                WaitCommand(0.75).andThen(superstructure.intakeCoralCommand())
-            ),
+                WaitCommand(1.3).andThen(superstructure.intakeCoralCommand())
+            )),
             ParallelCommandGroup(
                 ReefAlignCommand(
                     driver = Jessika(),
@@ -84,9 +82,9 @@ class ThreeL4HomeAuto(
                     superstructure,
                     vision,
                     0
-                ).withTimeout(3.0),
-                superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L3)
-            )
+                ),
+                superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L4)
+             )
         )
     }
     companion object {
