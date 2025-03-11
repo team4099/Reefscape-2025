@@ -114,13 +114,6 @@ object ElevatorTunableValues {
         Pair({ it.inInches }, { it.inches })
       )
 
-    val intakeL1Height =
-      LoggedTunableValue(
-        "Elevator/intakeL1Height",
-        ElevatorConstants.INTAKE_L1_HEIGHT,
-        Pair({ it.inInches }, { it.inches })
-      )
-
     val intakeAlgaeGroundHeight =
       LoggedTunableValue(
         "Elevator/intakeAlgaeGroundHeight",

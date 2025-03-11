@@ -58,8 +58,6 @@ sealed interface Request {
 
   sealed interface ArmRequest : Request {
     class OpenLoop(val armVoltage: ElectricalPotential) : ArmRequest
-    class ClosedLoop(val armPosition: Angle) : ArmRequest
-    class Zero() : ArmRequest
   }
 
   sealed interface ClimberRequest : Request {

@@ -50,7 +50,6 @@ object ElevatorConstants {
   val IDLE_ALGAE_HEIGHT = 0.0.inches
 
   val INTAKE_CORAL_HEIGHT = 0.inches
-  val INTAKE_L1_HEIGHT = 3.inches
 
   val PASS_THROUGH_HEIGHT = 0.inches
 

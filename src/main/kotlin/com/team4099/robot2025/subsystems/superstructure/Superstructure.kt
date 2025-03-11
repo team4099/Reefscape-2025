@@ -346,29 +346,28 @@ class Superstructure(
         }
 
         // idle to request transitions
-        if (true) {
-          nextState =
-            when (currentRequest) {
-              is Request.SuperstructureRequest.Home -> SuperstructureStates.HOME_PREP
-              is Request.SuperstructureRequest.IntakeAlgae ->
-                SuperstructureStates.PREP_ELEVATOR_MOVEMENT
-              is Request.SuperstructureRequest.IntakeCoral ->
-                SuperstructureStates.PREP_ARM_PASS_THROUGH
-              is Request.SuperstructureRequest.IntakeL1 ->
-                SuperstructureStates.PREP_ELEVATOR_MOVEMENT
-              is Request.SuperstructureRequest.ScorePrepCoral ->
-                SuperstructureStates.PREP_ELEVATOR_MOVEMENT
-              is Request.SuperstructureRequest.ScorePrepAlgaeProcessor ->
-                SuperstructureStates.PREP_ELEVATOR_MOVEMENT
-              is Request.SuperstructureRequest.ScorePrepAlgaeBarge ->
-                SuperstructureStates.PREP_ELEVATOR_MOVEMENT
-              is Request.SuperstructureRequest.ClimbExtend -> SuperstructureStates.CLIMB_EXTEND
-              is Request.SuperstructureRequest.ClimbRetract -> SuperstructureStates.CLIMB_RETRACT
-              is Request.SuperstructureRequest.Tuning -> SuperstructureStates.TUNING
-              else -> currentState
-            }
-        }
+        nextState =
+          when (currentRequest) {
+            is Request.SuperstructureRequest.Home -> SuperstructureStates.HOME_PREP
+            is Request.SuperstructureRequest.IntakeAlgae ->
+              SuperstructureStates.PREP_ELEVATOR_MOVEMENT
+            is Request.SuperstructureRequest.IntakeCoral ->
+              SuperstructureStates.PREP_ARM_PASS_THROUGH
+            is Request.SuperstructureRequest.IntakeL1 ->
+              SuperstructureStates.PREP_ELEVATOR_MOVEMENT
+            is Request.SuperstructureRequest.ScorePrepCoral ->
+              SuperstructureStates.PREP_ELEVATOR_MOVEMENT
+            is Request.SuperstructureRequest.ScorePrepAlgaeProcessor ->
+              SuperstructureStates.PREP_ELEVATOR_MOVEMENT
+            is Request.SuperstructureRequest.ScorePrepAlgaeBarge ->
+              SuperstructureStates.PREP_ELEVATOR_MOVEMENT
+            is Request.SuperstructureRequest.ClimbExtend -> SuperstructureStates.CLIMB_EXTEND
+            is Request.SuperstructureRequest.ClimbRetract -> SuperstructureStates.CLIMB_RETRACT
+            is Request.SuperstructureRequest.Tuning -> SuperstructureStates.TUNING
+            else -> currentState
+          }
       }
+
       SuperstructureStates.PREP_ELEVATOR_MOVEMENT -> {
         arm.currentRequest =
           Request.ArmRequest.ClosedLoop(ArmTunableValues.ArmAngles.safeElevatorFrontAngle.get())

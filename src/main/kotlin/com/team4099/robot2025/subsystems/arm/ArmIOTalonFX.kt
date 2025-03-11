@@ -52,60 +52,19 @@ object ArmIOTalonFX : ArmIO {
   private val armTalon: TalonFX = TalonFX(Constants.Arm.ARM_MOTOR_ID)
   private val armConfiguration: TalonFXConfiguration = TalonFXConfiguration()
 
-  private val absoluteEncoder: CANcoder = CANcoder(Constants.Arm.CANCODER_ID)
-  private val absoluteEncoderConfiguration: MagnetSensorConfigs = MagnetSensorConfigs()
-
   var armAccelerationStatusSignal: StatusSignal<WPILibAngularAcceleration>
   var armTempStatusSignal: StatusSignal<WPILibTemperature>
   var armAppliedVoltageStatusSignal: StatusSignal<WPILibVoltage>
   var armStatorCurrentStatusSignal: StatusSignal<WPILibCurrent>
   var armSupplyCurrentStatusSignal: StatusSignal<WPILibCurrent>
-  var absoluteEncoderSignal: StatusSignal<edu.wpi.first.units.measure.Angle>
 
-  private var armPositionSignal: StatusSignal<edu.wpi.first.units.measure.Angle>
   private var armVelocitySignal: StatusSignal<AngularVelocity>
 
-  private var motionMagicTargetVelocity: StatusSignal<Double>
-  private var motionMagicTargetPosition: StatusSignal<Double>
 
   val voltageControl: VoltageOut = VoltageOut(0.volts.inVolts)
-  val positionControl: MotionMagicVoltage = MotionMagicVoltage(0.degrees.inDegrees)
 
-  val armSensor: AngularMechanismSensor =
-    ctreAngularMechanismSensor(
-      armTalon, ArmConstants.ARM_GEAR_RATIO, ArmConstants.VOLTAGE_COMPENSATION
-    )
 
   init {
-
-    // Configure PID Values
-    armConfiguration.Slot0.kP =
-      armSensor.proportionalPositionGainToRawUnits(ArmConstants.PID.REAL_ARM_KP)
-    armConfiguration.Slot0.kI =
-      armSensor.integralPositionGainToRawUnits(ArmConstants.PID.REAL_ARM_KI)
-    armConfiguration.Slot0.kD =
-      armSensor.derivativePositionGainToRawUnits(ArmConstants.PID.REAL_ARM_KD)
-    armConfiguration.Slot0.GravityType = GravityTypeValue.Arm_Cosine
-
-    // Configure Feedforward Values
-    armConfiguration.Slot0.kG = ArmConstants.ARM_KG.inVolts
-    armConfiguration.Slot0.kS = ArmConstants.ARM_KS.inVolts
-    armConfiguration.Slot0.kA = armSensor.accelerationFeedforwardToRawUnits(ARM_KA)
-    armConfiguration.Slot0.kV = armSensor.velocityFeedforwardToRawUnits(ARM_KV)
-
-    /*
-    // Configure Gear Ratio and Cancoder Fusing
-    armConfiguration.Feedback.FeedbackRemoteSensorID = absoluteEncoder.deviceID
-    armConfiguration.Feedback.SensorToMechanismRatio = ArmConstants.ARM_ENCODER_TO_MECHANISM_RATIO
-    armConfiguration.Feedback.RotorToSensorRatio = ArmConstants.ARM_GEAR_RATIO
-    armConfiguration.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder
-
-    // Configure Sensor Direction
-    absoluteEncoderConfiguration.SensorDirection = ArmConstants.ENCODER_DIRECTION_VALUE
-    absoluteEncoderConfiguration.MagnetOffset = ArmConstants.ENCODER_OFFSET.inRotations
-
-
-     */
 
     // Configure Current Limits
     armConfiguration.CurrentLimits.StatorCurrentLimit = ArmConstants.STATOR_CURRENT_LIMIT.inAmperes
@@ -113,105 +72,49 @@ object ArmIOTalonFX : ArmIO {
     armConfiguration.CurrentLimits.StatorCurrentLimitEnable = true
     armConfiguration.CurrentLimits.SupplyCurrentLimitEnable = true
 
-    // Configure Motor Inversion and Breakmode
+    // Configure Motor Inversion and Break-mode
     armConfiguration.MotorOutput.Inverted = ArmConstants.INVERSION_VALUE
     armConfiguration.MotorOutput.NeutralMode = ArmConstants.NEUTRAL_MODE_VALUE
-
-    // Configure Motion Magic
-    armConfiguration.MotionMagic.MotionMagicAcceleration =
-      ArmConstants.MOTION_MAGIC_ACCELERATION.inDegreesPerSecondPerSecond
-    armConfiguration.MotionMagic.MotionMagicCruiseVelocity =
-      ArmConstants.MOTION_MAGIC_CRUISE_VELOCITY.inDegreesPerSecond
-
-    // Configure Softlimits
-    armConfiguration.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
-      armSensor.positionToRawUnits(ArmConstants.ARM_MAX_ANGLE)
-    armConfiguration.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
-      armSensor.positionToRawUnits(ArmConstants.ARM_MIN_ANGLE)
-
-    armConfiguration.SoftwareLimitSwitch.ForwardSoftLimitEnable = true
-    armConfiguration.SoftwareLimitSwitch.ReverseSoftLimitEnable = true
 
     // Apply Configs+
 
     armTalon.configurator.apply(armConfiguration)
-    // absoluteEncoder.configurator.apply(absoluteEncoderConfiguration)
 
-    motionMagicTargetPosition = armTalon.closedLoopReference
-    motionMagicTargetVelocity = armTalon.closedLoopReferenceSlope
-
-    motionMagicTargetPosition.setUpdateFrequency(250.0)
-    motionMagicTargetVelocity.setUpdateFrequency(250.0)
-
-    armPositionSignal = armTalon.position
     armVelocitySignal = armTalon.velocity
     armAccelerationStatusSignal = armTalon.acceleration
     armTempStatusSignal = armTalon.deviceTemp
     armAppliedVoltageStatusSignal = armTalon.motorVoltage
     armStatorCurrentStatusSignal = armTalon.statorCurrent
     armSupplyCurrentStatusSignal = armTalon.supplyCurrent
-
-    absoluteEncoderSignal = absoluteEncoder.position
   }
 
   fun updateStatusSignals() {
     BaseStatusSignal.refreshAll(
-      armPositionSignal,
       armVelocitySignal,
-      motionMagicTargetPosition,
-      motionMagicTargetVelocity,
       armAccelerationStatusSignal,
       armTempStatusSignal,
       armAppliedVoltageStatusSignal,
       armStatorCurrentStatusSignal,
       armSupplyCurrentStatusSignal,
-      absoluteEncoderSignal
     )
   }
 
   override fun updateInputs(inputs: ArmIOInputs) {
     updateStatusSignals()
 
-    CustomLogger.recordOutput("Arm/absoluteEncoderRotations", absoluteEncoderSignal.valueAsDouble)
 
-    inputs.armPosition = armSensor.position
-    inputs.armVelocity = armSensor.velocity
     inputs.armAcceleration = armAccelerationStatusSignal.valueAsDouble.degrees.perSecond.perSecond
     inputs.armAppliedVoltage = armAppliedVoltageStatusSignal.valueAsDouble.volts
     inputs.armStatorCurrent = armStatorCurrentStatusSignal.valueAsDouble.amps
     inputs.armSupplyCurrent = armSupplyCurrentStatusSignal.valueAsDouble.amps
     inputs.armTemp = armTempStatusSignal.valueAsDouble.celsius
 
-    Logger.recordOutput(
-      "Arm/motionMagicPosition",
-      motionMagicTargetPosition.value * ArmConstants.ARM_GEAR_RATIO * 360
-    )
-    Logger.recordOutput(
-      "Arm/motionMagicVelocity",
-      motionMagicTargetVelocity.value * ArmConstants.ARM_GEAR_RATIO * 360
-    )
   }
 
   override fun setArmVoltage(voltage: ElectricalPotential) {
     armTalon.setControl(voltageControl.withOutput(voltage.inVolts))
   }
 
-  override fun setArmPosition(position: Angle) {
-    armTalon.setControl(positionControl.withPosition(armSensor.positionToRawUnits(position)))
-  }
-
-  override fun zeroEncoder() {
-    /*
-    var angleToZero =
-      (absoluteEncoder.position.valueAsDouble).rotations / ArmConstants.ARM_GEAR_RATIO
-
-    CustomLogger.recordOutput("Arm/angleToZero", angleToZero.inDegrees)
-    armTalon.setPosition(angleToZero.inRotations)
-
-     */
-
-    armTalon.setPosition(armSensor.positionToRawUnits(ArmConstants.ZERO_OFFSET))
-  }
 
   override fun setArmBrakeMode(brake: Boolean) {
     if (brake) {
@@ -223,31 +126,5 @@ object ArmIOTalonFX : ArmIO {
     armTalon.configurator.apply(armConfiguration)
   }
 
-  override fun configurePID(
-    kP: ProportionalGain<Radian, Volt>,
-    kI: IntegralGain<Radian, Volt>,
-    kD: DerivativeGain<Radian, Volt>
-  ) {
-    val PIDConfig = armConfiguration.Slot0
-    PIDConfig.kP = kP.inVoltsPerDegree
-    PIDConfig.kI = kI.inVoltsPerDegreeSeconds
-    PIDConfig.kD = kD.inVoltsPerDegreePerSecond
 
-    armTalon.configurator.apply(PIDConfig)
-  }
-
-  override fun configureFF(
-    kG: ElectricalPotential,
-    kS: ElectricalPotential,
-    kA: AccelerationFeedforward<Radian, Volt>,
-    kV: VelocityFeedforward<Radian, Volt>
-  ) {
-    val FeedforwardConfig = armConfiguration.Slot0
-    FeedforwardConfig.kA = kA.inVoltsPerDegreesPerSecondPerSecond
-    FeedforwardConfig.kV = kV.inVoltsPerDegreePerSecond
-    FeedforwardConfig.kG = kG.inVolts
-    FeedforwardConfig.kS = kS.inVolts
-
-    armTalon.configurator.apply(FeedforwardConfig)
-  }
 }
