@@ -1,9 +1,11 @@
 package com.team4099.robot2025.commands.drivetrain
 
 import com.team4099.lib.hal.Clock
+import com.team4099.robot2025.config.constants.ElevatorConstants
 import com.team4099.robot2025.config.constants.RollersConstants
 import com.team4099.robot2025.config.constants.VisionConstants
 import com.team4099.robot2025.subsystems.drivetrain.drive.Drivetrain
+import com.team4099.robot2025.subsystems.elevator.Elevator
 import com.team4099.robot2025.subsystems.superstructure.Request
 import com.team4099.robot2025.subsystems.superstructure.Superstructure
 import com.team4099.robot2025.subsystems.vision.Vision
@@ -23,6 +25,7 @@ class ReefAlignCommand(
   val turn: () -> Double,
   val slowMode: () -> Boolean,
   val drivetrain: Drivetrain,
+  val elevator: Elevator,
   val superstructure: Superstructure,
   val vision: Vision,
   val branchID: Int
@@ -69,11 +72,14 @@ class ReefAlignCommand(
 
   override fun execute() {
     command.execute()
+    vision.isAligned = false
+    vision.isAutoAligning = true
 
     if (command.isAtSepoint() &&
       superstructure.currentState ==
       Superstructure.Companion.SuperstructureStates.PREP_SCORE_CORAL
     ) {
+      vision.isAligned = true
       superstructure.currentRequest = Request.SuperstructureRequest.Score()
 
       if (DriverStation.isAutonomous()) {
@@ -87,11 +93,18 @@ class ReefAlignCommand(
   }
 
   override fun isFinished(): Boolean {
-    return scored && Clock.fpgaTime - timeScored > RollersConstants.CORAL_SPIT_TIME && DriverStation.isAutonomous()
+    return scored &&
+      Clock.fpgaTime - timeScored > RollersConstants.CORAL_SPIT_TIME &&
+      elevator.inputs.elevatorPosition <=
+      ElevatorConstants
+        .PREP_L4_HEIGHT && // just so it doesn't tip when driving and logic stays the same
+      DriverStation.isAutonomous()
   }
 
   override fun end(interrupted: Boolean) {
 
+    vision.isAligned = false
+    vision.isAutoAligning = false
     command.end(interrupted)
 
     CustomLogger.recordDebugOutput("ActiveCommands/TargetReefCommand", false)

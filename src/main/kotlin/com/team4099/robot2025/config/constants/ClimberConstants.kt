@@ -15,32 +15,17 @@ import org.team4099.lib.units.perSecond
 
 object ClimberConstants {
   // TODO: Change the constant values
-  val MAX_VELOCITY = 100.0.degrees.perSecond
-  val MAX_ACCELERATION = 50.0.degrees.perSecond.perSecond
-  val MAX_ANGLE = 180.0.degrees
-  val MIN_ANGLE = 0.0.degrees
-  val TOLERANCE = 5.0.degrees
-
-  val HOMING_APPLIED_VOLTAGE = 0.0.volts
-  val HOMING_STALL_CURRENT = 0.0.amps
-  val HOMING_STALL_TIME_THRESHOLD = 0.0.seconds
-
   val VOLTAGE_COMPENSATION = 12.0.volts
   val STATOR_CURRENT_LIMIT = 30.0.amps
   val SUPPLY_CURRENT_LIMIT = 40.0.amps
   val THRESHOLD_CURRENT_LIMIT = 40.0.amps
 
-  // make few constants[[-;[
-
-  val CLIMBER_IDLE_ANGLE = 0.0.degrees
-  val CLIMBER_EXTEND_ANGLE = 0.0.degrees
-  val CLIMBER_RETRACT_ANGLE = 0.0.degrees
-
-  val CLIMBER_TEST_ANGLE = 0.0.degrees
+  val CLIMB_EXTEND_VOLTAGE = -4.volts
+  val CLIMB_RETRACT_VOLTAGE = 6.volts
 
   val LENGTH = 13.408.inches
   val INERTIA = 16.767866.pounds * 1.0.inches.squared
-  val GEAR_RATIO = 80.0 / 1.0
+  val GEAR_RATIO = 240.0 / 1.0
 
   // TODO: Tune the PID values
   object PID {

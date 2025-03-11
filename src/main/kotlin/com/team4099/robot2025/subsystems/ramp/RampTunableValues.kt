@@ -24,4 +24,9 @@ object RampTunableValues {
       RampConstants.INTAKE_CORAL_VOLTAGE_SLOW,
       Pair({ it.inVolts }, { it.volts })
     )
+
+  val ejectVoltage =
+    LoggedTunableValue(
+      "Ramp/ejectVoltage", RampConstants.EJECT_VOLTAGE, Pair({ it.inVolts }, { it.volts })
+    )
 }

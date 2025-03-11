@@ -25,7 +25,6 @@ import org.team4099.lib.geometry.Translation2d
 import org.team4099.lib.hal.Clock
 import org.team4099.lib.units.Velocity
 import org.team4099.lib.units.base.Meter
-import org.team4099.lib.units.base.inInches
 import org.team4099.lib.units.base.inMeters
 import org.team4099.lib.units.base.inSeconds
 import org.team4099.lib.units.base.inches
@@ -320,8 +319,10 @@ private constructor(
 
     return endPathOnceAtReference &&
       (
-          (drivePoseSupplier().pose2d.x.meters - generatedTrajectory.endPose.x).absoluteValue < 6.inches &&
-          (drivePoseSupplier().pose2d.y.meters - generatedTrajectory.endPose.y).absoluteValue < 6.inches &&
+        (drivePoseSupplier().pose2d.x.meters - generatedTrajectory.endPose.x).absoluteValue <
+          6.inches &&
+          (drivePoseSupplier().pose2d.y.meters - generatedTrajectory.endPose.y).absoluteValue <
+          6.inches &&
           (drivePoseSupplier().rotation - generatedTrajectory.endPose.rotation).absoluteValue <
           5.degrees &&
           trajCurTime > generatedTrajectory.totalTime

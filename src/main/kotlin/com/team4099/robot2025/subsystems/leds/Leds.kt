@@ -17,6 +17,8 @@ class Leds(val io: LedIO) {
   var isAutoAligning = false
   var isAligned = true
   var seesTag = true
+  var closestReefTagID = -1
+  var isIntaking = false
   var isTuningDebugging = Constants.Tuning.TUNING_MODE || Constants.Tuning.DEBUGING_MODE
 
   var state = LEDConstants.CandleState.NOTHING
@@ -24,6 +26,25 @@ class Leds(val io: LedIO) {
       io.setState(value)
       field = value
     }
+
+  fun ledColorBasedOnTag(): LEDConstants.CandleState {
+    if (DriverStation.getAlliance().isPresent) {
+      if (FMSData.isBlue) {
+        if (closestReefTagID in LEDConstants.BLUE_REEF_TAGS_BACK) {
+          return LEDConstants.CandleState.REEF_TAG_BACK
+        } else if (closestReefTagID in LEDConstants.BLUE_REEF_TAGS_FRONT) {
+          return LEDConstants.CandleState.REEF_TAG_FRONT
+        }
+      } else {
+        if (closestReefTagID in LEDConstants.RED_REEF_TAGS_BACK) {
+          return LEDConstants.CandleState.REEF_TAG_BACK
+        } else if (closestReefTagID in LEDConstants.RED_REEF_TAGS_FRONT) {
+          return LEDConstants.CandleState.REEF_TAG_FRONT
+        }
+      }
+    }
+    return LEDConstants.CandleState.NO_REEF_TAG
+  }
 
   fun periodic() {
     io.updateInputs(inputs)
@@ -44,12 +65,19 @@ class Leds(val io: LedIO) {
       } else {
         state = LEDConstants.CandleState.RED
       }
-    } else if (hasCoral) {
+    } else if (isIntaking) {
+      if (hasCoral) {
+        state = LEDConstants.CandleState.INTAKE_SUCCESS
+      } else {
+        state = LEDConstants.CandleState.INTAKE_WAITING
+      }
+    } else {
+      // if (hasCoral) {
       if (!isAutoAligning) {
         if (!seesTag) {
-          state = LEDConstants.CandleState.HAS_CORAL
+          state = LEDConstants.CandleState.NO_REEF_TAG
         } else {
-          state = LEDConstants.CandleState.SEES_REEF_TAG
+          state = ledColorBasedOnTag()
         }
       } else {
         if (isAligned) {
@@ -60,6 +88,9 @@ class Leds(val io: LedIO) {
           state = LEDConstants.CandleState.IS_ALIGNING
         }
       }
+      // } else {
+      // state = LEDConstants.CandleState.GOLD
+      // }
     }
 
     Logger.processInputs("LED", inputs)

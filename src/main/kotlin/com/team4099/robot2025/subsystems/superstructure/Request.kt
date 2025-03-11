@@ -86,6 +86,6 @@ sealed interface Request {
 
   sealed interface VisionRequest : Request {
     class TargetReef() : VisionRequest
-    class TargetTag(val tags: Array<Int> ) : VisionRequest
+    class TargetTag(val tags: Array<Int>) : VisionRequest
   }
 }

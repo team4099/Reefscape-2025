@@ -61,8 +61,8 @@ object DrivetrainConstants {
   val SLOW_AUTO_VEL = 2.meters.perSecond
   val SLOW_AUTO_ACCEL = 2.0.meters.perSecond.perSecond
 
-  val MAX_AUTO_VEL = 3.5.meters.perSecond // 4
-  val MAX_AUTO_ACCEL = 5.meters.perSecond.perSecond // 3
+  val MAX_AUTO_VEL = 3.meters.perSecond // 4
+  val MAX_AUTO_ACCEL = 4.meters.perSecond.perSecond // 3
 
   val MAX_REEF_VEL = 1.meters.perSecond
   val MAX_REEF_ACCEL = 2.meters.perSecond.perSecond
@@ -148,15 +148,14 @@ object DrivetrainConstants {
     val AUTO_REEF_PID_KD =
       (0.4.degrees.perSecond / (1.degrees / 1.seconds)).radiansPerSecondPerRadiansPerSecond
 
-    val TELEOP_THETA_PID_KP = 3.9.degrees.perSecond / 1.degrees
+    val TELEOP_THETA_PID_KP = 2.9.degrees.perSecond / 1.degrees
     val TELEOP_THETA_PID_KI = 0.0.degrees.perSecond / (1.degrees * 1.seconds)
     val TELEOP_THETA_PID_KD =
-      (0.3.degrees.perSecond / (1.degrees / 1.seconds)).radiansPerSecondPerRadiansPerSecond
+      (0.4.degrees.perSecond / (1.degrees / 1.seconds)).radiansPerSecondPerRadiansPerSecond
 
     val TELEOP_Y_PID_KP = 3.5.meters.perSecond / 1.meters
     val TELEOP_Y_PID_KI = 0.0.meters.perSecond / (1.meters * 1.seconds)
     val TELEOP_Y_PID_KD = 0.0.meters.perSecond.perMeterPerSecond
-
 
     val SIM_TELEOP_Y_PID_KP = 0.0.meters.perSecond / 1.meters
     val SIM_TELEOP_Y_PID_KI = 0.0.meters.perSecond / (1.meters * 1.seconds)

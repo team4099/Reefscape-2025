@@ -83,10 +83,12 @@ object Robot : LoggedRobot() {
       else -> Logger.recordMetadata("GitDirty", "Unknown")
     }
 
+    var isLogging = false
     if (RobotBase.isReal()) {
       // check if folder path exists
       if (Files.exists(Paths.get(Constants.Universal.LOG_FOLDER))) {
         // log to USB stick and network for real time data viewing on AdvantageScope
+        isLogging = true
         Logger.addDataReceiver(WPILOGWriter(Constants.Universal.LOG_FOLDER))
       } else {
         logFolderAlert.set(true)
@@ -115,6 +117,8 @@ object Robot : LoggedRobot() {
     }
 
     Logger.start() // no more configuration allowed
+
+    Logger.recordOutput("LogFolder/isLogging", isLogging)
 
     LiveWindow.disableAllTelemetry()
 

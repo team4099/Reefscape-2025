@@ -2,8 +2,6 @@ package com.team4099.robot2025.subsystems.climber
 
 import com.team4099.lib.logging.LoggedTunableValue
 import com.team4099.robot2025.config.constants.ClimberConstants
-import org.team4099.lib.units.derived.degrees
-import org.team4099.lib.units.derived.inDegrees
 import org.team4099.lib.units.derived.inVolts
 import org.team4099.lib.units.derived.inVoltsPerDegree
 import org.team4099.lib.units.derived.inVoltsPerDegreePerSecond
@@ -61,33 +59,5 @@ object ClimberTunableValues {
   val kD =
     LoggedTunableValue(
       "Climber/kD", Pair({ it.inVoltsPerDegreePerSecond }, { it.volts.perDegreePerSecond })
-    )
-
-  val climbIdleAngle =
-    LoggedTunableValue(
-      "Climber/climbIdleAngle",
-      ClimberConstants.CLIMBER_IDLE_ANGLE,
-      Pair({ it.inDegrees }, { it.degrees })
-    )
-
-  val climbExtendAngle =
-    LoggedTunableValue(
-      "Climber/climbExtendAngle",
-      ClimberConstants.CLIMBER_EXTEND_ANGLE,
-      Pair({ it.inDegrees }, { it.degrees })
-    )
-
-  val climbRetractAngle =
-    LoggedTunableValue(
-      "Climber/climbRetractAngle",
-      ClimberConstants.CLIMBER_RETRACT_ANGLE,
-      Pair({ it.inDegrees }, { it.degrees })
-    )
-
-  val climberTestAngle =
-    LoggedTunableValue(
-      "Climber/testAngle",
-      ClimberConstants.CLIMBER_TEST_ANGLE,
-      Pair({ it.inDegrees }, { it.degrees })
     )
 }

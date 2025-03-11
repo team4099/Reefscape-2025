@@ -3,19 +3,16 @@ package com.team4099.robot2025.commands.drivetrain
 import com.team4099.lib.hal.Clock
 import com.team4099.lib.logging.LoggedTunableValue
 import com.team4099.robot2025.config.constants.DrivetrainConstants
-import com.team4099.robot2025.config.constants.VisionConstants
 import com.team4099.robot2025.subsystems.drivetrain.drive.Drivetrain
 import com.team4099.robot2025.subsystems.superstructure.Request
 import com.team4099.robot2025.subsystems.vision.Vision
 import com.team4099.robot2025.util.CustomLogger
-import com.team4099.robot2025.util.FMSData
 import com.team4099.robot2025.util.driver.DriverProfile
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.RobotBase
 import edu.wpi.first.wpilibj2.command.Command
 import org.littletonrobotics.junction.Logger
 import org.team4099.lib.controller.PIDController
-import org.team4099.lib.controller.ProfiledPIDController
 import org.team4099.lib.geometry.Transform2d
 import org.team4099.lib.geometry.Translation2d
 import org.team4099.lib.units.Velocity
@@ -118,11 +115,7 @@ class TargetTagCommand(
       )
 
     yPID = PIDController(ykP.get(), ykI.get(), ykD.get())
-    xPID = PIDController(
-      ykP.get(),
-      ykI.get(),
-      ykD.get()
-    )
+    xPID = PIDController(ykP.get(), ykI.get(), ykD.get())
 
     if (!(RobotBase.isSimulation())) {
 
@@ -137,8 +130,7 @@ class TargetTagCommand(
             DrivetrainConstants.PID.TELEOP_THETA_PID_KI,
             DrivetrainConstants.PID.TELEOP_THETA_PID_KD
           )
-      }
-      else {
+      } else {
         thetakP.initDefault(DrivetrainConstants.PID.AUTO_REEF_PID_KP)
         thetakI.initDefault(DrivetrainConstants.PID.AUTO_REEF_PID_KI)
         thetakD.initDefault(DrivetrainConstants.PID.AUTO_REEF_PID_KD)
@@ -203,19 +195,32 @@ class TargetTagCommand(
   }
 
   fun isAtSepoint(keepTrapping: Boolean = false): Boolean {
-    val atSetPoint = if (!keepTrapping) {
-      (thetaPID.error < 3.degrees && yPID.error < 2.inches && (vision.lastTrigVisionUpdate.robotTReefTag.translation.x.absoluteValue - 18.0.inches) < 3.inches)
-    }
-    else {
-      (thetaPID.error < 3.degrees && yPID.error < 2.inches && (vision.lastTrigVisionUpdate.robotTReefTag.translation.x.absoluteValue - 18.0.inches) < 3.inches)
-    }
+    val atSetPoint =
+      if (!keepTrapping) {
+        (
+          thetaPID.error < 3.degrees &&
+            yPID.error < 2.inches &&
+            (
+            vision.lastTrigVisionUpdate.robotTReefTag.translation.x.absoluteValue -
+              18.0.inches
+            ) < 3.inches
+          )
+      } else {
+        (
+          thetaPID.error < 3.degrees &&
+            yPID.error < 2.inches &&
+            (
+            vision.lastTrigVisionUpdate.robotTReefTag.translation.x.absoluteValue -
+              18.0.inches
+            ) < 3.inches
+          )
+      }
 
     vision.isAligned = atSetPoint
     return atSetPoint && (Clock.fpgaTime - timeStarted > 50.0.milli.seconds)
   }
 
   override fun initialize() {
-
 
     thetaPID.reset() // maybe do first for x?
     yPID.reset()
@@ -230,7 +235,7 @@ class TargetTagCommand(
       xPID = PIDController(ykP.get(), ykI.get(), ykD.get())
     }
 
-    if(tagTargetID != -1) {
+    if (tagTargetID != -1) {
       vision.currentRequest = Request.VisionRequest.TargetTag(arrayOf(tagTargetID))
     }
 
@@ -241,8 +246,10 @@ class TargetTagCommand(
 
   override fun execute() {
 
+    vision.isAutoAligning = true
+
     drivetrain.defaultCommand.end(true)
-    CustomLogger.recordDebugOutput("ActiveCommands/TargetTagCommand", true)
+    CustomLogger.recordOutput("ActiveCommands/TargetTagCommand", true)
 
     val visionData = vision.lastTrigVisionUpdate
 
@@ -250,24 +257,26 @@ class TargetTagCommand(
       visionData.robotTReefTag != Transform2d(Translation2d(0.meters, 0.meters), 0.degrees)
     ) {
 
-      Logger.recordOutput("Testing/tagID", tagTargetID)
-
-      val aprilTagAlignmentAngle =
-        if (FMSData.isBlue) {
-          VisionConstants.BLUE_REEF_TAG_THETA_ALIGNMENTS[tagTargetID]
-        } else {
-          VisionConstants.RED_REEF_TAG_THETA_ALIGNMENTS[tagTargetID]
-        }
+      var robotRotation = drivetrain.odomTRobot.rotation
+      var flippedRotation = -robotRotation
+      var appliedRotation = if ((tagTargetID == 21 || tagTargetID == 7 )&& robotRotation < 0.degrees) flippedRotation else robotRotation
 
       var thetaFeedback =
-        thetaPID.calculate(
-          drivetrain.odomTRobot.rotation,
-          aprilTagAlignmentAngle ?: drivetrain.odomTRobot.rotation
-        )
+        thetaPID.calculate(appliedRotation, visionData.robotTReefTag.rotation)
 
-      CustomLogger.recordDebugOutput(
-        "Testing/CurrentDrivetrainRotation", drivetrain.odomTRobot.rotation.inDegrees
+      if((tagTargetID == 21 || tagTargetID == 7) && robotRotation < 0.degrees) {
+        thetaFeedback = -thetaFeedback
+      }
+
+      Logger.recordOutput("TagAlign/tagID", tagTargetID)
+
+      CustomLogger.recordOutput(
+        "TagAlignment/CurrentDrivetrainRotation", drivetrain.odomTRobot.rotation.inDegrees
       )
+      CustomLogger.recordOutput(
+        "TagAlignment/targetAlignmentAngle", visionData.robotTReefTag.rotation.inDegrees
+      )
+
       CustomLogger.recordOutput("TagAlignment/thetaError", thetaPID.error.inDegrees)
       CustomLogger.recordOutput("TagAlignment/thetaFeedback", thetaFeedback.inDegreesPerSecond)
 
@@ -280,9 +289,19 @@ class TargetTagCommand(
           )
       } else {
 
-        var yFeedback = yPID.calculate(-visionData.robotTReefTag.translation.y, yTargetOffset - (visionData.robotTReefTag.translation.y + yTargetOffset) / 2.0)
-        var xFeedBack = xPID.calculate(-visionData.robotTReefTag.translation.x, -(18.0).inches - (visionData.robotTReefTag.translation.x - 18.0.inches) / 1.75)
+        var yFeedback =
+                    yPID.calculate(
+                      -visionData.robotTReefTag.translation.y,
+                      yTargetOffset - (visionData.robotTReefTag.translation.y + yTargetOffset) / 2.0
+                    )
+          //0.meters.perSecond
 
+        var xFeedBack =
+                    xPID.calculate(
+                      -visionData.robotTReefTag.translation.x,
+                      -(18.0).inches - (visionData.robotTReefTag.translation.x - 18.0.inches) / 1.75
+                    )
+          //0.meters.perSecond
 
         CustomLogger.recordOutput("TagAlignment/yError", yPID.error.inMeters)
         CustomLogger.recordOutput(
@@ -314,12 +333,9 @@ class TargetTagCommand(
   }
 
   override fun end(interrupted: Boolean) {
-    CustomLogger.recordDebugOutput("ActiveCommands/TargetTagCommand", false)
+    CustomLogger.recordOutput("ActiveCommands/TargetTagCommand", false)
 
     vision.currentRequest = Request.VisionRequest.TargetReef()
-
-    vision.isAutoAligning = false
-    vision.isAligned = false
 
     drivetrain.currentRequest =
       Request.DrivetrainRequest.OpenLoop(

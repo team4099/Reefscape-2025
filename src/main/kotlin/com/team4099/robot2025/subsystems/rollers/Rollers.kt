@@ -84,7 +84,10 @@ class Rollers(val io: RollersIO) {
 
         CustomLogger.recordOutput("Rollers/lastRollerRunTime", lastRollerRunTime.inSeconds)
         CustomLogger.recordOutput("Rollers/delta", (Clock.fpgaTime - lastRollerRunTime).inSeconds)
-        CustomLogger.recordOutput("Rollers/surpassThreshold", (Clock.fpgaTime - lastRollerRunTime) >= RollersConstants.CORAL_DETECTION_TIME_THRESHOLD)
+        CustomLogger.recordOutput(
+          "Rollers/surpassThreshold",
+          (Clock.fpgaTime - lastRollerRunTime) >= RollersConstants.CORAL_DETECTION_TIME_THRESHOLD
+        )
       }
     }
 

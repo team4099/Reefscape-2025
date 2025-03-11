@@ -1,9 +1,11 @@
 package com.team4099.robot2025.auto
 
 import com.team4099.robot2025.auto.mode.ExamplePathAuto
-import com.team4099.robot2025.auto.mode.ThreeL4Auto
 import com.team4099.robot2025.auto.mode.ThreeL4HomeAuto
+import com.team4099.robot2025.auto.mode.ThreeL4LeftAuto
+import com.team4099.robot2025.auto.mode.ThreeL4RightAuto
 import com.team4099.robot2025.subsystems.drivetrain.drive.Drivetrain
+import com.team4099.robot2025.subsystems.elevator.Elevator
 import com.team4099.robot2025.subsystems.superstructure.Superstructure
 import com.team4099.robot2025.subsystems.vision.Vision
 import com.team4099.robot2025.util.AllianceFlipUtil
@@ -33,8 +35,13 @@ object AutonomousSelector {
     //    orientationChooser.addOption("Right", 270.degrees)
     //    autoTab.add("Starting Orientation", orientationChooser)
 
-    autonomousModeChooser.addOption("Three L4 Auto from Processor Side (Default)",  AutonomousMode.THREE_L4_AUTO)
-    autonomousModeChooser.addOption("Three L4 Auto (Home version, DO NOT CHOOSE AT COMP)", AutonomousMode.THREE_L4_HOME_AUTO)
+    autonomousModeChooser.addOption(
+      "Three L4 Auto from Processor Side (Default)", AutonomousMode.THREE_L4_LEFT_AUTO
+    )
+
+    autonomousModeChooser.addOption(
+      "Three L4 Auto from Far Side", AutonomousMode.THREE_L4_RIGHT_AUTO
+    )
 
     autoTab.add("Mode", autonomousModeChooser.sendableChooser).withSize(4, 2).withPosition(2, 0)
 
@@ -60,22 +67,16 @@ object AutonomousSelector {
   val secondaryWaitTime: Time
     get() = secondaryWaitInAuto.getDouble(0.0).seconds
 
-  fun getCommand(drivetrain: Drivetrain, superstructure: Superstructure, vision: Vision): Command {
+  fun getCommand(
+    drivetrain: Drivetrain,
+    elevator: Elevator,
+    superstructure: Superstructure,
+    vision: Vision
+  ): Command {
     val mode = autonomousModeChooser.get()
 
     when (mode) {
       // Delete this when real autos are made
-      AutonomousMode.THREE_L4_AUTO ->
-        return WaitCommand(waitTime.inSeconds)
-          .andThen({
-            drivetrain.tempZeroGyroYaw(
-              AllianceFlipUtil.apply(ThreeL4Auto.startingPose).rotation
-            )
-            drivetrain.resetFieldFrameEstimator(
-              AllianceFlipUtil.apply(ThreeL4Auto.startingPose)
-            )
-          })
-          .andThen(ThreeL4Auto(drivetrain, superstructure, vision))
       AutonomousMode.THREE_L4_HOME_AUTO ->
         return WaitCommand(waitTime.inSeconds)
           .andThen({
@@ -86,21 +87,41 @@ object AutonomousSelector {
               AllianceFlipUtil.apply(ThreeL4HomeAuto.startingPose)
             )
           })
-          .andThen(ThreeL4HomeAuto(drivetrain, superstructure, vision))
-      else -> println("ERROR: unexpected auto mode: $mode")
+          .andThen(ThreeL4HomeAuto(drivetrain, elevator, superstructure, vision))
+      AutonomousMode.THREE_L4_LEFT_AUTO ->
+        return WaitCommand(waitTime.inSeconds)
+          .andThen({
+            drivetrain.tempZeroGyroYaw(
+              AllianceFlipUtil.apply(ThreeL4LeftAuto.startingPose).rotation
+            )
+            drivetrain.resetFieldFrameEstimator(
+              AllianceFlipUtil.apply(ThreeL4LeftAuto.startingPose)
+            )
+          })
+          .andThen(ThreeL4LeftAuto(drivetrain, elevator, superstructure, vision))
+      AutonomousMode.THREE_L4_RIGHT_AUTO ->
+        return WaitCommand(waitTime.inSeconds)
+          .andThen({
+            drivetrain.tempZeroGyroYaw(
+              AllianceFlipUtil.apply(ThreeL4RightAuto.startingPose).rotation
+            )
+            drivetrain.resetFieldFrameEstimator(
+              AllianceFlipUtil.apply(ThreeL4RightAuto.startingPose)
+            )
+          })
+          .andThen(ThreeL4RightAuto(drivetrain, elevator, superstructure, vision))
+      else -> return InstantCommand()
     }
-    return InstantCommand()
   }
 
-  fun getLoadingCommand(
-    drivetrain: Drivetrain
-  ): Command {
+  fun getLoadingCommand(drivetrain: Drivetrain): Command {
     return ExamplePathAuto(drivetrain)
   }
 
   private enum class AutonomousMode {
     // Delete this when real autos are made
-    THREE_L4_AUTO,
-    THREE_L4_HOME_AUTO
+    THREE_L4_HOME_AUTO,
+    THREE_L4_LEFT_AUTO,
+    THREE_L4_RIGHT_AUTO
   }
 }

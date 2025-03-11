@@ -6,7 +6,6 @@ import com.team4099.robot2023.subsystems.vision.camera.CameraIOPhotonvision
 import com.team4099.robot2025.auto.AutonomousSelector
 import com.team4099.robot2025.commands.drivetrain.ReefAlignCommand
 import com.team4099.robot2025.commands.drivetrain.ResetGyroYawCommand
-import com.team4099.robot2025.commands.drivetrain.StationAlignCommand
 import com.team4099.robot2025.commands.drivetrain.TargetTagCommand
 import com.team4099.robot2025.commands.drivetrain.TeleopDriveCommand
 import com.team4099.robot2025.config.ControlBoard
@@ -235,6 +234,7 @@ object RobotContainer {
         { ControlBoard.turn.smoothDeadband(Constants.Joysticks.TURN_DEADBAND) },
         { ControlBoard.slowMode },
         drivetrain,
+        elevator,
         superstructure,
         vision,
         0
@@ -249,6 +249,7 @@ object RobotContainer {
         { ControlBoard.turn.smoothDeadband(Constants.Joysticks.TURN_DEADBAND) },
         { ControlBoard.slowMode },
         drivetrain,
+        elevator,
         superstructure,
         vision,
         1
@@ -267,37 +268,37 @@ object RobotContainer {
       )
     )
 
-//    ControlBoard.intakeCoral.whileTrue(
-//      StationAlignCommand(
-//        driver = Jessika(),
-//        { ControlBoard.forward.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
-//        { ControlBoard.strafe.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
-//        { ControlBoard.turn.smoothDeadband(Constants.Joysticks.TURN_DEADBAND) },
-//        { ControlBoard.slowMode },
-//        drivetrain,
-//        Constants.Universal.GamePiece.CORAL
-//      )
-//    )
-//
-//    ControlBoard.intakeL1.whileTrue(
-//      StationAlignCommand(
-//        driver = Jessika(),
-//        { ControlBoard.forward.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
-//        { ControlBoard.strafe.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
-//        { ControlBoard.turn.smoothDeadband(Constants.Joysticks.TURN_DEADBAND) },
-//        { ControlBoard.slowMode },
-//        drivetrain,
-//        Constants.Universal.GamePiece.CORAL_L1
-//      )
-//    )
+    //    ControlBoard.intakeCoral.whileTrue(
+    //      StationAlignCommand(
+    //        driver = Jessika(),
+    //        { ControlBoard.forward.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
+    //        { ControlBoard.strafe.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
+    //        { ControlBoard.turn.smoothDeadband(Constants.Joysticks.TURN_DEADBAND) },
+    //        { ControlBoard.slowMode },
+    //        drivetrain,
+    //        Constants.Universal.GamePiece.CORAL
+    //      )
+    //    )
+    //
+    //    ControlBoard.intakeL1.whileTrue(
+    //      StationAlignCommand(
+    //        driver = Jessika(),
+    //        { ControlBoard.forward.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
+    //        { ControlBoard.strafe.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
+    //        { ControlBoard.turn.smoothDeadband(Constants.Joysticks.TURN_DEADBAND) },
+    //        { ControlBoard.slowMode },
+    //        drivetrain,
+    //        Constants.Universal.GamePiece.CORAL_L1
+    //      )
+    //    )
   }
 
   fun mapTestControls() {}
 
-  fun getAutonomousCommand() = AutonomousSelector.getCommand(drivetrain, superstructure, vision)
+  fun getAutonomousCommand() =
+    AutonomousSelector.getCommand(drivetrain, elevator, superstructure, vision)
 
-  fun getAutonomousLoadingCommand() =
-    AutonomousSelector.getLoadingCommand(drivetrain)
+  fun getAutonomousLoadingCommand() = AutonomousSelector.getLoadingCommand(drivetrain)
 
   fun resetGyroYawCommand(angle: Angle): Command = ResetGyroYawCommand(drivetrain, angle)
 

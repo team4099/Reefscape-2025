@@ -1,9 +1,11 @@
 package com.team4099.robot2025.subsystems.led
 
 import com.ctre.phoenix.led.CANdle
+import com.team4099.lib.hal.Clock
 import com.team4099.robot2025.config.constants.Constants
 import com.team4099.robot2025.config.constants.LEDConstants
 import org.littletonrobotics.junction.Logger
+import org.team4099.lib.units.base.inSeconds
 import kotlin.math.absoluteValue
 
 object LedIOCandle : LedIO {
@@ -186,15 +188,54 @@ object LedIOCandle : LedIO {
     }
   }
 
+  private fun hsvToRgb(h: Float, s: Float, v: Float): Triple<Int, Int, Int> {
+    if (s <= 0.0f) {
+      val gray = (v * 255).toInt()
+      return Triple(gray, gray, gray)
+    }
+
+    val hh = (if (h >= 360f) 0f else h) / 60f
+    val i = hh.toInt()
+    val ff = hh - i
+
+    val p = v * (1.0f - s)
+    val q = v * (1.0f - (s * ff))
+    val t = v * (1.0f - (s * (1.0f - ff)))
+
+    val (r, g, b) =
+      when (i) {
+        0 -> Triple(v, t, p)
+        1 -> Triple(q, v, p)
+        2 -> Triple(p, v, t)
+        3 -> Triple(p, q, v)
+        4 -> Triple(t, p, v)
+        else -> Triple(v, p, q)
+      }
+
+    return Triple((r * 255).toInt(), (g * 255).toInt(), (b * 255).toInt())
+  }
+
+  private fun rainbow() {
+    // Calculate how far through the cycle we are (0.0 to 1.0)
+    val cycleProgress = (Clock.fpgaTime.inSeconds % 3) / 3
+
+    // Update each light with an offset based on its position
+    for (i in 0 until LEDConstants.LED_COUNT) {
+      // Calculate the phase for this light (spread evenly across the cycle)
+      val position = (cycleProgress + (i.toDouble() / 60)) % 1f
+      val hue = position * 360f
+      val (r, g, b) = hsvToRgb(hue.toFloat(), 1.0f, 1.0f)
+
+      ledController.setLEDs(r, g, b, 0, i, 1)
+    }
+  }
+
   private fun setCANdleState(state: LEDConstants.CandleState) {
     if (state == LEDConstants.CandleState.LOW_BATTERY_WARNING) {
       wave(state, LEDConstants.CandleState.NOTHING)
-    } else if (state == LEDConstants.CandleState.BLUE) {
+    } else if (state == LEDConstants.CandleState.IS_ALIGNING) {
       ledController.clearAnimation(0)
-      fadeBetweenColors(state, LEDConstants.CandleState.MAGENTA, loopCyclesToConverge = 2)
-    } else if (state == LEDConstants.CandleState.RED) {
-      ledController.clearAnimation(0)
-      fadeBetweenColors(LEDConstants.CandleState.ORANGE, state, loopCyclesToConverge = 2)
+      rainbow()
     } else if (state.animation == null) {
       ledController.clearAnimation(0)
       ledController.setLEDs(state.r, state.g, state.b)

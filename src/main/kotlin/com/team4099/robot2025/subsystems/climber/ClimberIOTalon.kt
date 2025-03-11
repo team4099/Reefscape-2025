@@ -37,8 +37,6 @@ import org.team4099.lib.units.derived.inDegrees
 import org.team4099.lib.units.derived.inVolts
 import org.team4099.lib.units.derived.newtons
 import org.team4099.lib.units.derived.volts
-import org.team4099.lib.units.inRotationsPerSecond
-import org.team4099.lib.units.inRotationsPerSecondPerSecond
 import org.team4099.lib.units.perSecond
 
 object ClimberIOTalon : ClimberIO {
@@ -82,17 +80,9 @@ object ClimberIOTalon : ClimberIO {
     climberConfiguration.CurrentLimits.StatorCurrentLimit =
       ClimberConstants.STATOR_CURRENT_LIMIT.inAmperes
     climberConfiguration.CurrentLimits.StatorCurrentLimitEnable = false
-    motionMagicConfiguration.MotionMagicCruiseVelocity =
-      ClimberConstants.MAX_VELOCITY.inRotationsPerSecond
-    motionMagicConfiguration.MotionMagicAcceleration =
-      ClimberConstants.MAX_ACCELERATION.inRotationsPerSecondPerSecond
 
     climberConfiguration.SoftwareLimitSwitch.ForwardSoftLimitEnable = true
     climberConfiguration.SoftwareLimitSwitch.ReverseSoftLimitEnable = true
-    climberConfiguration.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
-      climberSensor.positionToRawUnits(ClimberConstants.MAX_ANGLE)
-    climberConfiguration.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
-      climberSensor.positionToRawUnits(ClimberConstants.MIN_ANGLE)
 
     climberConfiguration.MotorOutput.NeutralMode = NeutralModeValue.Brake
     climberConfiguration.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive
@@ -124,10 +114,6 @@ object ClimberIOTalon : ClimberIO {
     inputs.climberStatorCurrent = statorCurrentSignal.valueAsDouble.amps
     inputs.climberSupplyCurrent = supplyCurrentSignal.valueAsDouble.amps
     inputs.climberTemperature = tempSignal.valueAsDouble.celsius
-
-    if (inputs.climberPosition < ClimberConstants.MIN_ANGLE) {
-      zeroEncoder()
-    }
   }
 
   override fun zeroEncoder() {

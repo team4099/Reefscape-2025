@@ -5,8 +5,7 @@ import com.team4099.robot2025.config.constants.ClimberConstants
 import com.team4099.robot2025.config.constants.Constants
 import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim
-import org.team4099.lib.controller.ProfiledPIDController
-import org.team4099.lib.controller.TrapezoidProfile
+import org.team4099.lib.controller.PIDController
 import org.team4099.lib.units.base.amps
 import org.team4099.lib.units.base.celsius
 import org.team4099.lib.units.base.inMeters
@@ -36,20 +35,15 @@ object ClimberIOSim : ClimberIO {
       1 / ClimberConstants.GEAR_RATIO,
       ClimberConstants.INERTIA.inKilogramsMeterSquared,
       ClimberConstants.LENGTH.inMeters,
-      ClimberConstants.MIN_ANGLE.inRadians,
-      ClimberConstants.MAX_ANGLE.inRadians,
+      0.degrees.inRadians,
+      180.degrees.inRadians,
       true,
       0.0
     )
 
   private var climberController =
-    ProfiledPIDController(
-      ClimberConstants.PID.KP_SIM,
-      ClimberConstants.PID.KI_SIM,
-      ClimberConstants.PID.KD_SIM,
-      TrapezoidProfile.Constraints(
-        ClimberConstants.MAX_VELOCITY, ClimberConstants.MAX_ACCELERATION
-      )
+    PIDController(
+      ClimberConstants.PID.KP_SIM, ClimberConstants.PID.KI_SIM, ClimberConstants.PID.KD_SIM
     )
 
   private var targetPosition = 0.degrees

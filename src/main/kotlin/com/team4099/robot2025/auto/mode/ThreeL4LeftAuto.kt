@@ -10,17 +10,15 @@ import com.team4099.robot2025.subsystems.drivetrain.drive.Drivetrain
 import com.team4099.robot2025.subsystems.elevator.Elevator
 import com.team4099.robot2025.subsystems.superstructure.Superstructure
 import com.team4099.robot2025.subsystems.vision.Vision
-import com.team4099.robot2025.util.AllianceFlipUtil
 import com.team4099.robot2025.util.TrajectoryTypes
 import com.team4099.robot2025.util.driver.Jessika
-import edu.wpi.first.wpilibj2.command.Commands.runOnce
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import edu.wpi.first.wpilibj2.command.WaitCommand
 import org.team4099.lib.geometry.Pose2d
 import org.team4099.lib.smoothDeadband
 
-class ThreeL4HomeAuto(
+class ThreeL4LeftAuto(
   val drivetrain: Drivetrain,
   val elevator: Elevator,
   val superstructure: Superstructure,
@@ -30,6 +28,7 @@ class ThreeL4HomeAuto(
     addRequirements(drivetrain)
 
     addCommands(
+      WaitCommand(0.5),
       DrivePathCommand.createPathInFieldFrame(
         drivetrain, TrajectoryTypes.Choreo(firstTrajectory), keepTrapping = false
       ),
@@ -46,18 +45,17 @@ class ThreeL4HomeAuto(
           vision,
           1
         ),
-        superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L3)
-      )
-        .withTimeout(3.0),
-      runOnce({
-        drivetrain.resetFieldFrameEstimator(AllianceFlipUtil.apply(secondPose))
-      }), // reset pose after scoring
-      ParallelCommandGroup(
-        DrivePathCommand.createPathInFieldFrame(
-          drivetrain, TrajectoryTypes.Choreo(secondTrajectory), keepTrapping = false
-        ),
-        WaitCommand(0.75).andThen(superstructure.intakeCoralCommand())
+        superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L4)
       ),
+      WaitCommand(0.3)
+        .andThen(
+          ParallelCommandGroup(
+            DrivePathCommand.createPathInFieldFrame(
+              drivetrain, TrajectoryTypes.Choreo(secondTrajectory), keepTrapping = false
+            ),
+            WaitCommand(1.4).andThen(superstructure.intakeCoralCommand())
+          )
+        ),
       ParallelCommandGroup(
         ReefAlignCommand(
           driver = Jessika(),
@@ -71,16 +69,17 @@ class ThreeL4HomeAuto(
           vision,
           1
         ),
-        superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L3)
-      )
-        .withTimeout(3.0),
-      runOnce({ drivetrain.resetFieldFrameEstimator(AllianceFlipUtil.apply(thirdPose)) }),
-      ParallelCommandGroup(
-        DrivePathCommand.createPathInFieldFrame(
-          drivetrain, TrajectoryTypes.Choreo(thirdTrajectory), keepTrapping = false
-        ),
-        WaitCommand(0.75).andThen(superstructure.intakeCoralCommand())
+        superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L4)
       ),
+      WaitCommand(0.3)
+        .andThen(
+          ParallelCommandGroup(
+            DrivePathCommand.createPathInFieldFrame(
+              drivetrain, TrajectoryTypes.Choreo(thirdTrajectory), keepTrapping = false
+            ),
+            WaitCommand(1.3).andThen(superstructure.intakeCoralCommand())
+          )
+        ),
       ParallelCommandGroup(
         ReefAlignCommand(
           driver = Jessika(),
@@ -93,17 +92,16 @@ class ThreeL4HomeAuto(
           superstructure,
           vision,
           0
-        )
-          .withTimeout(3.0),
-        superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L3)
+        ),
+        superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L4)
       )
     )
   }
   companion object {
     private val firstTrajectory =
-      Choreo.loadTrajectory<SwerveSample>("ThreeL4/startingLineTo1").get()
-    private val secondTrajectory = Choreo.loadTrajectory<SwerveSample>("ThreeL4/1to2").get()
-    private val thirdTrajectory = Choreo.loadTrajectory<SwerveSample>("ThreeL4/2to3").get()
+      Choreo.loadTrajectory<SwerveSample>("ThreeL4Home/startingLineTo1Left").get()
+    private val secondTrajectory = Choreo.loadTrajectory<SwerveSample>("ThreeL4Home/1to2Left").get()
+    private val thirdTrajectory = Choreo.loadTrajectory<SwerveSample>("ThreeL4Home/2to3Left").get()
 
     val startingPose = Pose2d(firstTrajectory.getInitialPose(false).get())
     val secondPose = Pose2d(secondTrajectory.getInitialPose(false).get())
