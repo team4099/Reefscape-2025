@@ -489,7 +489,7 @@ class Superstructure(
             when (coralScoringLevel) {
               CoralLevel.L1 -> {
                 if (theoreticalGamePiece == GamePiece.CORAL)
-                  ElevatorTunableValues.ElevatorHeights.L1VerticalHeight.get()
+                  ElevatorTunableValues.ElevatorHeights.L1Height.get()
                 else ElevatorTunableValues.ElevatorHeights.L1HorizontalHeight.get()
               }
               CoralLevel.L2 -> ElevatorTunableValues.ElevatorHeights.L2Height.get()
@@ -539,7 +539,7 @@ class Superstructure(
           when (coralScoringLevel) {
             CoralLevel.L1 -> {
               if (theoreticalGamePiece == GamePiece.CORAL)
-                ElevatorTunableValues.ElevatorHeights.L1VerticalHeight.get()
+                ElevatorTunableValues.ElevatorHeights.L1Height.get()
               else ElevatorTunableValues.ElevatorHeights.L1HorizontalHeight.get()
             }
             CoralLevel.L2 -> ElevatorTunableValues.ElevatorHeights.L2Height.get()

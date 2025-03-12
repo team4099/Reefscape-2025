@@ -2,34 +2,37 @@ package com.team4099.robot2025.subsystems.superstructure
 
 import com.team4099.lib.hal.Clock
 import com.team4099.robot2023.subsystems.led.Leds
+import com.team4099.robot2025.config.constants.ClimberConstants
 import com.team4099.robot2025.config.constants.Constants.Universal.AlgaeLevel
 import com.team4099.robot2025.config.constants.Constants.Universal.CoralLevel
 import com.team4099.robot2025.config.constants.Constants.Universal.GamePiece
 import com.team4099.robot2025.config.constants.ElevatorConstants
 import com.team4099.robot2025.subsystems.arm.Arm
+import com.team4099.robot2025.subsystems.arm.ArmTunableValues
 import com.team4099.robot2025.subsystems.climber.Climber
-import com.team4099.robot2025.subsystems.drivetrain.drive.Drivetrain
 import com.team4099.robot2025.subsystems.elevator.Elevator
 import com.team4099.robot2025.subsystems.elevator.ElevatorTunableValues
-import com.team4099.robot2025.subsystems.limelight.LimelightVision
 import com.team4099.robot2025.subsystems.rollers.Ramp
 import com.team4099.robot2025.subsystems.rollers.RampTunableValues
 import com.team4099.robot2025.subsystems.rollers.Rollers
+import com.team4099.robot2025.subsystems.rollers.RollersTunableValues
 import com.team4099.robot2025.subsystems.superstructure.Superstructure.Companion.SuperstructureStates
 import com.team4099.robot2025.subsystems.vision.Vision
 import com.team4099.robot2025.util.CustomLogger
+import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import org.team4099.lib.geometry.Pose3d
 import org.team4099.lib.geometry.Rotation3d
 import org.team4099.lib.geometry.Transform3d
 import org.team4099.lib.geometry.Translation3d
+import org.team4099.lib.units.base.Length
 import org.team4099.lib.units.base.inMilliseconds
 import org.team4099.lib.units.base.inches
-import org.team4099.lib.units.base.meters
 import org.team4099.lib.units.base.seconds
 import org.team4099.lib.units.derived.degrees
 import org.team4099.lib.units.derived.volts
 import org.team4099.lib.units.milli
+import org.team4099.lib.units.derived.Angle
 
 class Superstructure2 (
     private val elevator: Elevator,
@@ -146,7 +149,6 @@ class Superstructure2 (
         CustomLogger.recordOutput("Superstructure/theoreticalGamePiece", theoreticalGamePiece)
 
         val elevatorPosition = elevator.inputs.elevatorPosition
-        val armAngle = arm.inputs.armPosition
 
         // First Elevator Stage
         CustomLogger.recordOutput(
@@ -197,6 +199,7 @@ class Superstructure2 (
         )
 
         // Arm
+        /*
         CustomLogger.recordOutput(
             "SimulatedMechanisms/3",
             Pose3d()
@@ -225,6 +228,7 @@ class Superstructure2 (
                 )
                 .pose3d
         )
+        */
 
         var nextState = currentState
         when (currentState) {
@@ -238,18 +242,25 @@ class Superstructure2 (
                 }
             }
             SuperstructureStates.MANUAL_RESET -> {
-
+                arm.currentRequest = Request.ArmRequest.OpenLoop(ArmTunableValues.ArmVoltages.retractVoltage.get())
+                elevator.currentRequest = Request.ElevatorRequest.OpenLoop(ElevatorTunableValues.slamVoltage.get())
             }
             SuperstructureStates.EJECT -> {
+                rollers.currentRequest = Request.RollersRequest.OpenLoop(RollersTunableValues.ejectVoltage.get())
+                ramp.currentRequest = Request.RampRequest.OpenLoop(RampTunableValues.ejectVoltage.get())
 
+                when(currentRequest) {
+                    is Request.SuperstructureRequest.Idle ->  {
+                        nextState = SuperstructureStates.IDLE
+                    }
+
+                    is Request.SuperstructureRequest.IntakeCoral -> {
+                        nextState = SuperstructureStates.INTAKE_CORAL
+                    }
+                }
             }
             SuperstructureStates.HOME_PREP -> {
-                arm.currentRequest = Request.ArmRequest.Zero()
-
-                if(arm.isZeroed) {
-                    nextState = SuperstructureStates.HOME
-                }
-
+                nextState = SuperstructureStates.HOME
             }
             SuperstructureStates.HOME -> {
                 elevator.currentRequest = Request.ElevatorRequest.Home()
@@ -260,55 +271,369 @@ class Superstructure2 (
 
             // Coral States
             SuperstructureStates.PREP_INTAKE_CORAL -> {
-                elevator.currentRequest = Request.ElevatorRequest.ClosedLoop(ElevatorTunableValues.ElevatorHeights.intak  q eCoralHeight.get())
-                arm.currentRequest = Reu
+                elevator.currentRequest = Request.ElevatorRequest.ClosedLoop(ElevatorTunableValues.ElevatorHeights.intakeCoralHeight.get())
+
+                if (elevator.isAtTargetedPosition) {
+                    nextState = SuperstructureStates.INTAKE_CORAL
+                }
             }
             SuperstructureStates.INTAKE_CORAL -> {
-
+                ramp.currentRequest = Request.RampRequest.OpenLoop(RampTunableValues.intakeCoralVoltageFast.get())
+                rollers.currentRequest = Request.RollersRequest.OpenLoop(RollersTunableValues.intakeCoralVoltageFast.get())
             }
             SuperstructureStates.INTAKE_CORAL_CLEANUP ->  {
-
+                ramp.currentRequest = Request.RampRequest.OpenLoop(RampTunableValues.idleVoltage.get())
             }
             SuperstructureStates.PREP_SCORE_CORAL ->  {
+                elevator.currentRequest =
+                    when (coralScoringLevel) {
+                        CoralLevel.L1 -> Request.ElevatorRequest.ClosedLoop(ElevatorTunableValues.ElevatorHeights.L1Height.get())
+                        CoralLevel.L2 -> Request.ElevatorRequest.ClosedLoop(ElevatorTunableValues.ElevatorHeights.L2Height.get())
+                        CoralLevel.L3 -> Request.ElevatorRequest.ClosedLoop(ElevatorTunableValues.ElevatorHeights.L3Height.get())
+                        CoralLevel.L4 -> Request.ElevatorRequest.ClosedLoop(ElevatorTunableValues.ElevatorHeights.PrepL4Height.get())
+                        else -> Request.ElevatorRequest.ClosedLoop(ElevatorTunableValues.ElevatorHeights.idleHeight.get())
+                    }
 
+                when (currentRequest) {
+                    is Request.SuperstructureRequest.Score -> {
+                        if (elevator.isAtTargetedPosition) {
+                            nextState = SuperstructureStates.SCORE_CORAL
+                        }
+                    }
+                    is Request.SuperstructureRequest.Idle -> {
+                        nextState = SuperstructureStates.SCORE_ACTION_CLEANUP
+                    }
+                }
             }
             SuperstructureStates.SCORE_CORAL -> {
+                if (theoreticalGamePiece == GamePiece.CORAL || theoreticalGamePiece == GamePiece.NONE) {
+                    if(coralScoringLevel == CoralLevel.L4) {
+                        elevator.currentRequest = Request.ElevatorRequest.ClosedLoop(ElevatorTunableValues.ElevatorHeights.L4Height.get())
+                        if (elevator.isAtTargetedPosition &&
+                            elevator.inputs.elevatorPosition >= ElevatorTunableValues.ElevatorHeights.L4HeightToScore.get()) {
+                            rollers.currentRequest = Request.RollersRequest.OpenLoop(RollersTunableValues.scoreCoralVoltage.get())
+                        }
+                    } else {
+                        if (elevator.isAtTargetedPosition) {
+                            rollers.currentRequest = Request.RollersRequest.OpenLoop(RollersTunableValues.scoreCoralVoltage.get())
+                        }
+                    }
 
+                    val spitOutTime =
+                        if(coralScoringLevel == CoralLevel.L4)
+                            (RollersTunableValues.coralL4SpitTime.get())
+                    else RollersTunableValues.coralSpitTime.get()
+
+                    if ((Clock.fpgaTime - lastTransitionTime) > spitOutTime) {
+                        theoreticalGamePiece = GamePiece.NONE
+                        nextState = SuperstructureStates.SCORE_ACTION_CLEANUP
+                    }
+                }
+
+                if (currentRequest is Request.SuperstructureRequest.Idle) {
+                    nextState = SuperstructureStates.SCORE_ACTION_CLEANUP
+                }
             }
 
             // Algae States
+            // TODO: Once design is finalized, recheck and rewrite algae code if necessary
             SuperstructureStates.PREP_INTAKE_ALGAE -> {
+                if (algaeIntakeLevel != lastAlgaeIntakeLevel) {
+                    nextState = SuperstructureStates.PREP_ELEVATOR_MOVEMENT
+                } else {
+                    val algaeIntakeElevatorHeight: Length =
+                        when (algaeIntakeLevel) {
+                            AlgaeLevel.GROUND ->
+                                ElevatorTunableValues.ElevatorHeights.intakeAlgaeGroundHeight.get()
+                            AlgaeLevel.L2 -> ElevatorTunableValues.ElevatorHeights.intakeAlgaeL2Height.get()
+                            AlgaeLevel.L3 -> ElevatorTunableValues.ElevatorHeights.intakeAlgaeL3Height.get()
+                            else -> 0.0.inches
+                        }
 
+                    elevator.currentRequest = Request.ElevatorRequest.ClosedLoop(algaeIntakeElevatorHeight)
+
+                    if (elevator.isAtTargetedPosition) {
+                        arm.currentRequest = Request.ArmRequest.OpenLoop(ArmTunableValues.ArmVoltages.extendVoltage.get())
+                    }
+                }
+
+                when (currentRequest){
+                    is Request.SuperstructureRequest.ScorePrepAlgaeBarge -> {
+                        if (elevator.isAtTargetedPosition) {
+                            nextState = SuperstructureStates.SCORE_ALGAE_BARGE
+                        }
+                    }
+                    is Request.SuperstructureRequest.ScorePrepAlgaeProcessor -> {
+                        if (elevator.isAtTargetedPosition) {
+                            nextState = SuperstructureStates.SCORE_ALGAE_PROCESSOR
+                        }
+                    }
+
+                    is Request.SuperstructureRequest.Idle -> {
+                        nextState = SuperstructureStates.SCORE_ACTION_CLEANUP
+                    }
+                }
             }
             SuperstructureStates.INTAKE_ALGAE -> {
+                rollers.currentRequest = Request.RollersRequest.OpenLoop(RollersTunableValues.intakeAlgaeVoltage.get())
 
+                if (currentRequest is Request.SuperstructureRequest.Idle ||
+                    currentRequest is Request.SuperstructureRequest.IntakeCoral
+                ) {
+                    nextState = SuperstructureStates.SCORE_ACTION_CLEANUP
+                }
             }
             SuperstructureStates.PREP_SCORE_ALGAE_PROCESSOR -> {
+                elevator.currentRequest = Request.ElevatorRequest.ClosedLoop(ElevatorTunableValues.ElevatorHeights.scoreAlgaeProcessorHeight.get())
+                if (elevator.isAtTargetedPosition) {
+                    arm.currentRequest = Request.ArmRequest.OpenLoop(ArmTunableValues.ArmVoltages.extendVoltage.get())
+                }
 
+                when (currentRequest) {
+                    is Request.SuperstructureRequest.Score -> {
+                        if (elevator.isAtTargetedPosition && arm.isAtTargetedPosition) {
+                            nextState = SuperstructureStates.SCORE_ALGAE_PROCESSOR
+                        }
+                    }
+                    is Request.SuperstructureRequest.Idle -> {
+                        nextState = SuperstructureStates.IDLE
+                    }
+                }
             }
             SuperstructureStates.SCORE_ALGAE_PROCESSOR -> {
+                rollers.currentRequest = Request.RollersRequest.OpenLoop(RollersTunableValues.scoreProcessorAlgaeVoltage.get())
+                
+                if((Clock.fpgaTime - lastTransitionTime) > RollersTunableValues.algaeProcessorSpitTime.get()) {
+                    theoreticalGamePiece = GamePiece.NONE
+                    nextState = SuperstructureStates.SCORE_ACTION_CLEANUP
+                }
 
+                if(currentRequest is Request.SuperstructureRequest.Idle) {
+                    nextState = SuperstructureStates.SCORE_ACTION_CLEANUP
+                }
             }
             SuperstructureStates.PREP_SCORE_ALGAE_BARGE -> {
+                elevator.currentRequest =
+                    Request.ElevatorRequest.ClosedLoop(
+                        ElevatorTunableValues.ElevatorHeights.scoreAlgaeBargeHeight.get()
+                    )
 
+                if (elevator.isAtTargetedPosition) {
+                    arm.currentRequest = Request.ArmRequest.OpenLoop(ArmTunableValues.ArmVoltages.retractVoltage.get())
+
+                    if (arm.isAtTargetedPosition && currentRequest is Request.SuperstructureRequest.Score) {
+                        nextState = SuperstructureStates.SCORE_ALGAE_BARGE
+                    }
+                }
+
+                if (currentRequest is Request.SuperstructureRequest.Idle) {
+                    nextState = SuperstructureStates.SCORE_ACTION_CLEANUP
+                }
             }
             SuperstructureStates.SCORE_ALGAE_BARGE -> {
+                rollers.currentRequest = Request.RollersRequest.OpenLoop(RollersTunableValues.scoreBargeAlgaeVoltage.get())
 
+                if ((Clock.fpgaTime - lastTransitionTime) > RollersTunableValues.algaeBargeSpitTime.get()) {
+                    theoreticalGamePiece = GamePiece.NONE
+                    nextState = SuperstructureStates.SCORE_ACTION_CLEANUP
+                }
+                /// my phone died again
+                if (currentRequest is Request.SuperstructureRequest.Idle) {
+                    nextState = SuperstructureStates.SCORE_ACTION_CLEANUP
+                }
             }
 
-            // General Scoring States
             SuperstructureStates.SCORE_ACTION_CLEANUP -> {
-
+                rollers.currentRequest = Request.RollersRequest.OpenLoop(0.0.volts)
+                arm.currentRequest = Request.ArmRequest.OpenLoop(ArmTunableValues.ArmVoltages.retractVoltage.get())
+                if (arm.isHomed) {
+                    elevator.currentRequest = Request.ElevatorRequest.ClosedLoop(ElevatorTunableValues.ElevatorHeights.idleHeight.get())
+                }
+                if (elevator.isHomed && currentRequest is Request.SuperstructureRequest.Idle) {
+                    nextState = SuperstructureStates.IDLE
+                }
             }
 
             // Climber States
             SuperstructureStates.CLIMB_EXTEND -> {
+                climber.currentRequest = Request.ClimberRequest.OpenLoop(ClimberConstants.CLIMB_EXTEND_VOLTAGE)
 
+                if (climber.isAtTargetedPosition || currentRequest is Request.SuperstructureRequest.Idle) {
+                    currentState = SuperstructureStates.IDLE
+                }
             }
             SuperstructureStates.CLIMB_RETRACT -> {
+                climber.currentRequest = Request.ClimberRequest.OpenLoop(ClimberConstants.CLIMB_RETRACT_VOLTAGE)
 
+                if (currentRequest is Request.SuperstructureRequest.Idle) {
+                    currentState = SuperstructureStates.IDLE
+                }
             }
         }
+
+        if(nextState != currentState) {
+            lastTransitionTime = Clock.fpgaTime
+        }
+
+        lastCoralScoringLevel = coralScoringLevel
+        lastAlgaeIntakeLevel = algaeIntakeLevel
+        currentState = nextState
+    }
+
+    // General Commands
+    fun requestIdleCommand(): Command {
+        val returnCommand =
+            run { currentRequest = Request.SuperstructureRequest.Idle() }.until {
+                isAtRequestedState && currentState == SuperstructureStates.IDLE
+            }
+        returnCommand.name = "RequestIdleCommand"
+        return returnCommand
+    }
+
+    fun homeCommand(): Command {
+        val returnCommand =
+            runOnce { currentRequest = Request.SuperstructureRequest.Home() }.until {
+                isAtRequestedState && currentState == SuperstructureStates.HOME
+            }
+        returnCommand.name = "HomeCommand"
+        return returnCommand
+    }
+
+    fun ejectCommand(): Command {
+        val returnCommand = run {
+            currentRequest = Request.SuperstructureRequest.Eject()
+            rollers.currentRequest = Request.RollersRequest.OpenLoop(8.0.volts)
+            ramp.currentRequest = Request.RampRequest.OpenLoop(5.0.volts)
+        }
+        returnCommand.name = "EjectCommand"
+        return returnCommand
+    }
+
+    // Coral Commands
+    fun intakeCoralCommand(): Command {
+        val returnCommand =
+            runOnce { currentRequest = Request.SuperstructureRequest.IntakeCoral() }.until {
+                isAtRequestedState && currentState == SuperstructureStates.PREP_INTAKE_CORAL
+            }
+        returnCommand.name = "IntakeCoralCommand"
+        return returnCommand
+    }
+
+    fun prepScoreCoralCommand(level: CoralLevel): Command {
+        val returnCommand =
+            runOnce { currentRequest = Request.SuperstructureRequest.ScorePrepCoral(level) }.until {
+                isAtRequestedState && currentState == SuperstructureStates.PREP_SCORE_CORAL
+            }
+        returnCommand.name = "PrepScoreCoralCommand"
+        return returnCommand
+    }
+
+
+    // Algae Commands
+    fun intakeAlgaeCommand(level: AlgaeLevel): Command {
+        val returnCommand =
+            runOnce { currentRequest = Request.SuperstructureRequest.IntakeAlgae(level) }.until {
+                isAtRequestedState && currentState == SuperstructureStates.PREP_INTAKE_ALGAE
+            }
+        returnCommand.name = "IntakeAlgaeCommand"
+        return returnCommand
+    }
+
+    fun prepScoreAlgaeBargeCommand(): Command {
+        val returnCommand =
+            runOnce { currentRequest = Request.SuperstructureRequest.ScorePrepAlgaeBarge() }.until {
+                isAtRequestedState && currentState == SuperstructureStates.PREP_SCORE_ALGAE_BARGE
+            }
+        returnCommand.name = "PrepScoreAlgaeBargeCommand"
+        return returnCommand
+    }
+
+    fun prepScoreAlgaeProcessorCommand(): Command {
+        val returnCommand =
+            runOnce { currentRequest = Request.SuperstructureRequest.ScorePrepAlgaeProcessor() }.until {
+                isAtRequestedState && currentState == SuperstructureStates.PREP_SCORE_ALGAE_PROCESSOR
+            }
+        returnCommand.name = "PrepScoreAlgaeProcessorCommand"
+        return returnCommand
+    }
+
+    // Score Commands
+    fun scoreCommand(): Command {
+        val returnCommand = runOnce { currentRequest = Request.SuperstructureRequest.Score() }
+        returnCommand.name = "ScoreCommand"
+        return returnCommand
+    }
+
+    fun prepScoreDefaultCommand(): Command {
+        val returnCommand =
+            run {
+                if (currentState == SuperstructureStates.IDLE) {
+                    when (theoreticalGamePiece) {
+                        GamePiece.CORAL ->
+                            currentRequest = Request.SuperstructureRequest.ScorePrepCoral(CoralLevel.L1)
+                        GamePiece.ALGAE ->
+                            currentRequest = Request.SuperstructureRequest.ScorePrepAlgaeProcessor()
+                    }
+                } else if (currentState == SuperstructureStates.PREP_SCORE_CORAL && coralScoringLevel != CoralLevel.L1) {
+                    currentRequest = Request.SuperstructureRequest.Score()
+                }
+            }
+                .until({
+                    currentState == SuperstructureStates.PREP_SCORE_CORAL ||
+                            currentState == SuperstructureStates.PREP_SCORE_ALGAE_PROCESSOR
+                })
+
+        returnCommand.name = "prepScoreDefaultCommand"
+        return returnCommand
+    }
+
+    // Elevator Commands
+    fun testElevatorCommand(): Command {
+        val returnCommand = run {
+            currentRequest = Request.SuperstructureRequest.Tuning()
+            elevator.currentRequest =
+                Request.ElevatorRequest.ClosedLoop(
+                    ElevatorTunableValues.ElevatorHeights.testPosition.get()
+                )
+
+            if (elevator.isAtTargetedPosition) {
+                currentRequest = Request.SuperstructureRequest.Idle()
+            }
+        }
+        returnCommand.name = "TestElevatorCommand"
+        return returnCommand
+    }
+
+    fun testElevatorDownCommand(): Command {
+        val returnCommand = run {
+            currentRequest = Request.SuperstructureRequest.Tuning()
+            elevator.currentRequest = Request.ElevatorRequest.ClosedLoop(5.inches)
+
+            if (elevator.isAtTargetedPosition) {
+                currentRequest = Request.SuperstructureRequest.Idle()
+            }
+        }
+        returnCommand.name = "TestElevatorDownCommand"
+        return returnCommand
+    }
+
+    // Climber Commands
+    fun climbExtendCommand(): Command {
+        val returnCommand =
+            runOnce { currentRequest = Request.SuperstructureRequest.ClimbExtend() }.until {
+                isAtRequestedState && currentState == SuperstructureStates.CLIMB_EXTEND
+            }
+        returnCommand.name = "ClimbExtendCommand"
+        return returnCommand
+    }
+
+    fun climbRetractCommand(): Command {
+        val returnCommand =
+            runOnce { currentRequest = Request.SuperstructureRequest.ClimbRetract() }.until {
+                isAtRequestedState && currentState == SuperstructureStates.CLIMB_RETRACT
+            }
+        returnCommand.name = "ClimbRetractCommand"
+        return returnCommand
     }
 
     companion object {
@@ -326,6 +651,7 @@ class Superstructure2 (
             INTAKE_CORAL_CLEANUP,
             PREP_SCORE_CORAL,
             SCORE_CORAL,
+            PREP_ELEVATOR_MOVEMENT,
 
             PREP_INTAKE_ALGAE,
             INTAKE_ALGAE,

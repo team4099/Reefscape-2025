@@ -17,8 +17,6 @@ sealed interface Request {
 
     class IntakeCoral() : SuperstructureRequest
 
-    class IntakeL1() : SuperstructureRequest
-
     class IntakeAlgae(val level: Constants.Universal.AlgaeLevel) : SuperstructureRequest
 
     class ScorePrepCoral(val level: Constants.Universal.CoralLevel) : SuperstructureRequest

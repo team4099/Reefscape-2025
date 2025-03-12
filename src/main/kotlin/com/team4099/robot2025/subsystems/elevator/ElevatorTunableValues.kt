@@ -56,6 +56,11 @@ object ElevatorTunableValues {
       ElevatorConstants.TESTING_VOLTAGE,
       Pair({ it.inVolts }, { it.volts })
     )
+  val slamVoltage = LoggedTunableValue(
+    "Elevator/slamVoltage",
+    ElevatorConstants.SLAM_VOLTAGE,
+    Pair({it.inVolts}, {it.volts})
+  )
 
   object ElevatorHeights {
     val minHeight =
@@ -169,17 +174,10 @@ object ElevatorTunableValues {
         Pair({ it.inVolts }, { it.volts })
       )
 
-    val L1HorizontalHeight =
-      LoggedTunableValue(
-        "Elevator/coralL1HorizontalHeight",
-        ElevatorConstants.L1_HORIZONTAL_HEIGHT,
-        Pair({ it.inInches }, { it.inches })
-      )
-
-    val L1VerticalHeight =
+    val L1Height =
       LoggedTunableValue(
         "Elevator/coralL1VerticalHeight",
-        ElevatorConstants.L1_VERTICAL_HEIGHT,
+        ElevatorConstants.L1_HEIGHT,
         Pair({ it.inInches }, { it.inches })
       )
 

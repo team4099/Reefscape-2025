@@ -11,6 +11,7 @@ import org.team4099.lib.units.perSecond
 object ElevatorConstants {
 
   val TESTING_VOLTAGE = 0.0.volts
+  val SLAM_VOLTAGE = -12.0.volts
   const val ENABLE_ELEVATOR = true
 
   val GEAR_RATIO = 16.0 / 48.0
@@ -61,8 +62,7 @@ object ElevatorConstants {
   val SCORE_BARGE_HEIGHT = 60.inches
 
   // TODO: adjust scoring/intaking heights for end-effector offset
-  val L1_HORIZONTAL_HEIGHT = 0.0.inches
-  val L1_VERTICAL_HEIGHT = 0.0.inches
+  val L1_HEIGHT = 0.0.inches
   val L2_HEIGHT = 13.039.inches - 2.inches + 0.5.inches
   val L3_HEIGHT = 28.789.inches - 2.inches + 0.5.inches
   val PREP_L4_HEIGHT = 42.inches
