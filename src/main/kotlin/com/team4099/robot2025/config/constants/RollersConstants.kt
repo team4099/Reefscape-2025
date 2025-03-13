@@ -33,16 +33,14 @@ object RollersConstants {
 
   val CORAL_VELOCITY_THRESHOLD = 0.0.rotations.perSecond
   val CORAL_CURRENT_THRESHOLD = 35.amps
-  val CORAL_HORIZONTAL_CURRENT_THRESHOLD = 35.amps
   val ALGAE_VELOCITY_THRESHOLD = 0.0.rotations.perSecond
   val ALGAE_CURRENT_THRESHOLD = 35.0.amps
 
   val CORAL_DETECTION_TIME_THRESHOLD = 0.5.seconds
-  val CORAL_HORIZONTAL_DETECTION_TIME_THRESHOLD = 0.5.seconds
   val ALGAE_DETECTION_TIME_THRESHOLD = 0.25.seconds
 
   val CORAL_SPIT_TIME = 0.5.seconds
-  val CORAL_L4_SPIT_TIME = 1.1.seconds
+  val CORAL_L4_SPIT_TIME = 1.0.seconds
   val ALGAE_PROCESSOR_SPIT_TIME = 0.5.seconds
   val ALGAE_BARGE_SPIT_TIME = 0.0.seconds
 

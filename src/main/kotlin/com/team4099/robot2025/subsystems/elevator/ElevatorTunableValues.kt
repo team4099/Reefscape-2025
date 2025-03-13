@@ -56,11 +56,12 @@ object ElevatorTunableValues {
       ElevatorConstants.TESTING_VOLTAGE,
       Pair({ it.inVolts }, { it.volts })
     )
-  val slamVoltage = LoggedTunableValue(
-    "Elevator/slamVoltage",
-    ElevatorConstants.SLAM_VOLTAGE,
-    Pair({it.inVolts}, {it.volts})
-  )
+  val slamVoltage =
+    LoggedTunableValue(
+      "Elevator/slamVoltage",
+      ElevatorConstants.SLAM_VOLTAGE,
+      Pair({ it.inVolts }, { it.volts })
+    )
 
   object ElevatorHeights {
     val minHeight =

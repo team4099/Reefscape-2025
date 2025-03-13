@@ -2,21 +2,9 @@ package com.team4099.robot2025.subsystems.arm
 
 import org.littletonrobotics.junction.LogTable
 import org.littletonrobotics.junction.inputs.LoggableInputs
-import org.team4099.lib.units.base.amps
-import org.team4099.lib.units.base.celsius
-import org.team4099.lib.units.base.inAmperes
-import org.team4099.lib.units.base.inCelsius
-import org.team4099.lib.units.derived.AccelerationFeedforward
-import org.team4099.lib.units.derived.Angle
-import org.team4099.lib.units.derived.DerivativeGain
+import org.team4099.lib.units.base.*
 import org.team4099.lib.units.derived.ElectricalPotential
-import org.team4099.lib.units.derived.IntegralGain
-import org.team4099.lib.units.derived.ProportionalGain
-import org.team4099.lib.units.derived.Radian
-import org.team4099.lib.units.derived.VelocityFeedforward
-import org.team4099.lib.units.derived.Volt
 import org.team4099.lib.units.derived.degrees
-import org.team4099.lib.units.derived.inDegrees
 import org.team4099.lib.units.derived.inVolts
 import org.team4099.lib.units.derived.volts
 import org.team4099.lib.units.inDegreesPerSecond
@@ -72,6 +60,7 @@ interface ArmIO {
 
   fun updateInputs(inputs: ArmIOInputs) {}
 
-  fun setArmVoltage(voltage: ElectricalPotential) {}
+  fun setArmCurrent(amps: Current) {}
 
-  fun setArmBrakeMode(brake: Boolean) {}}
+  fun setArmBrakeMode(brake: Boolean) {}
+}

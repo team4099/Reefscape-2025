@@ -259,12 +259,13 @@ class TargetTagCommand(
 
       var robotRotation = drivetrain.odomTRobot.rotation
       var flippedRotation = -robotRotation
-      var appliedRotation = if ((tagTargetID == 21 || tagTargetID == 7 )&& robotRotation < 0.degrees) flippedRotation else robotRotation
+      var appliedRotation =
+        if ((tagTargetID == 21 || tagTargetID == 7) && robotRotation < 0.degrees) flippedRotation
+        else robotRotation
 
-      var thetaFeedback =
-        thetaPID.calculate(appliedRotation, visionData.robotTReefTag.rotation)
+      var thetaFeedback = thetaPID.calculate(appliedRotation, visionData.robotTReefTag.rotation)
 
-      if((tagTargetID == 21 || tagTargetID == 7) && robotRotation < 0.degrees) {
+      if ((tagTargetID == 21 || tagTargetID == 7) && robotRotation < 0.degrees) {
         thetaFeedback = -thetaFeedback
       }
 
@@ -290,18 +291,18 @@ class TargetTagCommand(
       } else {
 
         var yFeedback =
-                    yPID.calculate(
-                      -visionData.robotTReefTag.translation.y,
-                      yTargetOffset - (visionData.robotTReefTag.translation.y + yTargetOffset) / 2.0
-                    )
-          //0.meters.perSecond
+          yPID.calculate(
+            -visionData.robotTReefTag.translation.y,
+            yTargetOffset - (visionData.robotTReefTag.translation.y + yTargetOffset) / 2.0
+          )
+        // 0.meters.perSecond
 
         var xFeedBack =
-                    xPID.calculate(
-                      -visionData.robotTReefTag.translation.x,
-                      -(18.0).inches - (visionData.robotTReefTag.translation.x - 18.0.inches) / 1.75
-                    )
-          //0.meters.perSecond
+          xPID.calculate(
+            -visionData.robotTReefTag.translation.x,
+            -(18.0).inches - (visionData.robotTReefTag.translation.x - 18.0.inches) / 1.75
+          )
+        // 0.meters.perSecond
 
         CustomLogger.recordOutput("TagAlignment/yError", yPID.error.inMeters)
         CustomLogger.recordOutput(

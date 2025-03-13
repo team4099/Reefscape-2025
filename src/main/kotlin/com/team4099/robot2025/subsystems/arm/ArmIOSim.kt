@@ -69,16 +69,11 @@ object ArmIOSim : ArmIO {
     inputs.isSimulating = true
   }
 
-  override fun setArmVoltage(voltage: ElectricalPotential) {
+  override fun setArmCurrent(voltage: ElectricalPotential) {
     val clampedVoltage =
       clamp(voltage, -ArmConstants.VOLTAGE_COMPENSATION, ArmConstants.VOLTAGE_COMPENSATION)
     armSim.setInputVoltage(clampedVoltage.inVolts)
     appliedVoltage = clampedVoltage
-  }
-
-  override fun setArmPosition(position: Angle) {
-    val feedback = armPIDController.calculate(armSim.angleRads.radians, position)
-    setArmVoltage(feedback)
   }
 
   override fun zeroEncoder() {}

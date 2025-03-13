@@ -55,7 +55,7 @@ class Superstructure(
 
   var theoreticalGamePiece: GamePiece = GamePiece.NONE
     get() {
-      if (rollers.hasCoralVertical || ramp.hasCoral) {
+      if (rollers.hasCoral || ramp.hasCoral) {
         return GamePiece.CORAL
       } else {
         return field
@@ -367,7 +367,6 @@ class Superstructure(
             else -> currentState
           }
       }
-
       SuperstructureStates.PREP_ELEVATOR_MOVEMENT -> {
         arm.currentRequest =
           Request.ArmRequest.ClosedLoop(ArmTunableValues.ArmAngles.safeElevatorFrontAngle.get())
@@ -433,7 +432,7 @@ class Superstructure(
         }
       }
       SuperstructureStates.INTAKE_CORAL -> {
-        if (!rollers.hasCoralVertical) {
+        if (!rollers.hasCoral) {
           ramp.currentRequest =
             Request.RampRequest.OpenLoop(RampTunableValues.intakeCoralVoltageFast.get())
           rollers.currentRequest =
