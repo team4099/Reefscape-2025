@@ -349,7 +349,7 @@ class Superstructure(
             }
           }
           is Request.SuperstructureRequest.Idle -> {
-            nextState = SuperstructureStates.SCORE_ACTION_CLEANUP
+            nextState = SuperstructureStates.IDLE
           }
         }
       }
@@ -380,12 +380,12 @@ class Superstructure(
 
           if ((Clock.fpgaTime - lastTransitionTime) > spitOutTime) {
             theoreticalGamePiece = GamePiece.NONE
-            nextState = SuperstructureStates.SCORE_ACTION_CLEANUP
+            nextState = SuperstructureStates.IDLE
           }
         }
 
         if (currentRequest is Request.SuperstructureRequest.Idle) {
-          nextState = SuperstructureStates.SCORE_ACTION_CLEANUP
+          nextState = SuperstructureStates.IDLE
         }
       }
 
@@ -424,7 +424,7 @@ class Superstructure(
             }
           }
           is Request.SuperstructureRequest.Idle -> {
-            nextState = SuperstructureStates.SCORE_ACTION_CLEANUP
+            nextState = SuperstructureStates.IDLE
           }
         }
       }
@@ -435,7 +435,7 @@ class Superstructure(
         if (currentRequest is Request.SuperstructureRequest.Idle ||
           currentRequest is Request.SuperstructureRequest.IntakeCoral
         ) {
-          nextState = SuperstructureStates.SCORE_ACTION_CLEANUP
+          nextState = SuperstructureStates.IDLE
         }
       }
       SuperstructureStates.PREP_SCORE_ALGAE_PROCESSOR -> {
@@ -467,11 +467,11 @@ class Superstructure(
           RollersTunableValues.algaeProcessorSpitTime.get()
         ) {
           theoreticalGamePiece = GamePiece.NONE
-          nextState = SuperstructureStates.SCORE_ACTION_CLEANUP
+          nextState = SuperstructureStates.IDLE
         }
 
         if (currentRequest is Request.SuperstructureRequest.Idle) {
-          nextState = SuperstructureStates.SCORE_ACTION_CLEANUP
+          nextState = SuperstructureStates.IDLE
         }
       }
       SuperstructureStates.PREP_SCORE_ALGAE_BARGE -> {
@@ -490,7 +490,7 @@ class Superstructure(
         }
 
         if (currentRequest is Request.SuperstructureRequest.Idle) {
-          nextState = SuperstructureStates.SCORE_ACTION_CLEANUP
+          nextState = SuperstructureStates.IDLE
         }
       }
       SuperstructureStates.SCORE_ALGAE_BARGE -> {
@@ -499,23 +499,9 @@ class Superstructure(
 
         if ((Clock.fpgaTime - lastTransitionTime) > RollersTunableValues.algaeBargeSpitTime.get()) {
           theoreticalGamePiece = GamePiece.NONE
-          nextState = SuperstructureStates.SCORE_ACTION_CLEANUP
+          nextState = SuperstructureStates.IDLE
         }
         if (currentRequest is Request.SuperstructureRequest.Idle) {
-          nextState = SuperstructureStates.SCORE_ACTION_CLEANUP
-        }
-      }
-      SuperstructureStates.SCORE_ACTION_CLEANUP -> {
-        rollers.currentRequest = Request.RollersRequest.OpenLoop(0.0.volts)
-        arm.currentRequest =
-          Request.ArmRequest.TorqueControl(-ArmTunableValues.ArmCurrents.stallCurrent.get())
-        if (arm.isHomed) {
-          elevator.currentRequest =
-            Request.ElevatorRequest.ClosedLoop(
-              ElevatorTunableValues.ElevatorHeights.idleHeight.get()
-            )
-        }
-        if (elevator.isHomed && currentRequest is Request.SuperstructureRequest.Idle) {
           nextState = SuperstructureStates.IDLE
         }
       }
@@ -694,7 +680,6 @@ class Superstructure(
       SCORE_ALGAE_PROCESSOR,
       PREP_SCORE_ALGAE_BARGE,
       SCORE_ALGAE_BARGE,
-      SCORE_ACTION_CLEANUP,
       CLIMB_EXTEND,
       CLIMB_RETRACT,
     }
