@@ -4,25 +4,25 @@ import com.team4099.lib.hal.Clock
 import com.team4099.robot2025.config.constants.ArmConstants
 import com.team4099.robot2025.subsystems.superstructure.Request
 import com.team4099.robot2025.util.CustomLogger
-import org.team4099.lib.units.derived.ElectricalPotential
-import org.team4099.lib.units.derived.inVolts
-import org.team4099.lib.units.derived.volts
+import org.team4099.lib.units.base.Current
+import org.team4099.lib.units.base.amps
+import org.team4099.lib.units.base.inAmperes
 
 class Arm(private val io: ArmIO) {
   val inputs = ArmIO.ArmIOInputs()
 
-  private var armTargetVoltage: ElectricalPotential = 0.0.volts
+  private var armTargetCurrent: Current = 0.0.amps
   var isHomed = false
   var isAtTargetedPosition: Boolean = false
 
   private var lastHomingStatorCurrentTripTime = Clock.fpgaTime
 
   private var currentState = ArmState.UNINITIALIZED
-  var currentRequest: Request.ArmRequest = Request.ArmRequest.OpenLoop(0.volts)
+  var currentRequest: Request.ArmRequest = Request.ArmRequest.TorqueControl(0.0.amps)
     set(value) {
       when (value) {
-        is Request.ArmRequest.OpenLoop -> {
-          armTargetVoltage = value.armVoltage
+        is Request.ArmRequest.TorqueControl -> {
+          armTargetCurrent = value.armCurrent
         }
         else -> {}
       }
@@ -36,13 +36,12 @@ class Arm(private val io: ArmIO) {
 
     var nextState = currentState
     CustomLogger.recordOutput("Arm/nextState", nextState.toString())
-    CustomLogger.recordOutput("Arm/armTargetVoltage", armTargetVoltage.inVolts)
+    CustomLogger.recordOutput("Arm/armTargetCurrent", armTargetCurrent.inAmperes)
 
     isAtTargetedPosition =
       !inputs.isSimulating &&
-      inputs.armStatorCurrent >= ArmConstants.HOMING_STALL_CURRENT &&
-      (Clock.fpgaTime - lastHomingStatorCurrentTripTime) >=
-      ArmConstants.HOMING_STALL_TIME_THRESHOLD
+      inputs.armStatorCurrent >= ArmConstants.STALL_CURRENT &&
+      (Clock.fpgaTime - lastHomingStatorCurrentTripTime) >= ArmConstants.STALL_TIME_THRESHOLD
 
     when (currentState) {
       ArmState.UNINITIALIZED -> {
@@ -50,29 +49,7 @@ class Arm(private val io: ArmIO) {
       }
       ArmState.TORQUE_CURRENT -> {
         if (!isAtTargetedPosition) {
-          io.setArmCurrent(armTargetVoltage)
-          nextState = fromRequestToState(currentRequest)
-        }
-      }
-      ArmState.HOME -> {
-        if (inputs.armStatorCurrent < ArmConstants.HOMING_STALL_CURRENT) {
-          lastHomingStatorCurrentTripTime = Clock.fpgaTime
-        }
-
-        if (!inputs.isSimulating &&
-          (
-            !isHomed &&
-              inputs.armStatorCurrent < ArmConstants.HOMING_STALL_CURRENT &&
-              (Clock.fpgaTime - lastHomingStatorCurrentTripTime) <
-              ArmConstants.HOMING_STALL_TIME_THRESHOLD
-            )
-        ) {
-          io.setArmCurrent(ArmConstants.HOMING_VOLTAGE)
-        } else {
-          isHomed = true
-        }
-
-        if (isHomed) {
+          io.setArmCurrent(armTargetCurrent)
           nextState = fromRequestToState(currentRequest)
         }
       }
@@ -91,7 +68,7 @@ class Arm(private val io: ArmIO) {
     // Translates Current Request to a State
     fun fromRequestToState(request: Request.ArmRequest): ArmState {
       return when (request) {
-        is Request.ArmRequest.OpenLoop -> ArmState.OPEN_LOOP
+        is Request.ArmRequest.TorqueControl -> ArmState.TORQUE_CURRENT
       }
     }
   }

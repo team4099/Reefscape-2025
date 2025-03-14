@@ -2,8 +2,11 @@ package com.team4099.robot2025.subsystems.arm
 
 import org.littletonrobotics.junction.LogTable
 import org.littletonrobotics.junction.inputs.LoggableInputs
-import org.team4099.lib.units.base.*
-import org.team4099.lib.units.derived.ElectricalPotential
+import org.team4099.lib.units.base.Current
+import org.team4099.lib.units.base.amps
+import org.team4099.lib.units.base.celsius
+import org.team4099.lib.units.base.inAmperes
+import org.team4099.lib.units.base.inCelsius
 import org.team4099.lib.units.derived.degrees
 import org.team4099.lib.units.derived.inVolts
 import org.team4099.lib.units.derived.volts

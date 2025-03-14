@@ -50,9 +50,7 @@ class ReefAimCommand(
   }
 
   override fun execute() {
-    if (superstructure.theoreticalGamePiece == Constants.Universal.GamePiece.CORAL ||
-      superstructure.theoreticalGamePiece == Constants.Universal.GamePiece.CORAL_L1
-    ) {
+    if (superstructure.theoreticalGamePiece == Constants.Universal.GamePiece.CORAL) {
       defaultCommand.end(true)
       aimCommand.execute()
     } else {

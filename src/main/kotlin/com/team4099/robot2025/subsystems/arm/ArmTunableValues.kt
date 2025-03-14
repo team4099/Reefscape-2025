@@ -2,7 +2,8 @@ package com.team4099.robot2025.subsystems.arm
 
 import com.team4099.lib.logging.LoggedTunableValue
 import com.team4099.robot2025.config.constants.ArmConstants
-import org.team4099.lib.units.derived.inVolts
+import org.team4099.lib.units.base.amps
+import org.team4099.lib.units.base.inAmperes
 import org.team4099.lib.units.derived.inVoltsPerDegree
 import org.team4099.lib.units.derived.inVoltsPerDegreePerSecond
 import org.team4099.lib.units.derived.inVoltsPerDegreeSeconds
@@ -24,20 +25,15 @@ object ArmTunableValues {
       "Arm/armKD", Pair({ it.inVoltsPerDegreePerSecond }, { it.volts.perDegreePerSecond })
     )
 
-  object ArmVoltages {
-    val idleVoltage =
+  object ArmCurrents {
+    val idleCurrent =
       LoggedTunableValue(
-        "Arm/idleVoltage", ArmConstants.IDLE_VOLTAGE, Pair({ it.inVolts }, { it.volts })
+        "Arm/idleCurrent", ArmConstants.IDLE_CURRENT, Pair({ it.inAmperes }, { it.amps })
       )
 
-    val retractVoltage =
+    val stallCurrent =
       LoggedTunableValue(
-        "Arm/retractVoltage", ArmConstants.RETRACT_VOLTAGE, Pair({ it.inVolts }, { it.volts })
-      )
-
-    val extendVoltage =
-      LoggedTunableValue(
-        "Arm/extendVoltage", ArmConstants.EXTEND_VOLTAGE, Pair({ it.inVolts }, { it.volts })
+        "Arm/stallCurrent", ArmConstants.STALL_CURRENT, Pair({ it.inAmperes }, { it.amps })
       )
   }
 }

@@ -4,6 +4,7 @@ import com.team4099.robot2025.config.constants.Constants
 import edu.wpi.first.math.kinematics.ChassisSpeeds
 import org.team4099.lib.units.AngularVelocity
 import org.team4099.lib.units.LinearVelocity
+import org.team4099.lib.units.base.Current
 import org.team4099.lib.units.base.Length
 import org.team4099.lib.units.derived.Angle
 import org.team4099.lib.units.derived.ElectricalPotential
@@ -55,7 +56,7 @@ sealed interface Request {
   }
 
   sealed interface ArmRequest : Request {
-    class OpenLoop(val armVoltage: ElectricalPotential) : ArmRequest
+    class TorqueControl(val armCurrent: Current) : ArmRequest
   }
 
   sealed interface ClimberRequest : Request {

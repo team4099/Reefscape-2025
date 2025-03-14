@@ -193,7 +193,6 @@ object RobotContainer {
     // ControlBoard.testArmBind.whileTrue(superstructure.testArmCommand())
 
     ControlBoard.intakeCoral.whileTrue(superstructure.intakeCoralCommand())
-    ControlBoard.intakeL1.whileTrue(superstructure.intakeL1Command())
 
     ControlBoard.intakeAlgaeGround.whileTrue(
       superstructure.intakeAlgaeCommand(Constants.Universal.AlgaeLevel.GROUND)
@@ -206,6 +205,9 @@ object RobotContainer {
     )
     // ControlBoard.prepAlgaeBarge.whileTrue(superstructure.prepScoreAlgaeBargeCommand())
     //
+    ControlBoard.prepL1.whileTrue(
+      superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L1)
+    )
     ControlBoard.prepL2.whileTrue(
       superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L2)
     )
