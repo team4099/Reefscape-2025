@@ -33,6 +33,7 @@ sealed interface Request {
     class Tuning() : SuperstructureRequest
 
     class Eject() : SuperstructureRequest
+    class ManualReset(): SuperstructureRequest
   }
 
   sealed interface DrivetrainRequest : Request {
