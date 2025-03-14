@@ -207,13 +207,8 @@ class Superstructure(
           nextState = SuperstructureStates.IDLE
         }
       }
-      SuperstructureStates.MANUAL_RESET -> {
-        arm.currentRequest = Request.ArmRequest.TorqueControl(-ArmTunableValues.ArmCurrents.stallCurrent.get())
-        elevator.currentRequest = Request.ElevatorRequest.Home()
-      }
       SuperstructureStates.EJECT -> {
-        rollers.currentRequest =
-          Request.RollersRequest.OpenLoop(RollersTunableValues.ejectVoltage.get())
+        rollers.currentRequest = Request.RollersRequest.OpenLoop(RollersTunableValues.ejectVoltage.get())
         ramp.currentRequest = Request.RampRequest.OpenLoop(RampTunableValues.ejectVoltage.get())
 
         when (currentRequest) {
@@ -224,6 +219,10 @@ class Superstructure(
             nextState = SuperstructureStates.INTAKE_CORAL
           }
         }
+      }
+      SuperstructureStates.MANUAL_RESET -> {
+        arm.currentRequest = Request.ArmRequest.TorqueControl(-ArmTunableValues.ArmCurrents.stallCurrent.get())
+        elevator.currentRequest = Request.ElevatorRequest.Home()
       }
       SuperstructureStates.HOME_PREP -> {
         nextState = SuperstructureStates.HOME
@@ -552,20 +551,13 @@ class Superstructure(
   }
 
   fun ejectCommand(): Command {
-    val returnCommand = run {
-      currentRequest = Request.SuperstructureRequest.Eject()
-      rollers.currentRequest = Request.RollersRequest.OpenLoop(8.0.volts)
-      ramp.currentRequest = Request.RampRequest.OpenLoop(5.0.volts)
-    }
+    val returnCommand = run { currentRequest = Request.SuperstructureRequest.Eject() }
     returnCommand.name = "EjectCommand"
     return returnCommand
   }
 
   fun manualResetCommand(): Command {
-    val returnCommand = run {
-      currentRequest = Request.SuperstructureRequest.ManualReset()
-    }
-
+    val returnCommand = run { currentRequest = Request.SuperstructureRequest.ManualReset() }
     returnCommand.name = "ManualResetCommand"
     return returnCommand
   }
