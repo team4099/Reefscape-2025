@@ -149,7 +149,7 @@ class Superstructure(
     val elevatorPosition = elevator.inputs.elevatorPosition
 
     // First Elevator Stage
-    CustomLogger.recordOutput(
+    CustomLogger.recordDebugOutput(
       "SimulatedMechanisms/0",
       Pose3d()
         .transformBy(
@@ -168,7 +168,7 @@ class Superstructure(
     )
 
     // Second Elevator Stage
-    CustomLogger.recordOutput(
+    CustomLogger.recordDebugOutput(
       "SimulatedMechanisms/1",
       Pose3d()
         .transformBy(
@@ -187,7 +187,7 @@ class Superstructure(
     )
 
     // Carriage
-    CustomLogger.recordOutput(
+    CustomLogger.recordDebugOutput(
       "SimulatedMechanisms/2",
       Pose3d()
         .transformBy(
@@ -195,38 +195,6 @@ class Superstructure(
         )
         .pose3d
     )
-
-    // Arm
-    /*
-    CustomLogger.recordOutput(
-        "SimulatedMechanisms/3",
-        Pose3d()
-            .transformBy(
-                Transform3d(
-                    Translation3d(0.21.meters, 0.meters, 0.38.meters + elevatorPosition),
-                    Rotation3d(0.degrees, -armAngle, 0.degrees)
-                )
-            )
-            .pose3d
-    )
-
-    // Manipulator
-    CustomLogger.recordOutput(
-        "SimulatedMechanisms/4",
-        Pose3d()
-            .transformBy(
-                Transform3d(
-                    Translation3d(
-                        0.21.meters + 0.2775.meters * armAngle.cos,
-                        0.meters,
-                        0.38.meters + 0.2775.meters * armAngle.sin + elevatorPosition
-                    ),
-                    Rotation3d()
-                )
-            )
-            .pose3d
-    )
-    */
 
     var nextState = currentState
     when (currentState) {
