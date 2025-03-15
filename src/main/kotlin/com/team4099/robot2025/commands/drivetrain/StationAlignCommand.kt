@@ -35,9 +35,6 @@ class StationAlignCommand(
 
     val stationSideFlip = if (drivetrain.fieldTRobot.y > FieldConstants.fieldWidth / 2) -1 else 1
 
-    val L1Flip =
-      if (desiredGamePiece == Constants.Universal.GamePiece.CORAL_L1) 180.degrees else 0.degrees
-
     command =
       TargetAngleCommand(
         driver,
@@ -46,7 +43,7 @@ class StationAlignCommand(
         turn,
         slowMode,
         drivetrain,
-        { targetAngle * stationSideFlip + L1Flip }
+        { targetAngle * stationSideFlip }
       )
   }
 

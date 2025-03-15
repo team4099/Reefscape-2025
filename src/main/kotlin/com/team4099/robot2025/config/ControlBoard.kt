@@ -46,15 +46,14 @@ object ControlBoard {
 
   val stopRollersBind = Trigger { driver.dPadDown }
   // Tuning Binds
-  val testElevatorBind = Trigger { driver.aButton }
-  val testElevatorDownBind = Trigger { driver.bButton }
-  val testClimberBind = Trigger { driver.bButton }
-  val testRollersBind = Trigger { driver.xButton }
-  val testIntakeBind = Trigger { driver.rightTriggerAxis > 0.5 }
-  val testOuttakeBind = Trigger { driver.leftTriggerAxis > 0.5 }
-
-  val testArmBind = Trigger { driver.yButton }
-  val testArmDownBind = Trigger { driver.xButton }
+//  val testElevatorBind = Trigger { driver.aButton }
+//  val testElevatorDownBind = Trigger { driver.bButton }
+//  val testClimberBind = Trigger { driver.bButton }
+//  val testRollersBind = Trigger { driver.xButton }
+//  val testIntakeBind = Trigger { driver.rightTriggerAxis > 0.5 }
+//  val testOuttakeBind = Trigger { driver.leftTriggerAxis > 0.5 }
+//  val testArmBind = Trigger { driver.yButton }
+//  val testArmDownBind = Trigger { driver.xButton }
 
   // Single Driver Binds
   val prepL1 = Trigger { !driver.rightJoystickButton && driver.xButton }

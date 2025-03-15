@@ -12,8 +12,7 @@ import com.team4099.robot2025.config.ControlBoard
 import com.team4099.robot2025.config.constants.Constants
 import com.team4099.robot2025.config.constants.VisionConstants
 import com.team4099.robot2025.subsystems.arm.Arm
-import com.team4099.robot2025.subsystems.arm.ArmIOSim
-import com.team4099.robot2025.subsystems.arm.ArmIOTalonFX
+import com.team4099.robot2025.subsystems.arm.ArmIO
 import com.team4099.robot2025.subsystems.climber.Climber
 import com.team4099.robot2025.subsystems.climber.ClimberIO
 import com.team4099.robot2025.subsystems.climber.ClimberIOSim
@@ -65,7 +64,7 @@ object RobotContainer {
 
       drivetrain = Drivetrain(GyroIOPigeon2, DrivetrainIOReal)
       limelight = LimelightVision(object : LimelightVisionIO {})
-      arm = Arm(ArmIOTalonFX)
+      arm = Arm(object : ArmIO {})
       climber = Climber(object : ClimberIO {})
       elevator = Elevator(ElevatorIOTalon)
       rollers = Rollers(RollersIOTalonFX)
@@ -85,7 +84,7 @@ object RobotContainer {
       // Simulation implementations
       drivetrain = Drivetrain(object : GyroIO {}, DrivetrainIOSim)
       limelight = LimelightVision(object : LimelightVisionIO {})
-      arm = Arm(ArmIOSim)
+      arm = Arm(object : ArmIO {})
       climber = Climber(ClimberIOSim)
       elevator = Elevator(ElevatorIOSim)
       rollers = Rollers(RollersIOSim)
@@ -221,8 +220,7 @@ object RobotContainer {
       superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L4)
     )
 
-    ControlBoard.score.onTrue(superstructure.prepScoreDefaultCommand())
-    ControlBoard.score.onFalse(superstructure.scoreCommand())
+    ControlBoard.score.whileTrue(superstructure.scoreCommand())
 
     ControlBoard.forceIdle.whileTrue(superstructure.requestIdleCommand())
 
@@ -279,18 +277,6 @@ object RobotContainer {
     //        { ControlBoard.slowMode },
     //        drivetrain,
     //        Constants.Universal.GamePiece.CORAL
-    //      )
-    //    )
-    //
-    //    ControlBoard.intakeL1.whileTrue(
-    //      StationAlignCommand(
-    //        driver = Jessika(),
-    //        { ControlBoard.forward.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
-    //        { ControlBoard.strafe.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
-    //        { ControlBoard.turn.smoothDeadband(Constants.Joysticks.TURN_DEADBAND) },
-    //        { ControlBoard.slowMode },
-    //        drivetrain,
-    //        Constants.Universal.GamePiece.CORAL_L1
     //      )
     //    )
   }

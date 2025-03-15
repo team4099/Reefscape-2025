@@ -177,7 +177,7 @@ object ElevatorTunableValues {
 
     val L1Height =
       LoggedTunableValue(
-        "Elevator/coralL1VerticalHeight",
+        "Elevator/coralL1Height",
         ElevatorConstants.L1_HEIGHT,
         Pair({ it.inInches }, { it.inches })
       )

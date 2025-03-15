@@ -8,7 +8,6 @@ import com.team4099.robot2025.config.constants.Constants.Universal.CoralLevel
 import com.team4099.robot2025.config.constants.Constants.Universal.GamePiece
 import com.team4099.robot2025.config.constants.ElevatorConstants
 import com.team4099.robot2025.subsystems.arm.Arm
-import com.team4099.robot2025.subsystems.arm.ArmTunableValues
 import com.team4099.robot2025.subsystems.climber.Climber
 import com.team4099.robot2025.subsystems.drivetrain.drive.Drivetrain
 import com.team4099.robot2025.subsystems.elevator.Elevator
@@ -238,6 +237,9 @@ class Superstructure(
       }
       SuperstructureStates.HOME -> {
         elevator.currentRequest = Request.ElevatorRequest.Home()
+        if (elevator.isHomed) {
+          nextState = SuperstructureStates.IDLE
+        }
       }
       SuperstructureStates.IDLE -> {
         climber.currentRequest = Request.ClimberRequest.OpenLoop(0.0.volts)
@@ -623,31 +625,6 @@ class Superstructure(
   fun scoreCommand(): Command {
     val returnCommand = runOnce { currentRequest = Request.SuperstructureRequest.Score() }
     returnCommand.name = "ScoreCommand"
-    return returnCommand
-  }
-
-  fun prepScoreDefaultCommand(): Command {
-    val returnCommand =
-      run {
-        if (currentState == SuperstructureStates.IDLE) {
-          when (theoreticalGamePiece) {
-            GamePiece.CORAL ->
-              currentRequest = Request.SuperstructureRequest.ScorePrepCoral(CoralLevel.L1)
-            GamePiece.ALGAE ->
-              currentRequest = Request.SuperstructureRequest.ScorePrepAlgaeProcessor()
-          }
-        } else if (currentState == SuperstructureStates.PREP_SCORE_CORAL &&
-          coralScoringLevel != CoralLevel.L1
-        ) {
-          currentRequest = Request.SuperstructureRequest.Score()
-        }
-      }
-        .until({
-          currentState == SuperstructureStates.PREP_SCORE_CORAL ||
-            currentState == SuperstructureStates.PREP_SCORE_ALGAE_PROCESSOR
-        })
-
-    returnCommand.name = "prepScoreDefaultCommand"
     return returnCommand
   }
 
