@@ -223,6 +223,16 @@ class Superstructure(
       SuperstructureStates.MANUAL_RESET -> {
         arm.currentRequest = Request.ArmRequest.TorqueControl(-ArmTunableValues.ArmCurrents.stallCurrent.get())
         elevator.currentRequest = Request.ElevatorRequest.Home()
+        climber.currentRequest = Request.ClimberRequest.Home()
+
+        if (
+          elevator.inputs.leaderStatorCurrent > ElevatorConstants.HOMING_STALL_CURRENT &&
+          elevator.inputs.elevatorVelocity.epsilonEquals(0.inches.perSecond) &&
+          elevator.inputs.leaderAppliedVoltage < 0.volts &&
+          (Clock.fpgaTime - lastTransitionTime) > 0.5.seconds
+        ) {
+          nextState = SuperstructureStates.IDLE
+        }
       }
       SuperstructureStates.HOME_PREP -> {
         nextState = SuperstructureStates.HOME
@@ -234,14 +244,13 @@ class Superstructure(
         climber.currentRequest = Request.ClimberRequest.OpenLoop(0.0.volts)
         ramp.currentRequest = Request.RampRequest.OpenLoop(RampTunableValues.idleVoltage.get())
 
-        if (elevator.inputs.leaderStatorCurrent > ElevatorConstants.HOMING_STALL_CURRENT &&
-          elevator.elevatorVelocityTarget == 0.inches.perSecond &&
+        if (
+          elevator.inputs.leaderStatorCurrent > ElevatorConstants.HOMING_STALL_CURRENT &&
+          elevator.elevatorVelocityTarget.epsilonEquals(0.inches.perSecond) &&
           elevator.elevatorPositionTarget == 0.inches &&
-          elevator.inputs.elevatorPosition - elevator.elevatorPositionTarget <=
-          ElevatorConstants.ELEVATOR_TOLERANCE &&
+          elevator.inputs.elevatorPosition - elevator.elevatorPositionTarget <= ElevatorConstants.ELEVATOR_TOLERANCE &&
           elevator.inputs.leaderAppliedVoltage < 0.volts &&
-          (Clock.fpgaTime - lastTransitionTime) >
-          0.5.seconds
+          (Clock.fpgaTime - lastTransitionTime) > 0.5.seconds
         ) { // add buffer so it won't home when still up
           elevator.currentRequest = Request.ElevatorRequest.Home() // stop stalling
         } else {
