@@ -31,9 +31,14 @@ object ArmTunableValues {
         "Arm/idleCurrent", ArmConstants.IDLE_CURRENT, Pair({ it.inAmperes }, { it.amps })
       )
 
-    val stallCurrent =
+    val retractCurrent =
       LoggedTunableValue(
-        "Arm/stallCurrent", ArmConstants.STALL_CURRENT, Pair({ it.inAmperes }, { it.amps })
+        "Arm/retractCurrent", ArmConstants.RETRACT_CURRENT, Pair({ it.inAmperes }, { it.amps })
+      )
+
+    val extendCurrent =
+      LoggedTunableValue(
+        "Arm/extendCurrent", ArmConstants.EXTEND_CURRENT, Pair({ it.inAmperes }, { it.amps })
       )
   }
 }

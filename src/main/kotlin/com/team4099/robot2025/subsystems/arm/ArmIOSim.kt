@@ -8,24 +8,19 @@ import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim
 import org.team4099.lib.controller.ProfiledPIDController
 import org.team4099.lib.controller.TrapezoidProfile
+import org.team4099.lib.units.base.Current
 import org.team4099.lib.units.base.amps
 import org.team4099.lib.units.base.celsius
 import org.team4099.lib.units.base.inMeters
 import org.team4099.lib.units.base.inSeconds
-import org.team4099.lib.units.derived.AccelerationFeedforward
-import org.team4099.lib.units.derived.DerivativeGain
-import org.team4099.lib.units.derived.ElectricalPotential
-import org.team4099.lib.units.derived.IntegralGain
-import org.team4099.lib.units.derived.ProportionalGain
-import org.team4099.lib.units.derived.Radian
-import org.team4099.lib.units.derived.VelocityFeedforward
-import org.team4099.lib.units.derived.Volt
 import org.team4099.lib.units.derived.inKilogramsMeterSquared
 import org.team4099.lib.units.derived.inRadians
 import org.team4099.lib.units.derived.inVolts
 import org.team4099.lib.units.derived.radians
 import org.team4099.lib.units.derived.volts
 import org.team4099.lib.units.perSecond
+
+// TODO: completely broken
 
 object ArmIOSim : ArmIO {
 
@@ -68,29 +63,12 @@ object ArmIOSim : ArmIO {
     inputs.isSimulating = true
   }
 
-  override fun setArmCurrent(voltage: ElectricalPotential) {
+  override fun setArmCurrent(amps: Current) {
     val clampedVoltage =
       clamp(voltage, -ArmConstants.VOLTAGE_COMPENSATION, ArmConstants.VOLTAGE_COMPENSATION)
     armSim.setInputVoltage(clampedVoltage.inVolts)
     appliedVoltage = clampedVoltage
   }
 
-  override fun zeroEncoder() {}
-
   override fun setArmBrakeMode(brake: Boolean) {}
-
-  override fun configurePID(
-    kP: ProportionalGain<Radian, Volt>,
-    kI: IntegralGain<Radian, Volt>,
-    kD: DerivativeGain<Radian, Volt>
-  ) {
-    armPIDController.setPID(kP, kI, kD)
-  }
-
-  override fun configureFF(
-    kG: ElectricalPotential,
-    kS: ElectricalPotential,
-    kA: AccelerationFeedforward<Radian, Volt>,
-    kV: VelocityFeedforward<Radian, Volt>
-  ) {}
 }

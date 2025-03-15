@@ -10,7 +10,8 @@ import org.team4099.lib.units.perSecond
 
 object ArmConstants {
   val IDLE_CURRENT = 0.0.amps
-  val STALL_CURRENT = 20.0.amps
+  val RETRACT_CURRENT = 20.0.amps
+  val EXTEND_CURRENT = -(20.0).amps
   val STALL_TIME_THRESHOLD = 0.15.seconds
 
   val STATOR_CURRENT_LIMIT = 30.0.amps

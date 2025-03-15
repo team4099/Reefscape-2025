@@ -12,22 +12,17 @@ class Arm(private val io: ArmIO) {
   val inputs = ArmIO.ArmIOInputs()
 
   private var armTargetCurrent: Current = 0.0.amps
-  var isHomed = false
-  var isAtTargetedPosition: Boolean = false
+  val isAtTargetedPosition: Boolean
+    get() {
+      return currentState == lastRequestedState
+    }
+  var currentPosition: ArmPosition = ArmPosition.RETRACTED
 
   private var lastHomingStatorCurrentTripTime = Clock.fpgaTime
+  private var lastRequestedState: ArmState = ArmState.UNINITIALIZED
 
   private var currentState = ArmState.UNINITIALIZED
-  var currentRequest: Request.ArmRequest = Request.ArmRequest.TorqueControl(0.0.amps)
-    set(value) {
-      when (value) {
-        is Request.ArmRequest.TorqueControl -> {
-          armTargetCurrent = value.armCurrent
-        }
-        else -> {}
-      }
-      field = value
-    }
+  var currentRequest: Request.ArmRequest = Request.ArmRequest.Retract()
 
   fun periodic() {
     io.updateInputs(inputs)
@@ -38,18 +33,25 @@ class Arm(private val io: ArmIO) {
     CustomLogger.recordOutput("Arm/nextState", nextState.toString())
     CustomLogger.recordOutput("Arm/armTargetCurrent", armTargetCurrent.inAmperes)
 
-    isAtTargetedPosition =
-      !inputs.isSimulating &&
-      inputs.armStatorCurrent >= ArmConstants.STALL_CURRENT &&
-      (Clock.fpgaTime - lastHomingStatorCurrentTripTime) >= ArmConstants.STALL_TIME_THRESHOLD
-
     when (currentState) {
       ArmState.UNINITIALIZED -> {
         nextState = fromRequestToState(currentRequest)
       }
-      ArmState.TORQUE_CURRENT -> {
-        if (!isAtTargetedPosition) {
-          io.setArmCurrent(armTargetCurrent)
+      ArmState.RETRACTED -> {
+        if (currentPosition != ArmPosition.RETRACTED) {
+          io.setArmCurrent(ArmTunableValues.ArmCurrents.retractCurrent.get())
+        }
+        if (inputs.armStatorCurrent > ArmConstants.STATOR_CURRENT_LIMIT) {
+          currentPosition = ArmPosition.RETRACTED
+          nextState = fromRequestToState(currentRequest)
+        }
+      }
+      ArmState.EXTENDED -> {
+        if (currentPosition != ArmPosition.EXTENDED) {
+          io.setArmCurrent(ArmTunableValues.ArmCurrents.extendCurrent.get())
+        }
+        if (inputs.armStatorCurrent < -ArmConstants.STATOR_CURRENT_LIMIT) {
+          currentPosition = ArmPosition.EXTENDED
           nextState = fromRequestToState(currentRequest)
         }
       }
@@ -59,16 +61,23 @@ class Arm(private val io: ArmIO) {
   }
 
   companion object {
+    enum class ArmPosition {
+      EXTENDED,
+      RETRACTED,
+    }
+
     enum class ArmState {
       UNINITIALIZED,
-      TORQUE_CURRENT,
-      HOME
+      EXTENDED,
+      RETRACTED
     }
 
     // Translates Current Request to a State
     fun fromRequestToState(request: Request.ArmRequest): ArmState {
       return when (request) {
-        is Request.ArmRequest.TorqueControl -> ArmState.TORQUE_CURRENT
+        // is Request.ArmRequest.TorqueControl -> ArmState.TORQUE_CURRENT
+        is Request.ArmRequest.Extend -> ArmState.EXTENDED
+        is Request.ArmRequest.Retract -> ArmState.RETRACTED
       }
     }
   }

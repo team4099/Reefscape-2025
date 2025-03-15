@@ -208,7 +208,8 @@ class Superstructure(
         }
       }
       SuperstructureStates.EJECT -> {
-        rollers.currentRequest = Request.RollersRequest.OpenLoop(RollersTunableValues.ejectVoltage.get())
+        rollers.currentRequest =
+          Request.RollersRequest.OpenLoop(RollersTunableValues.ejectVoltage.get())
         ramp.currentRequest = Request.RampRequest.OpenLoop(RampTunableValues.ejectVoltage.get())
 
         when (currentRequest) {
@@ -221,12 +222,10 @@ class Superstructure(
         }
       }
       SuperstructureStates.MANUAL_RESET -> {
-        arm.currentRequest = Request.ArmRequest.TorqueControl(-ArmTunableValues.ArmCurrents.stallCurrent.get())
-        elevator.currentRequest = Request.ElevatorRequest.Home()
-        climber.currentRequest = Request.ClimberRequest.Home()
+        arm.currentRequest = Request.ArmRequest.Retract()
+        elevator.currentRequest = Request.ElevatorRequest.OpenLoop((-2.0).volts)
 
-        if (
-          elevator.inputs.leaderStatorCurrent > ElevatorConstants.HOMING_STALL_CURRENT &&
+        if (elevator.inputs.leaderStatorCurrent > ElevatorConstants.HOMING_STALL_CURRENT &&
           elevator.inputs.elevatorVelocity.epsilonEquals(0.inches.perSecond) &&
           elevator.inputs.leaderAppliedVoltage < 0.volts &&
           (Clock.fpgaTime - lastTransitionTime) > 0.5.seconds
@@ -243,14 +242,16 @@ class Superstructure(
       SuperstructureStates.IDLE -> {
         climber.currentRequest = Request.ClimberRequest.OpenLoop(0.0.volts)
         ramp.currentRequest = Request.RampRequest.OpenLoop(RampTunableValues.idleVoltage.get())
+        arm.currentRequest = Request.ArmRequest.Retract()
 
-        if (
-          elevator.inputs.leaderStatorCurrent > ElevatorConstants.HOMING_STALL_CURRENT &&
-          elevator.elevatorVelocityTarget.epsilonEquals(0.inches.perSecond) &&
+        if (elevator.inputs.leaderStatorCurrent > ElevatorConstants.HOMING_STALL_CURRENT &&
+          elevator.elevatorVelocityTarget == 0.inches.perSecond &&
           elevator.elevatorPositionTarget == 0.inches &&
-          elevator.inputs.elevatorPosition - elevator.elevatorPositionTarget <= ElevatorConstants.ELEVATOR_TOLERANCE &&
+          elevator.inputs.elevatorPosition - elevator.elevatorPositionTarget <=
+          ElevatorConstants.ELEVATOR_FORCE_HOME_TOLERANCE &&
           elevator.inputs.leaderAppliedVoltage < 0.volts &&
-          (Clock.fpgaTime - lastTransitionTime) > 0.5.seconds
+          (Clock.fpgaTime - lastTransitionTime) >
+          0.5.seconds
         ) { // add buffer so it won't home when still up
           elevator.currentRequest = Request.ElevatorRequest.Home() // stop stalling
         } else {
@@ -413,8 +414,10 @@ class Superstructure(
           elevator.currentRequest = Request.ElevatorRequest.ClosedLoop(algaeIntakeElevatorHeight)
 
           if (elevator.isAtTargetedPosition) {
-            arm.currentRequest =
-              Request.ArmRequest.TorqueControl(ArmTunableValues.ArmCurrents.stallCurrent.get())
+            arm.currentRequest = Request.ArmRequest.Extend()
+          }
+          if (arm.isAtTargetedPosition) {
+            nextState = SuperstructureStates.INTAKE_ALGAE
           }
         }
 
@@ -450,8 +453,7 @@ class Superstructure(
             ElevatorTunableValues.ElevatorHeights.scoreAlgaeProcessorHeight.get()
           )
         if (elevator.isAtTargetedPosition) {
-          arm.currentRequest =
-            Request.ArmRequest.TorqueControl(ArmTunableValues.ArmCurrents.stallCurrent.get())
+          arm.currentRequest = Request.ArmRequest.Extend()
         }
 
         when (currentRequest) {
@@ -487,8 +489,7 @@ class Superstructure(
           )
 
         if (elevator.isAtTargetedPosition) {
-          arm.currentRequest =
-            Request.ArmRequest.TorqueControl(ArmTunableValues.ArmCurrents.stallCurrent.get())
+          arm.currentRequest = Request.ArmRequest.Extend()
 
           if (arm.isAtTargetedPosition && currentRequest is Request.SuperstructureRequest.Score) {
             nextState = SuperstructureStates.SCORE_ALGAE_BARGE

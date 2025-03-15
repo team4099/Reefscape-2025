@@ -33,7 +33,7 @@ sealed interface Request {
     class Tuning() : SuperstructureRequest
 
     class Eject() : SuperstructureRequest
-    class ManualReset(): SuperstructureRequest
+    class ManualReset() : SuperstructureRequest
   }
 
   sealed interface DrivetrainRequest : Request {
@@ -57,7 +57,8 @@ sealed interface Request {
   }
 
   sealed interface ArmRequest : Request {
-    class TorqueControl(val armCurrent: Current) : ArmRequest
+    class Retract() : ArmRequest
+    class Extend() : ArmRequest
   }
 
   sealed interface ClimberRequest : Request {
