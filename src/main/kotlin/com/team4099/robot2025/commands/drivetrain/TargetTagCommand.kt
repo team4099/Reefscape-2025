@@ -203,7 +203,7 @@ class TargetTagCommand(
             (
             vision.lastTrigVisionUpdate.robotTReefTag.translation.x.absoluteValue -
               18.0.inches
-            ) < 3.inches
+            ) < 2.inches
           )
       } else {
         (
@@ -212,7 +212,7 @@ class TargetTagCommand(
             (
             vision.lastTrigVisionUpdate.robotTReefTag.translation.x.absoluteValue -
               18.0.inches
-            ) < 3.inches
+            ) < 2.inches
           )
       }
 

@@ -69,6 +69,13 @@ object RollersTunableValues {
       Pair({ it.inVolts }, { it.volts })
     )
 
+  val scoreCoralL1Voltage =
+    LoggedTunableValue(
+      "Rollers/scoreCoralL1Voltage",
+      RollersConstants.SCORE_CORAL_L1_VOLTAGE,
+      Pair({ it.inVolts }, { it.volts })
+    )
+
   val coralSpitTime =
     LoggedTunableValue(
       "Rollers/coralSpitTime",

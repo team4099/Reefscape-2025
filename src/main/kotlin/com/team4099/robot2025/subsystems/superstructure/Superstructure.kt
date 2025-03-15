@@ -279,6 +279,7 @@ class Superstructure(
         nextState =
           when (currentRequest) {
             is Request.SuperstructureRequest.Home -> SuperstructureStates.HOME_PREP
+            is Request.SuperstructureRequest.Eject -> SuperstructureStates.EJECT
             is Request.SuperstructureRequest.IntakeAlgae -> SuperstructureStates.PREP_INTAKE_ALGAE
             is Request.SuperstructureRequest.IntakeCoral -> SuperstructureStates.PREP_INTAKE_CORAL
             is Request.SuperstructureRequest.ScorePrepCoral ->
@@ -369,17 +370,16 @@ class Superstructure(
               Request.ElevatorRequest.ClosedLoop(
                 ElevatorTunableValues.ElevatorHeights.L4Height.get()
               )
-            if (elevator.isAtTargetedPosition &&
-              elevator.inputs.elevatorPosition >=
-              ElevatorTunableValues.ElevatorHeights.L4HeightToScore.get()
-            ) {
+          }
+
+          if (elevator.isAtTargetedPosition) {
+            if (coralScoringLevel != CoralLevel.L1) {
               rollers.currentRequest =
                 Request.RollersRequest.OpenLoop(RollersTunableValues.scoreCoralVoltage.get())
             }
-          } else {
-            if (elevator.isAtTargetedPosition) {
+            else {
               rollers.currentRequest =
-                Request.RollersRequest.OpenLoop(RollersTunableValues.scoreCoralVoltage.get())
+                Request.RollersRequest.OpenLoop(RollersTunableValues.scoreCoralL1Voltage.get())
             }
           }
 

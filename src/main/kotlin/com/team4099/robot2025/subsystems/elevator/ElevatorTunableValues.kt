@@ -204,13 +204,6 @@ object ElevatorTunableValues {
         "Elevator/L4Height", ElevatorConstants.L4_HEIGHT, Pair({ it.inInches }, { it.inches })
       )
 
-    val L4HeightToScore =
-      LoggedTunableValue(
-        "Elevator/L4Height",
-        ElevatorConstants.L4_HEIGHT_TO_SCORE,
-        Pair({ it.inInches }, { it.inches })
-      )
-
     val ejectHeight =
       LoggedTunableValue(
         "Elevator/ejectHeight",
