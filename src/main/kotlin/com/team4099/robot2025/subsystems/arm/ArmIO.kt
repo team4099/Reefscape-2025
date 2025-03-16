@@ -2,21 +2,12 @@ package com.team4099.robot2025.subsystems.arm
 
 import org.littletonrobotics.junction.LogTable
 import org.littletonrobotics.junction.inputs.LoggableInputs
+import org.team4099.lib.units.base.Current
 import org.team4099.lib.units.base.amps
 import org.team4099.lib.units.base.celsius
 import org.team4099.lib.units.base.inAmperes
 import org.team4099.lib.units.base.inCelsius
-import org.team4099.lib.units.derived.AccelerationFeedforward
-import org.team4099.lib.units.derived.Angle
-import org.team4099.lib.units.derived.DerivativeGain
-import org.team4099.lib.units.derived.ElectricalPotential
-import org.team4099.lib.units.derived.IntegralGain
-import org.team4099.lib.units.derived.ProportionalGain
-import org.team4099.lib.units.derived.Radian
-import org.team4099.lib.units.derived.VelocityFeedforward
-import org.team4099.lib.units.derived.Volt
 import org.team4099.lib.units.derived.degrees
-import org.team4099.lib.units.derived.inDegrees
 import org.team4099.lib.units.derived.inVolts
 import org.team4099.lib.units.derived.volts
 import org.team4099.lib.units.inDegreesPerSecond
@@ -27,7 +18,6 @@ interface ArmIO {
 
   class ArmIOInputs : LoggableInputs {
     // Arm Inputs
-    var armPosition = 0.0.degrees
     var armVelocity = 0.0.degrees.perSecond
     var armAcceleration = 0.0.degrees.perSecond.perSecond
     var armAppliedVoltage = 0.0.volts
@@ -38,7 +28,6 @@ interface ArmIO {
     var isSimulating = false
 
     override fun toLog(table: LogTable?) {
-      table?.put("armPositionDegrees", armPosition.inDegrees)
       table?.put("armVelocityDegreesPerSecond", armVelocity.inDegreesPerSecond)
       table?.put(
         "armAccelerationDegreesPerSecondPerSecond", armAcceleration.inDegreesPerSecondPerSecond
@@ -51,7 +40,6 @@ interface ArmIO {
 
     override fun fromLog(table: LogTable?) {
 
-      table?.get("armPositionDegrees", armPosition.inDegrees)?.let { armPosition = it.degrees }
       table?.get("armVelocityDegreesPerSecond", armVelocity.inDegreesPerSecond)?.let {
         armVelocity = it.degrees.perSecond
       }
@@ -75,24 +63,7 @@ interface ArmIO {
 
   fun updateInputs(inputs: ArmIOInputs) {}
 
-  fun setArmVoltage(voltage: ElectricalPotential) {}
-
-  fun setArmPosition(position: Angle) {}
-
-  fun zeroEncoder() {}
+  fun setArmCurrent(amps: Current) {}
 
   fun setArmBrakeMode(brake: Boolean) {}
-
-  fun configurePID(
-    kP: ProportionalGain<Radian, Volt>,
-    kI: IntegralGain<Radian, Volt>,
-    kD: DerivativeGain<Radian, Volt>
-  ) {}
-
-  fun configureFF(
-    kG: ElectricalPotential,
-    kS: ElectricalPotential,
-    kA: AccelerationFeedforward<Radian, Volt>,
-    kV: VelocityFeedforward<Radian, Volt>
-  ) {}
 }

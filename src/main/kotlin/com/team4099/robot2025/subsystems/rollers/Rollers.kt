@@ -30,7 +30,7 @@ class Rollers(val io: RollersIO) {
 
   var debounceFilter = Debouncer(RollersConstants.BEAM_BREAK_FILTER_TIME.inSeconds)
 
-  val hasCoralVertical: Boolean
+  val hasCoral: Boolean
     get() {
       return inputs.rollerStatorCurrent > RollersConstants.CORAL_CURRENT_THRESHOLD &&
         !inputs.rollerAppliedVoltage.epsilonEquals(
@@ -38,14 +38,6 @@ class Rollers(val io: RollersIO) {
             .SCORE_CORAL_VOLTAGE
         ) && // make sure score & intake are not the same voltage
         (Clock.fpgaTime - lastRollerRunTime) >= RollersConstants.CORAL_DETECTION_TIME_THRESHOLD
-    }
-
-  val hasCoralHorizontal: Boolean
-    get() {
-      return inputs.rollerStatorCurrent > RollersConstants.CORAL_HORIZONTAL_CURRENT_THRESHOLD &&
-        inputs.rollerAppliedVoltage.sign < 0 &&
-        (Clock.fpgaTime - lastRollerRunTime) >=
-        RollersConstants.CORAL_HORIZONTAL_DETECTION_TIME_THRESHOLD
     }
 
   val hasAlgae: Boolean
@@ -66,7 +58,7 @@ class Rollers(val io: RollersIO) {
 
     var nextState = currentState
     CustomLogger.recordOutput("Rollers/nextState", nextState.toString())
-    CustomLogger.recordOutput("Rollers/hasCoralVertical", hasCoralVertical)
+    CustomLogger.recordOutput("Rollers/hasCoralVertical", hasCoral)
     CustomLogger.recordOutput("Rollers/targetVoltage", rollersTargetVoltage.inVolts)
 
     when (currentState) {

@@ -9,7 +9,6 @@ import com.team4099.robot2025.util.CustomLogger
 import com.team4099.robot2025.util.FMSData
 import com.team4099.robot2025.util.driver.DriverProfile
 import edu.wpi.first.wpilibj2.command.Command
-import org.team4099.lib.units.derived.degrees
 
 class StationAlignCommand(
   val driver: DriverProfile,
@@ -35,18 +34,9 @@ class StationAlignCommand(
 
     val stationSideFlip = if (drivetrain.fieldTRobot.y > FieldConstants.fieldWidth / 2) -1 else 1
 
-    val L1Flip =
-      if (desiredGamePiece == Constants.Universal.GamePiece.CORAL_L1) 180.degrees else 0.degrees
-
     command =
       TargetAngleCommand(
-        driver,
-        driveX,
-        driveY,
-        turn,
-        slowMode,
-        drivetrain,
-        { targetAngle * stationSideFlip + L1Flip }
+        driver, driveX, driveY, turn, slowMode, drivetrain, { targetAngle * stationSideFlip }
       )
   }
 

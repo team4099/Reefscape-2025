@@ -292,12 +292,12 @@ class Vision(vararg cameras: CameraIO) : SubsystemBase() {
               )
             )
 
-          //reefVisionConsumer.accept(lastTrigVisionUpdate)
+          // reefVisionConsumer.accept(lastTrigVisionUpdate)
         }
       }
     }
 
-    //visionConsumer.accept(visionUpdates)
+    // visionConsumer.accept(visionUpdates)
     Logger.recordOutput(
       "LoggedRobot/VisionLoopTimeMS", (Clock.realTimestamp - startTime).inMilliseconds
     )

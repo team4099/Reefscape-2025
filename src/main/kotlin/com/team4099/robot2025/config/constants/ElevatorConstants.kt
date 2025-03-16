@@ -11,6 +11,7 @@ import org.team4099.lib.units.perSecond
 object ElevatorConstants {
 
   val TESTING_VOLTAGE = 0.0.volts
+  val SLAM_VOLTAGE = -12.0.volts
   const val ENABLE_ELEVATOR = true
 
   val GEAR_RATIO = 16.0 / 48.0
@@ -19,7 +20,7 @@ object ElevatorConstants {
   val OPEN_LOOP_EXTEND_VOLTAGE = 8.0.volts
   val OPEN_LOOP_RETRACT_VOLTAGE = -(12.0.volts)
   val HOMING_APPLIED_VOLTAGE = -1.0.volts
-  val HOMING_STALL_CURRENT = 20.0.amps
+  val HOMING_STALL_CURRENT = 15.0.amps
   val HOMING_STALL_TIME_THRESHOLD = 0.15.seconds
   val UPWARDS_EXTENSION_LIMIT = 70.0.inches
   val DOWNWARDS_EXTENSION_LIMIT = -0.5.inches
@@ -27,7 +28,9 @@ object ElevatorConstants {
   val SPOOL_DIAMETER = 2.0051.inches
   val VOLTAGE_COMPENSATION = 12.0.volts
 
-  val ELEVATOR_TOLERANCE = 1.inches
+  val ELEVATOR_TOLERANCE = 0.5.inches
+  val ELEVATOR_FORCE_HOME_TOLERANCE = 0.75.inches
+  val ELEVATION_EJECT_TOLERANCE = 0.125.inches
 
   val LEADER_STATOR_CURRENT_LIMIT = 60.0.amps
   val LEADER_SUPPLY_CURRENT_LIMIT = 60.0.amps
@@ -50,7 +53,6 @@ object ElevatorConstants {
   val IDLE_ALGAE_HEIGHT = 0.0.inches
 
   val INTAKE_CORAL_HEIGHT = 0.inches
-  val INTAKE_L1_HEIGHT = 3.inches
 
   val PASS_THROUGH_HEIGHT = 0.inches
 
@@ -62,15 +64,13 @@ object ElevatorConstants {
   val SCORE_BARGE_HEIGHT = 60.inches
 
   // TODO: adjust scoring/intaking heights for end-effector offset
-  val L1_HORIZONTAL_HEIGHT = 0.0.inches
-  val L1_VERTICAL_HEIGHT = 0.0.inches
-  val L2_HEIGHT = 13.039.inches - 2.inches + 0.5.inches
-  val L3_HEIGHT = 28.789.inches - 2.inches + 0.5.inches
-  val PREP_L4_HEIGHT = 42.inches
-  val L4_HEIGHT = 53.5.inches
-  val L4_HEIGHT_TO_SCORE = 50.inches
+  val L1_HEIGHT = 24.inches
+  val L2_HEIGHT = 28.789.inches - 2.inches + 0.5.inches + 5.5.inches
+  val L3_HEIGHT = 28.789.inches - 2.inches + 0.5.inches + 20.5.inches
+  val PREP_L4_HEIGHT = 53.5.inches
+  val L4_HEIGHT = 73.inches
 
-  val EJECT_HEIGHT = 0.0.inches
+  val EJECT_HEIGHT = 9.0.inches
 
   val ELEVATOR_GROUND_OFFSET = 3.829.inches
 

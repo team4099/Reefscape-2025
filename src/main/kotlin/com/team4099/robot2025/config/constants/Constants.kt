@@ -23,7 +23,6 @@ object Constants {
 
     enum class GamePiece {
       CORAL,
-      CORAL_L1,
       ALGAE,
       NONE
     }

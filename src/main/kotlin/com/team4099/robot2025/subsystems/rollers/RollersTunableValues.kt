@@ -20,13 +20,6 @@ object RollersTunableValues {
       Pair({ it.inVolts }, { it.volts })
     )
 
-  val idleCoralL1Voltage =
-    LoggedTunableValue(
-      "Rollers/idleCoralL1Voltage",
-      RollersConstants.IDLE_CORAL_L1_VOLTAGE,
-      Pair({ it.inVolts }, { it.volts })
-    )
-
   val idleAlgaeVoltage =
     LoggedTunableValue(
       "Rollers/idleAlgaeVoltage",
@@ -45,13 +38,6 @@ object RollersTunableValues {
     LoggedTunableValue(
       "Rollers/intakeCoralVoltageSlow",
       RollersConstants.INTAKE_CORAL_VOLTAGE_SLOW,
-      Pair({ it.inVolts }, { it.volts })
-    )
-
-  val intakeL1Voltage =
-    LoggedTunableValue(
-      "Rollers/intakeL1Voltage",
-      RollersConstants.INTAKE_L1_VOLTAGE,
       Pair({ it.inVolts }, { it.volts })
     )
 
@@ -97,10 +83,10 @@ object RollersTunableValues {
       Pair({ it.inSeconds }, { it.seconds })
     )
 
-  val coralL1SpitTime =
+  val coralL4SpitTime =
     LoggedTunableValue(
-      "Rollers/coralL1SpitTime",
-      RollersConstants.CORAL_L1_SPIT_TIME,
+      "Rollers/coralSpitTime",
+      RollersConstants.CORAL_L4_SPIT_TIME,
       Pair({ it.inSeconds }, { it.seconds })
     )
 
@@ -122,6 +108,13 @@ object RollersTunableValues {
     LoggedTunableValue(
       "Rollers/ejectVoltage",
       RollersConstants.EJECT_VOLTAGE,
+      Pair({ it.inVolts }, { it.volts })
+    )
+
+  val unjamVoltage =
+    LoggedTunableValue(
+      "Rollers/unjamVoltage",
+      RollersConstants.UNJAM_VOLTAGE,
       Pair({ it.inVolts }, { it.volts })
     )
 }

@@ -17,8 +17,6 @@ sealed interface Request {
 
     class IntakeCoral() : SuperstructureRequest
 
-    class IntakeL1() : SuperstructureRequest
-
     class IntakeAlgae(val level: Constants.Universal.AlgaeLevel) : SuperstructureRequest
 
     class ScorePrepCoral(val level: Constants.Universal.CoralLevel) : SuperstructureRequest
@@ -34,6 +32,7 @@ sealed interface Request {
     class Tuning() : SuperstructureRequest
 
     class Eject() : SuperstructureRequest
+    class ManualReset() : SuperstructureRequest
   }
 
   sealed interface DrivetrainRequest : Request {
@@ -57,9 +56,8 @@ sealed interface Request {
   }
 
   sealed interface ArmRequest : Request {
-    class OpenLoop(val armVoltage: ElectricalPotential) : ArmRequest
-    class ClosedLoop(val armPosition: Angle) : ArmRequest
-    class Zero() : ArmRequest
+    class Retract() : ArmRequest
+    class Extend() : ArmRequest
   }
 
   sealed interface ClimberRequest : Request {
