@@ -28,7 +28,6 @@ class ThreeL4RightAuto(
     addRequirements(drivetrain)
 
     addCommands(
-      WaitCommand(0.25),
       DrivePathCommand.createPathInFieldFrame(
         drivetrain, TrajectoryTypes.Choreo(firstTrajectory), keepTrapping = false
       ),
