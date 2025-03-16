@@ -1,5 +1,6 @@
 package com.team4099.robot2025.config.constants
 
+import org.team4099.lib.units.base.inches
 import org.team4099.lib.units.base.meters
 import org.team4099.lib.units.base.seconds
 import org.team4099.lib.units.milli
@@ -137,4 +138,24 @@ object Constants {
   object LED {
     const val LED_CANDLE_ID = 1
   }
+
+  val distanceElevatorHeightOffsetTableReal =
+    listOf(
+      Pair(0.inches, 5.inches),
+      Pair(63.89.inches, 5.inches),
+      Pair(75.5.inches, 5.inches),
+      Pair(84.25.inches, 5.inches),
+      Pair(92.6.inches, 5.inches),
+      Pair(103.7.inches, 5.inches),
+      Pair(113.23.inches, 5.inches),
+      Pair(122.0.inches, 5.inches),
+      Pair(134.inches, 5.inches),
+      Pair(143.8.inches, 5.inches),
+      Pair(156.8.inches, 5.inches),
+      Pair(166.9.inches, 5.inches),
+      Pair(172.2.inches, 5.inches),
+      Pair(185.6.inches, 5.inches),
+      Pair(198.15.inches, 5.inches),
+      Pair(220.1.inches, 5.inches)
+    )
 }

@@ -32,6 +32,7 @@ class ReefAlignCommand(
 ) : Command() {
 
   lateinit var command: TargetTagCommand
+
   var scored = false
   var timeScored: Time = -1337.seconds
   var tagID = -1
@@ -66,6 +67,7 @@ class ReefAlignCommand(
       TargetTagCommand(
         driver, driveX, driveY, turn, slowMode, drivetrain, vision, horizontalOffset, tagID
       )
+
 
     command.initialize()
   }

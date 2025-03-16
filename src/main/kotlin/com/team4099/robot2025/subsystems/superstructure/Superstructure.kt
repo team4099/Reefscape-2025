@@ -2,6 +2,7 @@ package com.team4099.robot2025.subsystems.superstructure
 
 import com.team4099.lib.hal.Clock
 import com.team4099.robot2023.subsystems.led.Leds
+import com.team4099.robot2025.commands.drivetrain.AutoAim
 import com.team4099.robot2025.config.constants.ClimberConstants
 import com.team4099.robot2025.config.constants.Constants.Universal.AlgaeLevel
 import com.team4099.robot2025.config.constants.Constants.Universal.CoralLevel
@@ -53,12 +54,13 @@ class Superstructure(
         return field
       }
     }
-
   private var lastCoralScoringLevel: CoralLevel = CoralLevel.NONE
   private var coralScoringLevel: CoralLevel = CoralLevel.NONE
 
   private var lastAlgaeIntakeLevel: AlgaeLevel = AlgaeLevel.NONE
   private var algaeIntakeLevel: AlgaeLevel = AlgaeLevel.NONE
+
+  var aimer = AutoAim(drivetrain, vision)
 
   var currentRequest: Request.SuperstructureRequest = Request.SuperstructureRequest.Idle()
     set(value) {
@@ -252,6 +254,10 @@ class Superstructure(
         ) {
           nextState = SuperstructureStates.IDLE
         }
+
+        if (currentRequest is Request.SuperstructureRequest.Idle) {
+          nextState = SuperstructureStates.IDLE
+        }
       }
       SuperstructureStates.HOME_PREP -> {
         nextState = SuperstructureStates.HOME
@@ -349,23 +355,25 @@ class Superstructure(
         }
       }
       SuperstructureStates.PREP_SCORE_CORAL -> {
+        val targetElevtorHeightOffset = aimer.calculateElevatorHeight()
+
         elevator.currentRequest =
           when (coralScoringLevel) {
             CoralLevel.L1 ->
               Request.ElevatorRequest.ClosedLoop(
-                ElevatorTunableValues.ElevatorHeights.L1Height.get()
+                ElevatorTunableValues.ElevatorHeights.L1Height.get() + targetElevtorHeightOffset
               )
             CoralLevel.L2 ->
               Request.ElevatorRequest.ClosedLoop(
-                ElevatorTunableValues.ElevatorHeights.L2Height.get()
+                ElevatorTunableValues.ElevatorHeights.L2Height.get() + targetElevtorHeightOffset
               )
             CoralLevel.L3 ->
               Request.ElevatorRequest.ClosedLoop(
-                ElevatorTunableValues.ElevatorHeights.L3Height.get()
+                ElevatorTunableValues.ElevatorHeights.L3Height.get() + targetElevtorHeightOffset
               )
             CoralLevel.L4 ->
               Request.ElevatorRequest.ClosedLoop(
-                ElevatorTunableValues.ElevatorHeights.PrepL4Height.get()
+                ElevatorTunableValues.ElevatorHeights.PrepL4Height.get() + targetElevtorHeightOffset
               )
             else ->
               Request.ElevatorRequest.ClosedLoop(

@@ -24,10 +24,7 @@ import org.team4099.lib.geometry.Transform3d
 import org.team4099.lib.geometry.Transform3dWPILIB
 import org.team4099.lib.geometry.Translation2d
 import org.team4099.lib.geometry.Translation3d
-import org.team4099.lib.units.base.inInches
-import org.team4099.lib.units.base.inMeters
-import org.team4099.lib.units.base.inMilliseconds
-import org.team4099.lib.units.base.meters
+import org.team4099.lib.units.base.*
 import org.team4099.lib.units.derived.cos
 import org.team4099.lib.units.derived.degrees
 import org.team4099.lib.units.derived.inRadians
@@ -40,6 +37,8 @@ class Vision(vararg cameras: CameraIO) : SubsystemBase() {
   val inputs = List(io.size) { CameraIO.CameraInputs() }
 
   var tagIDFilter = arrayOf<Int>()
+
+  var distanceToTarget: Length = 0.meters
 
   var currentState = VisionState.UNINITIALIZED
   var currentRequest: Request.VisionRequest = Request.VisionRequest.TargetReef()
@@ -180,7 +179,7 @@ class Vision(vararg cameras: CameraIO) : SubsystemBase() {
                 )
               )
 
-              val distanceToTarget = robotTTag.translation.norm
+              distanceToTarget = robotTTag.translation.norm
 
               Logger.recordOutput(
                 "Vision/${VisionConstants.CAMERA_NAMES[instance]}/${tag.fiducialId}/cameraDistanceToTarget3D",

@@ -30,7 +30,7 @@ object ElevatorConstants {
 
   val ELEVATOR_TOLERANCE = 0.5.inches
   val ELEVATOR_FORCE_HOME_TOLERANCE = 0.75.inches
-  val ELEVATION_EJECT_TOLERANCE = 0.125.inches
+  val ELEVATION_EJECT_TOLERANCE = 0.2.inches
 
   val LEADER_STATOR_CURRENT_LIMIT = 60.0.amps
   val LEADER_SUPPLY_CURRENT_LIMIT = 60.0.amps
