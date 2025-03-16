@@ -43,6 +43,7 @@ object ControlBoard {
 
   val resetGyro = Trigger { driver.startButton && driver.selectButton }
   val forceIdle = Trigger { driver.dPadDown }
+  val manualReset = Trigger { driver.leftShoulderButton && driver.rightShoulderButton }
 
   val stopRollersBind = Trigger { driver.dPadDown }
   // Tuning Binds

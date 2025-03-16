@@ -110,4 +110,11 @@ object RollersTunableValues {
       RollersConstants.EJECT_VOLTAGE,
       Pair({ it.inVolts }, { it.volts })
     )
+
+  val unjamVoltage =
+    LoggedTunableValue(
+      "Rollers/unjamVoltage",
+      RollersConstants.UNJAM_VOLTAGE,
+      Pair({ it.inVolts }, { it.volts })
+    )
 }

@@ -32,6 +32,7 @@ import org.team4099.lib.units.base.seconds
 import org.team4099.lib.units.derived.volts
 import org.team4099.lib.units.milli
 import org.team4099.lib.units.perSecond
+import kotlin.math.abs
 
 class Superstructure(
   private val drivetrain: Drivetrain,
@@ -207,15 +208,35 @@ class Superstructure(
         }
       }
       SuperstructureStates.EJECT -> {
-        rollers.currentRequest =
-          Request.RollersRequest.OpenLoop(RollersTunableValues.ejectVoltage.get())
-        ramp.currentRequest = Request.RampRequest.OpenLoop(RampTunableValues.ejectVoltage.get())
+        if (abs(
+            elevator.inputs.elevatorPosition.value -
+              ElevatorTunableValues.ElevatorHeights.idleHeight.get().value
+          ) <
+          ElevatorConstants.ELEVATION_EJECT_TOLERANCE.value
+        ) {
+          rollers.currentRequest =
+            Request.RollersRequest.OpenLoop(RollersTunableValues.ejectVoltage.get())
+          ramp.currentRequest = Request.RampRequest.OpenLoop(RampTunableValues.ejectVoltage.get())
+        } else {
+          elevator.currentRequest =
+            Request.ElevatorRequest.ClosedLoop(
+              ElevatorTunableValues.ElevatorHeights.ejectHeight.get()
+            )
+          if (elevator.isAtTargetedPosition) {
+            rollers.currentRequest =
+              Request.RollersRequest.OpenLoop(RollersTunableValues.unjamVoltage.get())
+          }
+        }
 
         when (currentRequest) {
           is Request.SuperstructureRequest.Idle -> {
-            nextState = SuperstructureStates.IDLE
+            if ((Clock.fpgaTime - lastTransitionTime) > RollersTunableValues.coralSpitTime.get()) {
+              theoreticalGamePiece = GamePiece.NONE
+              nextState = SuperstructureStates.IDLE
+            }
           }
           is Request.SuperstructureRequest.IntakeCoral -> {
+            theoreticalGamePiece = GamePiece.NONE
             nextState = SuperstructureStates.INTAKE_CORAL
           }
         }
@@ -376,8 +397,7 @@ class Superstructure(
             if (coralScoringLevel != CoralLevel.L1) {
               rollers.currentRequest =
                 Request.RollersRequest.OpenLoop(RollersTunableValues.scoreCoralVoltage.get())
-            }
-            else {
+            } else {
               rollers.currentRequest =
                 Request.RollersRequest.OpenLoop(RollersTunableValues.scoreCoralL1Voltage.get())
             }

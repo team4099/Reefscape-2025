@@ -226,6 +226,8 @@ object RobotContainer {
 
     ControlBoard.eject.whileTrue(superstructure.ejectCommand())
 
+    ControlBoard.manualReset.whileTrue(superstructure.manualResetCommand())
+
     ControlBoard.alignLeft.whileTrue(
       ReefAlignCommand(
         driver = Jessika(),

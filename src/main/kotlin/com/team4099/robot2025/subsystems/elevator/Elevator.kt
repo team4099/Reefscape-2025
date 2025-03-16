@@ -183,9 +183,7 @@ class Elevator(val io: ElevatorIO) : SubsystemBase() {
         nextState = fromElevatorRequestToState(currentRequest)
       }
       ElevatorState.CLOSED_LOOP -> {
-
         io.setPosition(elevatorPositionTarget)
-
         nextState = fromElevatorRequestToState(currentRequest)
       }
     }
