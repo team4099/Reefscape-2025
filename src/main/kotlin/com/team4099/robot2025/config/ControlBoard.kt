@@ -79,4 +79,6 @@ object ControlBoard {
   }
 
   val eject = Trigger { driver.dPadLeft }
+
+  val testHome = Trigger { driver.dPadRight }
 }

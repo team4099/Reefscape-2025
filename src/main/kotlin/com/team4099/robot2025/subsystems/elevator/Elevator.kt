@@ -12,6 +12,7 @@ import org.team4099.lib.units.derived.inVolts
 import org.team4099.lib.units.derived.volts
 import org.team4099.lib.units.inInchesPerSecond
 import org.team4099.lib.units.perSecond
+import kotlin.math.abs
 import com.team4099.robot2025.subsystems.superstructure.Request.ElevatorRequest as ElevatorRequest
 
 class Elevator(val io: ElevatorIO) : SubsystemBase() {
@@ -33,7 +34,9 @@ class Elevator(val io: ElevatorIO) : SubsystemBase() {
         is ElevatorRequest.ClosedLoop -> {
           elevatorPositionTarget = value.position
         }
-        else -> {}
+        is ElevatorRequest.Home -> {
+          isHomed = false
+        }
       }
       field = value
     }
@@ -160,13 +163,20 @@ class Elevator(val io: ElevatorIO) : SubsystemBase() {
           lastHomingStatorCurrentTripTime = Clock.fpgaTime
         }
 
-        if (!inputs.isSimulating &&
-          (
-            !isHomed &&
-              inputs.leaderStatorCurrent < ElevatorConstants.HOMING_STALL_CURRENT &&
-              (Clock.fpgaTime - lastHomingStatorCurrentTripTime) <
-              ElevatorConstants.HOMING_STALL_TIME_THRESHOLD
-            )
+        if (inputs.isSimulating) {
+          if (!isHomed &&
+            abs(inputs.elevatorPosition.inInches - elevatorPositionTarget.inInches).inches >
+            ElevatorConstants.ELEVATOR_FORCE_HOME_TOLERANCE
+          ) {
+            setVoltage(ElevatorConstants.HOMING_APPLIED_VOLTAGE)
+          } else {
+            io.zeroEncoder()
+            isHomed = true
+          }
+        } else if (!isHomed &&
+          inputs.leaderStatorCurrent < ElevatorConstants.HOMING_STALL_CURRENT &&
+          (Clock.fpgaTime - lastHomingStatorCurrentTripTime) <
+          ElevatorConstants.HOMING_STALL_TIME_THRESHOLD
         ) {
           setVoltage(ElevatorConstants.HOMING_APPLIED_VOLTAGE)
         } else {

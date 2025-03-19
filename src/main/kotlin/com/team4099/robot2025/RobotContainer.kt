@@ -228,6 +228,8 @@ object RobotContainer {
 
     ControlBoard.manualReset.whileTrue(superstructure.manualResetCommand())
 
+    ControlBoard.testHome.onTrue(superstructure.homeCommand())
+
     ControlBoard.alignLeft.whileTrue(
       ReefAlignCommand(
         driver = Jessika(),

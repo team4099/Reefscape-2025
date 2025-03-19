@@ -254,10 +254,10 @@ class Superstructure(
         }
       }
       SuperstructureStates.HOME_PREP -> {
+        elevator.currentRequest = Request.ElevatorRequest.Home()
         nextState = SuperstructureStates.HOME
       }
       SuperstructureStates.HOME -> {
-        elevator.currentRequest = Request.ElevatorRequest.Home()
         if (elevator.isHomed) {
           nextState = SuperstructureStates.IDLE
         }
@@ -374,6 +374,9 @@ class Superstructure(
           }
 
         when (currentRequest) {
+          is Request.SuperstructureRequest.Home -> {
+            nextState = SuperstructureStates.HOME_PREP
+          }
           is Request.SuperstructureRequest.Score -> {
             if (elevator.isAtTargetedPosition) {
               nextState = SuperstructureStates.SCORE_CORAL
