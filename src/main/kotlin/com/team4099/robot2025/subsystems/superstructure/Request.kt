@@ -56,8 +56,8 @@ sealed interface Request {
   }
 
   sealed interface ArmRequest : Request {
-    class Retract() : ArmRequest
-    class Extend() : ArmRequest
+    class Zero() : ArmRequest
+    class ClosedLoop(val position: Angle) : ArmRequest
   }
 
   sealed interface ClimberRequest : Request {

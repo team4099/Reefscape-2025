@@ -1,5 +1,11 @@
 package com.team4099.robot2025.subsystems.arm
 
+import org.team4099.lib.units.derived.DerivativeGain
+import org.team4099.lib.units.derived.IntegralGain
+import org.team4099.lib.units.derived.ProportionalGain
+import org.team4099.lib.units.derived.Radian
+import org.team4099.lib.units.derived.Volt
+
 // import com.team4099.lib.math.clamp
 // import com.team4099.robot2025.config.constants.ArmConstants
 // import com.team4099.robot2025.config.constants.Constants
@@ -23,7 +29,7 @@ package com.team4099.robot2025.subsystems.arm
 // TODO: completely broken
 
 object ArmIOSim : ArmIO {
-  /*
+    /*
    private val armSim: SingleJointedArmSim =
      SingleJointedArmSim(
        DCMotor.getKrakenX60(1),
@@ -72,4 +78,11 @@ object ArmIOSim : ArmIO {
 
    override fun setArmBrakeMode(brake: Boolean) {}
   */
+//    override fun configurePID(
+//        kP: ProportionalGain<Radian, Volt>,
+//        kI: IntegralGain<Radian, Volt>,
+//        kD: DerivativeGain<Radian, Volt>
+//    ) {
+//        TODO("Not yet implemented")
+//    }
 }

@@ -13,6 +13,7 @@ import com.team4099.robot2025.config.constants.Constants
 import com.team4099.robot2025.config.constants.VisionConstants
 import com.team4099.robot2025.subsystems.arm.Arm
 import com.team4099.robot2025.subsystems.arm.ArmIO
+import com.team4099.robot2025.subsystems.arm.ArmIOTalonFX
 import com.team4099.robot2025.subsystems.climber.Climber
 import com.team4099.robot2025.subsystems.climber.ClimberIO
 import com.team4099.robot2025.subsystems.climber.ClimberIOSim
@@ -65,7 +66,7 @@ object RobotContainer {
 
       drivetrain = Drivetrain(GyroIOPigeon2, DrivetrainIOReal)
       limelight = LimelightVision(object : LimelightVisionIO {})
-      arm = Arm(object : ArmIO {})
+      arm = Arm(ArmIOTalonFX)
       climber = Climber(object : ClimberIO {})
       elevator = Elevator(ElevatorIOTalon)
       rollers = Rollers(RollersIOTalonFX)
@@ -194,8 +195,11 @@ object RobotContainer {
 
     ControlBoard.intakeCoral.whileTrue(superstructure.intakeCoralCommand())
 
-    ControlBoard.intakeAlgaeGround.whileTrue(
+    ControlBoard.intakeAlgaeGround.onTrue(
       superstructure.intakeAlgaeCommand(Constants.Universal.AlgaeLevel.GROUND)
+    )
+    ControlBoard.intakeAlgaeGround.onFalse(
+      superstructure.intakeAlgaeImmediatelyCommand()
     )
     ControlBoard.intakeAlgaeL3.whileTrue(
       superstructure.intakeAlgaeCommand(Constants.Universal.AlgaeLevel.L3)
@@ -203,7 +207,7 @@ object RobotContainer {
     ControlBoard.intakeAlgaeL2.whileTrue(
       superstructure.intakeAlgaeCommand(Constants.Universal.AlgaeLevel.L2)
     )
-    // ControlBoard.prepAlgaeBarge.whileTrue(superstructure.prepScoreAlgaeBargeCommand())
+    ControlBoard.prepAlgaeProcessor.whileTrue(superstructure.prepScoreAlgaeProcessorCommand())
     //
     ControlBoard.prepL1.whileTrue(
       superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L1)
@@ -217,9 +221,9 @@ object RobotContainer {
     )
     //
     // No L4 scoring in the church
-    ControlBoard.prepL4.whileTrue(
-      superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L4)
-    )
+//    ControlBoard.prepL4.whileTrue(
+//      superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L4)
+//    )
 
     ControlBoard.score.whileTrue(superstructure.scoreCommand())
 

@@ -7,7 +7,14 @@ import org.team4099.lib.units.base.amps
 import org.team4099.lib.units.base.celsius
 import org.team4099.lib.units.base.inAmperes
 import org.team4099.lib.units.base.inCelsius
+import org.team4099.lib.units.derived.Angle
+import org.team4099.lib.units.derived.DerivativeGain
+import org.team4099.lib.units.derived.IntegralGain
+import org.team4099.lib.units.derived.ProportionalGain
+import org.team4099.lib.units.derived.Radian
+import org.team4099.lib.units.derived.Volt
 import org.team4099.lib.units.derived.degrees
+import org.team4099.lib.units.derived.inDegrees
 import org.team4099.lib.units.derived.inVolts
 import org.team4099.lib.units.derived.volts
 import org.team4099.lib.units.inDegreesPerSecond
@@ -18,6 +25,7 @@ interface ArmIO {
 
   class ArmIOInputs : LoggableInputs {
     // Arm Inputs
+    var armPosition = 0.degrees
     var armVelocity = 0.0.degrees.perSecond
     var armAcceleration = 0.0.degrees.perSecond.perSecond
     var armAppliedVoltage = 0.0.volts
@@ -36,6 +44,7 @@ interface ArmIO {
       table?.put("armStatorCurrentAmps", armStatorCurrent.inAmperes)
       table?.put("armSupplyCurrentAmps", armSupplyCurrent.inAmperes)
       table?.put("armTempCelsius", armTemp.inCelsius)
+      table?.put("armPosition", armPosition.inDegrees)
     }
 
     override fun fromLog(table: LogTable?) {
@@ -58,12 +67,21 @@ interface ArmIO {
         armSupplyCurrent = it.amps
       }
       table?.get("armTempCelsius", armTemp.inCelsius)?.let { armTemp = it.celsius }
+      table?.get("armPosition", armPosition.inDegrees)?.let { armPosition = it.degrees }
     }
   }
 
   fun updateInputs(inputs: ArmIOInputs) {}
 
-  fun setArmCurrent(amps: Current) {}
+  fun setArmPosition(position: Angle) {}
+
+  fun configurePID(
+    kP: ProportionalGain<Radian, Volt>,
+    kI: IntegralGain<Radian, Volt>,
+    kD: DerivativeGain<Radian, Volt>
+  ) {}
 
   fun setArmBrakeMode(brake: Boolean) {}
+
+  fun zeroEncoder() {}
 }

@@ -12,6 +12,7 @@ import com.team4099.robot2025.subsystems.superstructure.Superstructure
 import com.team4099.robot2025.subsystems.vision.Vision
 import com.team4099.robot2025.util.TrajectoryTypes
 import com.team4099.robot2025.util.driver.Jessika
+import edu.wpi.first.wpilibj2.command.Commands.runOnce
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import edu.wpi.first.wpilibj2.command.WaitCommand
@@ -44,17 +45,14 @@ class ThreeL4LeftAuto(
           vision,
           1
         ),
-        superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L4)
+        superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L3)
       ),
-      WaitCommand(0.3)
-        .andThen(
-          ParallelCommandGroup(
-            DrivePathCommand.createPathInFieldFrame(
-              drivetrain, TrajectoryTypes.Choreo(secondTrajectory), keepTrapping = false
-            ),
-            WaitCommand(1.4).andThen(superstructure.intakeCoralCommand())
-          )
+      ParallelCommandGroup(
+        DrivePathCommand.createPathInFieldFrame(
+          drivetrain, TrajectoryTypes.Choreo(secondTrajectory), keepTrapping = false
         ),
+        WaitCommand(2.4).andThen(superstructure.intakeCoralCommand())
+      ),
       ParallelCommandGroup(
         ReefAlignCommand(
           driver = Jessika(),
@@ -68,17 +66,14 @@ class ThreeL4LeftAuto(
           vision,
           1
         ),
-        superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L4)
+        superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L3)
       ),
-      WaitCommand(0.3)
-        .andThen(
-          ParallelCommandGroup(
-            DrivePathCommand.createPathInFieldFrame(
-              drivetrain, TrajectoryTypes.Choreo(thirdTrajectory), keepTrapping = false
-            ),
-            WaitCommand(1.3).andThen(superstructure.intakeCoralCommand())
-          )
+      ParallelCommandGroup(
+        DrivePathCommand.createPathInFieldFrame(
+          drivetrain, TrajectoryTypes.Choreo(thirdTrajectory), keepTrapping = false
         ),
+        WaitCommand(1.9).andThen(superstructure.intakeCoralCommand())
+      ),
       ParallelCommandGroup(
         ReefAlignCommand(
           driver = Jessika(),
@@ -92,7 +87,7 @@ class ThreeL4LeftAuto(
           vision,
           0
         ),
-        superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L4)
+        superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L3)
       )
     )
   }

@@ -38,6 +38,7 @@ class Rollers(val io: RollersIO) {
             .SCORE_CORAL_VOLTAGE
         ) && // make sure score & intake are not the same voltage
         (Clock.fpgaTime - lastRollerRunTime) >= RollersConstants.CORAL_DETECTION_TIME_THRESHOLD
+        && inputs.rollerVelocity.absoluteValue < RollersConstants.CORAL_VELOCITY_THRESHOLD
     }
 
   val hasAlgae: Boolean
