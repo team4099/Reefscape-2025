@@ -12,6 +12,8 @@ object VisionConstants {
 
   const val NUM_OF_CAMERAS = 2
 
+  val ALGAE_CLEAR_DISTANCE = 12.inches
+
   val BLUE_REEF_TAGS = arrayOf(17, 18, 19, 20, 21, 22)
   val RED_REEF_TAGS = arrayOf(6, 7, 8, 9, 10, 11)
 

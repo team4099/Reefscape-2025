@@ -202,17 +202,24 @@ class TargetTagCommand(
             yPID.error < 2.inches &&
             (
             vision.lastTrigVisionUpdate.robotTReefTag.translation.x.absoluteValue -
-              18.0.inches
+              19.0.inches
             ) < 2.inches
+                  && (vision.lastTrigVisionUpdate.robotTReefTag.translation.y +
+                  yTargetOffset
+                  ).absoluteValue < 3.inches
           )
+
       } else {
         (
           thetaPID.error < 3.degrees &&
             yPID.error < 2.inches &&
             (
             vision.lastTrigVisionUpdate.robotTReefTag.translation.x.absoluteValue -
-              18.0.inches
+              19.0.inches
             ) < 2.inches
+                  && (vision.lastTrigVisionUpdate.robotTReefTag.translation.y +
+                  yTargetOffset).absoluteValue
+                  < 3.inches
           )
       }
 
@@ -300,7 +307,7 @@ class TargetTagCommand(
         var xFeedBack =
           xPID.calculate(
             -visionData.robotTReefTag.translation.x,
-            -(18.0).inches - (visionData.robotTReefTag.translation.x - 18.0.inches) / 1.75
+            -(19.0).inches - (visionData.robotTReefTag.translation.x - 19.0.inches) / 1.75
           )
         // 0.meters.perSecond
 

@@ -4,8 +4,10 @@ import com.team4099.robot2023.subsystems.led.Leds
 import com.team4099.robot2023.subsystems.vision.camera.CameraIO
 import com.team4099.robot2023.subsystems.vision.camera.CameraIOPhotonvision
 import com.team4099.robot2025.auto.AutonomousSelector
+import com.team4099.robot2025.commands.drivetrain.ReefAimCommand
 import com.team4099.robot2025.commands.drivetrain.ReefAlignCommand
 import com.team4099.robot2025.commands.drivetrain.ResetGyroYawCommand
+import com.team4099.robot2025.commands.drivetrain.StationAlignCommand
 import com.team4099.robot2025.commands.drivetrain.TargetTagCommand
 import com.team4099.robot2025.commands.drivetrain.TeleopDriveCommand
 import com.team4099.robot2025.config.ControlBoard
@@ -112,6 +114,8 @@ object RobotContainer {
   fun mapDefaultCommands() {
 
     drivetrain.defaultCommand =
+
+      /*
       TeleopDriveCommand(
         driver = Jessika(),
         { ControlBoard.forward.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
@@ -121,7 +125,7 @@ object RobotContainer {
         drivetrain,
       )
 
-    /*
+       */
 
 
        ReefAimCommand(
@@ -134,7 +138,7 @@ object RobotContainer {
          superstructure
        )
 
-    */
+
   }
 
   fun zeroSteering() {
@@ -275,17 +279,17 @@ object RobotContainer {
       )
     )
 
-    //    ControlBoard.intakeCoral.whileTrue(
-    //      StationAlignCommand(
-    //        driver = Jessika(),
-    //        { ControlBoard.forward.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
-    //        { ControlBoard.strafe.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
-    //        { ControlBoard.turn.smoothDeadband(Constants.Joysticks.TURN_DEADBAND) },
-    //        { ControlBoard.slowMode },
-    //        drivetrain,
-    //        Constants.Universal.GamePiece.CORAL
-    //      )
-    //    )
+    ControlBoard.intakeCoral.whileTrue(
+        StationAlignCommand(
+            driver = Jessika(),
+            { ControlBoard.forward.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
+            { ControlBoard.strafe.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
+            { ControlBoard.turn.smoothDeadband(Constants.Joysticks.TURN_DEADBAND) },
+            { ControlBoard.slowMode },
+          drivetrain,
+            Constants.Universal.GamePiece.CORAL
+          )
+        )
   }
 
   fun mapTestControls() {}

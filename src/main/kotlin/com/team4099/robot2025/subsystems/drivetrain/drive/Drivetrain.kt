@@ -713,13 +713,23 @@ class Drivetrain(val gyroIO: GyroIO, swerveModuleIOs: DrivetrainIO) : SubsystemB
       Pose2d(odomTRobot.x, odomTRobot.y, toAngle).pose2d
     )
 
-    fieldFrameEstimator.resetFieldFrameFilter(
-      Transform2d(odomTField.translation, gyroInputs.gyroYaw)
+    /*
+    resetFieldFrameEstimator(
+      Pose2d(
+        fieldTRobot.translation,
+        toAngle
+      )
     )
+
+     */
+
+    /*
 
     if (!(gyroInputs.gyroConnected)) {
       gyroYawOffset = toAngle - rawGyroAngle
     }
+
+     */
   }
 
   fun zeroGyroPitch(toAngle: Angle = 0.0.degrees) {
