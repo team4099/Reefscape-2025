@@ -64,11 +64,17 @@ object DrivetrainConstants {
   val MAX_AUTO_VEL = 3.meters.perSecond // 4
   val MAX_AUTO_ACCEL = 4.meters.perSecond.perSecond // 3
 
-  val MAX_REEF_VEL = 1.meters.perSecond
-  val MAX_REEF_ACCEL = 2.meters.perSecond.perSecond
+  val MAX_REEF_VEL = 3.meters.perSecond
+  val MAX_REEF_ACCEL = 4.meters.perSecond.perSecond
 
   val MAX_AUTO_BRAKE_VEL = 0.5.meters.perSecond // 4
   val MAX_AUTO_BRAKE_ACCEL = 0.5.meters.perSecond.perSecond // 3
+
+  val MAX_AUTO_ANGULAR_VEL = 5.radians.perSecond
+  val MAX_AUTO_ANGULAR_ACCEL = 10.radians.perSecond.perSecond
+
+  val MAX_REEF_ANGULAR_VEL = 5.radians.perSecond
+  val MAX_REEF_ANGULAR_ACCEL = 10.radians.perSecond.perSecond
 
   const val DRIVE_SENSOR_CPR = 2048
   const val STEERING_SENSOR_CPR = 2048
@@ -104,7 +110,14 @@ object DrivetrainConstants {
   val BL_LOCKING_ANGLE: Angle = 135.degrees
   val BR_LOCKING_ANGLE: Angle = 225.degrees
 
+  val REEF_POSITION_TOLERANCE = 2.inches
+  val REEF_THETA_TOLERANCE = 2.degrees
+
+  val REEF_VELOCITY_PREDICTION_TIME = 0.2.seconds
+
   object PID {
+
+    //Auto Path PID
     val AUTO_POS_KP: ProportionalGain<Meter, Velocity<Meter>>
       get() {
         if (RobotBase.isReal()) {
@@ -132,43 +145,47 @@ object DrivetrainConstants {
         }
       }
 
-    val LIMELIGHT_THETA_KP = 4.0.degrees.perSecond / 1.degrees
-    val LIMELIGHT_THETA_KI = 0.0.degrees.perSecond / (1.degrees * 1.seconds)
-    val LIMELIGHT_THETA_KD =
-      (0.1.degrees.perSecond / (1.degrees / 1.seconds)).radiansPerSecondPerRadiansPerSecond
-
-    val AUTO_THETA_ALLOWED_ERROR = 3.degrees
     val AUTO_THETA_PID_KP = (1.6.radians.perSecond / 1.radians)
     val AUTO_THETA_PID_KI = (0.0.radians.perSecond / (1.radians * 1.seconds))
     val AUTO_THETA_PID_KD =
       (0.2.degrees.perSecond / (1.degrees / 1.seconds)).radiansPerSecondPerRadiansPerSecond
-
-    val AUTO_REEF_PID_KP = (2.9.radians.perSecond / 1.radians)
-    val AUTO_REEF_PID_KI = (0.0.radians.perSecond / (1.radians * 1.seconds))
-    val AUTO_REEF_PID_KD =
-      (0.4.degrees.perSecond / (1.degrees / 1.seconds)).radiansPerSecondPerRadiansPerSecond
-
-    val TELEOP_THETA_PID_KP = 2.9.degrees.perSecond / 1.degrees
-    val TELEOP_THETA_PID_KI = 0.0.degrees.perSecond / (1.degrees * 1.seconds)
-    val TELEOP_THETA_PID_KD =
-      (0.4.degrees.perSecond / (1.degrees / 1.seconds)).radiansPerSecondPerRadiansPerSecond
-
-    val TELEOP_Y_PID_KP = 3.5.meters.perSecond / 1.meters
-    val TELEOP_Y_PID_KI = 0.0.meters.perSecond / (1.meters * 1.seconds)
-    val TELEOP_Y_PID_KD = 0.0.meters.perSecond.perMeterPerSecond
-
-    val SIM_TELEOP_Y_PID_KP = 0.0.meters.perSecond / 1.meters
-    val SIM_TELEOP_Y_PID_KI = 0.0.meters.perSecond / (1.meters * 1.seconds)
-    val SIM_TELEOP_Y_PID_KD = 0.0.meters.perSecond.perMeterPerSecond
 
     val SIM_AUTO_THETA_PID_KP = 4.0.degrees.perSecond / 1.degrees
     val SIM_AUTO_THETA_PID_KI = 0.0.degrees.perSecond / (1.degrees * 1.seconds)
     val SIM_AUTO_THETA_PID_KD =
       (0.degrees.perSecond / (1.degrees / 1.seconds)).radiansPerSecondPerRadiansPerSecond
 
-    val MAX_AUTO_ANGULAR_VEL = 5.radians.perSecond
-    val MAX_AUTO_ANGULAR_ACCEL = 10.radians.perSecond.perSecond
 
+    //Auto Align Reef PID
+    val REEF_POS_PID_KP = 3.15.meters.perSecond / 1.0.meters
+    val REEF_POS_PID_KI = 0.0.meters.perSecond / (1.0.meters * 1.0.seconds)
+    val REEF_POS_PID_KD =(0.6.meters.perSecond / (1.0.meters.perSecond))
+      .metersPerSecondPerMetersPerSecond
+
+    val REEF_THETA_PID_KP = 2.9.degrees.perSecond / 1.degrees
+    val REEF_THETA_PID_KI = 0.0.degrees.perSecond / (1.degrees * 1.seconds)
+    val REEF_THETA_PID_KD =
+      (0.4.degrees.perSecond / (1.degrees / 1.seconds)).radiansPerSecondPerRadiansPerSecond
+
+    val SIM_REEF_POS_PID_KP = 2.9.meters.perSecond / 1.meters
+    val SIM_REEF_POS_PID_KI = 0.0.meters.perSecond / (1.meters * 1.seconds)
+    val SIM_REEF_POS_PID_KD = 0.4.meters.perSecond.perMeterPerSecond
+
+    val SIM_REEF_THETA_PID_KP = 4.0.degrees.perSecond / 1.degrees
+    val SIM_REEF_THETA_PID_KI = 0.0.degrees.perSecond / (1.degrees * 1.seconds)
+    val SIM_REEF_THETA_PID_KD =
+      (0.degrees.perSecond / (1.degrees / 1.seconds)).radiansPerSecondPerRadiansPerSecond
+
+
+
+    //Angle Align PID
+    val TELEOP_THETA_PID_KP = 2.9.degrees.perSecond / 1.degrees
+    val TELEOP_THETA_PID_KI = 0.0.degrees.perSecond / (1.degrees * 1.seconds)
+    val TELEOP_THETA_PID_KD =
+      (0.4.degrees.perSecond / (1.degrees / 1.seconds)).radiansPerSecondPerRadiansPerSecond
+
+
+    //Individual module PID
     val STEERING_KP = 10.0.volts / 45.degrees
     val STEERING_KI = 0.0.volts.perDegreeSeconds
     val STEERING_KD = 0.0.volts.perDegreePerSecond

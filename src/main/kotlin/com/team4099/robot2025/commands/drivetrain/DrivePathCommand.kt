@@ -102,9 +102,9 @@ private constructor(
     )
 
   val thetaMaxVel =
-    LoggedTunableValue("Pathfollow/thetaMaxVel", DrivetrainConstants.PID.MAX_AUTO_ANGULAR_VEL)
+    LoggedTunableValue("Pathfollow/thetaMaxVel", DrivetrainConstants.MAX_AUTO_ANGULAR_VEL)
   val thetaMaxAccel =
-    LoggedTunableValue("Pathfollow/thetaMaxAccel", DrivetrainConstants.PID.MAX_AUTO_ANGULAR_ACCEL)
+    LoggedTunableValue("Pathfollow/thetaMaxAccel", DrivetrainConstants.MAX_AUTO_ANGULAR_ACCEL)
 
   val poskP =
     LoggedTunableValue(

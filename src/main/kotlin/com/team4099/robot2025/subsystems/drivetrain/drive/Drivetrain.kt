@@ -38,6 +38,7 @@ import org.team4099.lib.units.LinearVelocity
 import org.team4099.lib.units.base.inMeters
 import org.team4099.lib.units.base.inMilliseconds
 import org.team4099.lib.units.base.meters
+import org.team4099.lib.units.base.seconds
 import org.team4099.lib.units.derived.Angle
 import org.team4099.lib.units.derived.degrees
 import org.team4099.lib.units.derived.inDegrees
@@ -91,7 +92,7 @@ class Drivetrain(val gyroIO: GyroIO, swerveModuleIOs: DrivetrainIO) : SubsystemB
 
   var robotVelocity = Velocity2d(0.0.meters.perSecond, 0.0.meters.perSecond)
 
-  private var omegaVelocity = 0.0.radians.perSecond
+  var omegaVelocity = 0.0.radians.perSecond
 
   private var characterizationInput = 0.0.volts
 

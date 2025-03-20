@@ -42,6 +42,12 @@ object Constants {
       L2,
       L3
     }
+
+    enum class BranchSide {
+      LEFT,
+      CENTER,
+      RIGHT
+    }
   }
 
   object AprilTagIds {

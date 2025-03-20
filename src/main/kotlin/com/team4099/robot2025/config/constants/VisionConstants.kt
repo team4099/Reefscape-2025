@@ -27,12 +27,12 @@ object VisionConstants {
 
   val BLUE_REEF_TAG_Y_ALIGNMENTS =
     mapOf(
-      17 to Pair(6.5.inches, -6.5.inches),
-      18 to Pair(6.5.inches, -6.5.inches),
-      19 to Pair(6.5.inches, -6.5.inches),
-      20 to Pair(-6.5.inches, 6.5.inches),
-      21 to Pair(-6.5.inches, 6.5.inches),
-      22 to Pair(-6.5.inches, 6.5.inches),
+      17 to Pair(-6.5.inches, 6.5.inches),
+      18 to Pair(-6.5.inches, 6.5.inches),
+      19 to Pair(-6.5.inches, 6.5.inches),
+      20 to Pair(6.5.inches, -6.5.inches),
+      21 to Pair(6.5.inches, -6.5.inches),
+      22 to Pair(6.5.inches, -6.5.inches),
     )
 
   val RED_REEF_TAG_THETA_ALIGNMENTS =
@@ -47,12 +47,12 @@ object VisionConstants {
 
   val RED_REEF_TAG_Y_ALIGNMENTS =
     mapOf(
-      6 to Pair(6.5.inches, -6.5.inches),
-      7 to Pair(6.5.inches, -6.5.inches),
-      8 to Pair(6.5.inches, -6.5.inches),
-      9 to Pair(-6.5.inches, 6.5.inches),
-      10 to Pair(-6.5.inches, 6.5.inches),
-      11 to Pair(-6.5.inches, 6.5.inches),
+      6 to Pair(-6.5.inches, 6.5.inches),
+      7 to Pair(-6.5.inches, 6.5.inches),
+      8 to Pair(-6.5.inches, 6.5.inches),
+      9 to Pair(6.5.inches, -6.5.inches),
+      10 to Pair(6.5.inches, -6.5.inches),
+      11 to Pair(6.5.inches, -6.5.inches),
     )
 
   val BLUE_STATION_ALIGN_THETA = 54.degrees

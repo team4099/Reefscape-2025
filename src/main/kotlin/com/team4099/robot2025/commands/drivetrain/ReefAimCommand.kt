@@ -25,8 +25,8 @@ class ReefAimCommand(
   val superstructure: Superstructure
 ) : Command() {
 
-  lateinit var aimCommand: TargetAngleCommand
-  lateinit var defaultCommand: TeleopDriveCommand
+  var aimCommand: TargetAngleCommand = TargetAngleCommand(driver, driveX, driveY, turn, slowMode, drivetrain, { getTargetAngle() })
+  var defaultCommand: TeleopDriveCommand = TeleopDriveCommand(driver, driveX, driveY, turn, slowMode, drivetrain)
 
   init {
     addRequirements(drivetrain)
@@ -42,21 +42,13 @@ class ReefAimCommand(
     return atan2(y.inMeters, x.inMeters).radians
   }
 
-  override fun initialize() {
-    aimCommand =
-      TargetAngleCommand(driver, driveX, driveY, turn, slowMode, drivetrain, { getTargetAngle() })
-
-    defaultCommand = TeleopDriveCommand(driver, driveX, driveY, turn, slowMode, drivetrain)
-  }
+  override fun initialize() {}
 
   override fun execute() {
-    if (superstructure.theoreticalGamePiece == Constants.Universal.GamePiece.CORAL ||
-      superstructure.theoreticalGamePiece == Constants.Universal.GamePiece.CORAL_L1
+    if (true
     ) {
-      defaultCommand.end(true)
       aimCommand.execute()
     } else {
-      aimCommand.end(true)
       defaultCommand.execute()
     }
   }

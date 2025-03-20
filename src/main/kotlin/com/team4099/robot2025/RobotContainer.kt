@@ -4,12 +4,15 @@ import com.team4099.robot2023.subsystems.led.Leds
 import com.team4099.robot2023.subsystems.vision.camera.CameraIO
 import com.team4099.robot2023.subsystems.vision.camera.CameraIOPhotonvision
 import com.team4099.robot2025.auto.AutonomousSelector
+import com.team4099.robot2025.commands.drivetrain.DriveToPose
+import com.team4099.robot2025.commands.drivetrain.ReefAimCommand
 import com.team4099.robot2025.commands.drivetrain.ReefAlignCommand
 import com.team4099.robot2025.commands.drivetrain.ResetGyroYawCommand
-import com.team4099.robot2025.commands.drivetrain.TargetTagCommand
+import com.team4099.robot2025.commands.drivetrain.StationAlignCommand
 import com.team4099.robot2025.commands.drivetrain.TeleopDriveCommand
 import com.team4099.robot2025.config.ControlBoard
 import com.team4099.robot2025.config.constants.Constants
+import com.team4099.robot2025.config.constants.FieldConstants
 import com.team4099.robot2025.config.constants.VisionConstants
 import com.team4099.robot2025.subsystems.arm.Arm
 import com.team4099.robot2025.subsystems.arm.ArmIOSim
@@ -41,9 +44,12 @@ import com.team4099.robot2025.subsystems.vision.Vision
 import com.team4099.robot2025.util.driver.Jessika
 import edu.wpi.first.wpilibj.RobotBase
 import edu.wpi.first.wpilibj2.command.Command
+import org.team4099.lib.geometry.Pose2d
+import org.team4099.lib.geometry.Translation2d
 import org.team4099.lib.smoothDeadband
 import org.team4099.lib.units.base.inches
 import org.team4099.lib.units.derived.Angle
+import org.team4099.lib.units.derived.degrees
 import com.team4099.robot2025.subsystems.superstructure.Request.DrivetrainRequest as DrivetrainRequest
 
 object RobotContainer {
@@ -100,7 +106,6 @@ object RobotContainer {
       { drivetrain.addVisionData(it) },
       { drivetrain.addSpeakerVisionData(it) }
     )
-    vision.drivetrainOdometry = { drivetrain.odomTRobot }
 
     superstructure =
       Superstructure(drivetrain, elevator, rollers, ramp, arm, climber, leds, vision, limelight)
@@ -121,8 +126,6 @@ object RobotContainer {
       )
 
     /*
-
-
        ReefAimCommand(
          driver = Jessika(),
          { ControlBoard.forward.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
@@ -133,7 +136,7 @@ object RobotContainer {
          superstructure
        )
 
-    */
+     */
   }
 
   fun zeroSteering() {
@@ -178,20 +181,6 @@ object RobotContainer {
   fun mapTeleopControls() {
 
     ControlBoard.resetGyro.whileTrue(ResetGyroYawCommand(drivetrain))
-
-    // tuning commands
-    /*
-    ControlBoard.testElevatorBind.whileTrue(superstructure.testElevatorCommand())
-    ControlBoard.testElevatorDownBind.whileTrue(superstructure.testElevatorDownCommand())
-    ControlBoard.testArmBind.whileTrue(superstructure.testArmCommand())
-    ControlBoard.testArmDownBind.whileTrue(superstructure.testArmDownCommand())
-
-     */
-
-    // ControlBoard.testClimberBind.whileTrue(superstructure.testClimberCommand())
-    // ControlBoard.testRollersBind.whileTrue(superstructure.testRollersCommand())
-    // ControlBoard.testArmBind.whileTrue(superstructure.testArmCommand())
-
     ControlBoard.intakeCoral.whileTrue(superstructure.intakeCoralCommand())
     ControlBoard.intakeL1.whileTrue(superstructure.intakeL1Command())
 
@@ -237,7 +226,7 @@ object RobotContainer {
         elevator,
         superstructure,
         vision,
-        0
+        Constants.Universal.BranchSide.LEFT
       )
     )
 
@@ -252,45 +241,51 @@ object RobotContainer {
         elevator,
         superstructure,
         vision,
-        1
+        Constants.Universal.BranchSide.RIGHT
       )
     )
+
+
+
     ControlBoard.alignAlgae.whileTrue(
-      TargetTagCommand(
+      ReefAlignCommand(
         driver = Jessika(),
         { ControlBoard.forward.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
         { ControlBoard.strafe.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
         { ControlBoard.turn.smoothDeadband(Constants.Joysticks.TURN_DEADBAND) },
         { ControlBoard.slowMode },
         drivetrain,
+        elevator,
+        superstructure,
         vision,
-        0.inches
+        Constants.Universal.BranchSide.CENTER
       )
     )
 
-    //    ControlBoard.intakeCoral.whileTrue(
-    //      StationAlignCommand(
-    //        driver = Jessika(),
-    //        { ControlBoard.forward.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
-    //        { ControlBoard.strafe.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
-    //        { ControlBoard.turn.smoothDeadband(Constants.Joysticks.TURN_DEADBAND) },
-    //        { ControlBoard.slowMode },
-    //        drivetrain,
-    //        Constants.Universal.GamePiece.CORAL
-    //      )
-    //    )
-    //
-    //    ControlBoard.intakeL1.whileTrue(
-    //      StationAlignCommand(
-    //        driver = Jessika(),
-    //        { ControlBoard.forward.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
-    //        { ControlBoard.strafe.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
-    //        { ControlBoard.turn.smoothDeadband(Constants.Joysticks.TURN_DEADBAND) },
-    //        { ControlBoard.slowMode },
-    //        drivetrain,
-    //        Constants.Universal.GamePiece.CORAL_L1
-    //      )
-    //    )
+
+        ControlBoard.intakeCoral.whileTrue(
+          StationAlignCommand(
+            driver = Jessika(),
+            { ControlBoard.forward.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
+            { ControlBoard.strafe.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
+            { ControlBoard.turn.smoothDeadband(Constants.Joysticks.TURN_DEADBAND) },
+            { ControlBoard.slowMode },
+            drivetrain,
+            Constants.Universal.GamePiece.CORAL
+          )
+        )
+
+        ControlBoard.intakeL1.whileTrue(
+          StationAlignCommand(
+            driver = Jessika(),
+            { ControlBoard.forward.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
+            { ControlBoard.strafe.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
+            { ControlBoard.turn.smoothDeadband(Constants.Joysticks.TURN_DEADBAND) },
+            { ControlBoard.slowMode },
+            drivetrain,
+            Constants.Universal.GamePiece.CORAL_L1
+          )
+        )
   }
 
   fun mapTestControls() {}

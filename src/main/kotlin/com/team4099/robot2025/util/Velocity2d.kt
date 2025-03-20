@@ -2,6 +2,8 @@ package com.team4099.robot2025.util
 
 import edu.wpi.first.math.geometry.Translation2d
 import org.team4099.lib.units.LinearVelocity
+import org.team4099.lib.units.base.Time
+import org.team4099.lib.units.base.inSeconds
 import org.team4099.lib.units.base.meters
 import org.team4099.lib.units.derived.Angle
 import org.team4099.lib.units.derived.angle
@@ -53,6 +55,11 @@ data class Velocity2d(val x: LinearVelocity, val y: LinearVelocity) {
 
   fun normalize(): Velocity2d {
     return this / magnitude.inMetersPerSecond
+  }
+
+  fun interpolate(endValue: Velocity2d, t: Time): Velocity2d {
+    val translation = velocity2dWPIlib.interpolate(endValue.velocity2dWPIlib, t.inSeconds)
+    return Velocity2d(translation.x.meters.perSecond, translation.y.meters.perSecond)
   }
 
   override fun equals(other: Any?): Boolean {

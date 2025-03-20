@@ -14,9 +14,11 @@ import edu.wpi.first.math.VecBuilder
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj2.command.SubsystemBase
+import org.ejml.dense.row.misc.TransposeAlgs_DDRM
 import org.littletonrobotics.junction.Logger
 import org.photonvision.PhotonUtils
 import org.team4099.lib.geometry.Pose2d
+import org.team4099.lib.geometry.Pose2dWPILIB
 import org.team4099.lib.geometry.Pose3d
 import org.team4099.lib.geometry.Rotation3d
 import org.team4099.lib.geometry.Transform2d
@@ -56,18 +58,16 @@ class Vision(vararg cameras: CameraIO) : SubsystemBase() {
   var isAutoAligning = false
   var isAligned = false
 
-  var drivetrainOdometry: () -> Pose2d = { Pose2d() }
-
   private val xyStdDev = TunableNumber("Vision/xystdev", VisionConstants.XY_STDDEV)
 
   private val thetaStdDev = TunableNumber("Vision/thetaStdDev", VisionConstants.THETA_STDDEV)
 
   private var cameraPreference = 0 // 0 for left 1 for right
 
-  private var closestReefTagAcrossCams: Map.Entry<Int, Pair<Int, Transform3d>?>? = null
+  private var closestReefTagAcrossCams: Pair<Int, Pair<Int, Pose2d>?>? = null
 
   var lastTrigVisionUpdate =
-    TimestampedTrigVisionUpdate(Clock.fpgaTime, -1, Transform2d(Translation2d(), 0.degrees))
+    TimestampedTrigVisionUpdate(Clock.fpgaTime, -1, Pose2d(Translation2d(), 0.degrees))
 
   private var fieldFramePoseSupplier = Supplier<Pose2d> { Pose2d() }
   private var visionConsumer: Consumer<List<TimestampedVisionUpdate>> = Consumer {}
@@ -103,15 +103,15 @@ class Vision(vararg cameras: CameraIO) : SubsystemBase() {
 
     val visionUpdates = mutableListOf<TimestampedVisionUpdate>()
 
-    val closestReefTags = mutableMapOf<Int, Pair<Int, Transform3d>?>()
+    val closestReefTags = mutableMapOf<Int, Pair<Int, Pose2d>?>()
     for (i in io.indices) {
       closestReefTags[i] = null
     }
 
     for (instance in io.indices) {
 
-      var reefTags = mutableListOf<Pair<Int, Transform3d>>()
-      var closestReefTag: Pair<Int, Transform3d>? = null
+      var reefTags = mutableListOf<Pair<Int, Pose2d>>()
+      var closestReefTag: Pair<Int, Pose2d>? = null
 
       var tagTargets = inputs[instance].cameraTargets
 
@@ -123,13 +123,6 @@ class Vision(vararg cameras: CameraIO) : SubsystemBase() {
             if ((tag.fiducialId in VisionConstants.BLUE_REEF_TAGS && FMSData.isBlue) ||
               (tag.fiducialId in VisionConstants.RED_REEF_TAGS && !FMSData.isBlue)
             ) {
-
-              val aprilTagAlignmentAngle =
-                if (FMSData.isBlue) {
-                  VisionConstants.BLUE_REEF_TAG_THETA_ALIGNMENTS[tag.fiducialId]
-                } else {
-                  VisionConstants.RED_REEF_TAG_THETA_ALIGNMENTS[tag.fiducialId]
-                }
 
               val fieldTTag =
                 FieldConstants.AprilTagLayoutType.OFFICIAL
@@ -166,7 +159,7 @@ class Vision(vararg cameras: CameraIO) : SubsystemBase() {
                       )
                     )
                     .translation,
-                  Rotation3d(0.degrees, 0.degrees, aprilTagAlignmentAngle ?: 0.degrees)
+                  Rotation3d(0.degrees, 0.degrees, fieldTTag.rotation.z - fieldFramePoseSupplier.get().rotation)
                 )
 
               var fieldTRobot = Pose3d().transformBy(fieldTTag).transformBy(robotTTag.inverse())
@@ -223,12 +216,12 @@ class Vision(vararg cameras: CameraIO) : SubsystemBase() {
               }
 
               if (tag.fiducialId in tagIDFilter) {
-                reefTags.add(Pair(tag.fiducialId, robotTTag))
+                reefTags.add(Pair(tag.fiducialId, fieldTRobot.toPose2d()))
               }
             }
           }
 
-          closestReefTag = reefTags.minByOrNull { it.second.translation.norm }
+          closestReefTag = reefTags.minByOrNull { it.second.translation.magnitude }
 
           closestReefTags[instance] = closestReefTag
 
@@ -244,7 +237,7 @@ class Vision(vararg cameras: CameraIO) : SubsystemBase() {
 
           Logger.recordOutput(
             "Vision/${VisionConstants.CAMERA_NAMES[instance]}/closestReefTagPose}",
-            closestReefTag?.second?.transform3d ?: Transform3dWPILIB()
+            closestReefTag?.second?.pose2d ?: Pose2dWPILIB()
           )
         }
 
@@ -253,42 +246,41 @@ class Vision(vararg cameras: CameraIO) : SubsystemBase() {
         )
         closestReefTagAcrossCams =
           if (closestReefTags[0]?.first != closestReefTags[1]?.first) {
-            closestReefTags.minByOrNull { it.value?.second?.translation?.norm ?: 1000000.meters }
+            closestReefTags.minByOrNull { (fieldFramePoseSupplier.get().translation - (it.value?.second?.translation ?: Translation2d(100000000.meters, 100000000.meters))).magnitude }
+              ?.toPair()
           } else {
-            mapOf(cameraPreference to closestReefTags[cameraPreference]).minByOrNull {
-              it.value?.second?.translation?.norm ?: 1000000.meters
-            }
+            Pair(cameraPreference, closestReefTags[cameraPreference])
           }
 
         Logger.recordOutput(
           "Vision/ClosestReefTagAcrossAllCams/CameraID",
           if (closestReefTagAcrossCams != null)
-            VisionConstants.CAMERA_NAMES[closestReefTagAcrossCams?.key ?: -1]
+            VisionConstants.CAMERA_NAMES[closestReefTagAcrossCams?.first ?: -1]
           else "None"
         )
 
         Logger.recordOutput(
           "Vision/ClosestReefTagAcrossAllCams/TagID",
-          closestReefTagAcrossCams?.value?.first ?: -1
+          closestReefTagAcrossCams?.second?.first ?: -1
         )
 
         Logger.recordOutput(
           "Vision/ClosestReefTagAcrossAllCams/ReefTagPose",
-          closestReefTagAcrossCams?.value?.second?.transform3d ?: Transform3dWPILIB()
+          closestReefTagAcrossCams?.second?.second?.pose2d ?: Pose2dWPILIB()
         )
 
-        if (closestReefTagAcrossCams?.key != null && closestReefTagAcrossCams?.value != null) {
+        if (closestReefTagAcrossCams?.first != null && closestReefTagAcrossCams?.second != null) {
 
           lastTrigVisionUpdate =
             TimestampedTrigVisionUpdate(
-              inputs[closestReefTagAcrossCams?.key ?: 0].timestamp,
-              closestReefTagAcrossCams?.value?.first ?: -1,
-              Transform2d(
+              inputs[closestReefTagAcrossCams?.first ?: 0].timestamp,
+              closestReefTagAcrossCams?.second?.first ?: -1,
+              Pose2d(
                 Translation2d(
-                  closestReefTagAcrossCams?.value?.second?.translation?.x ?: 0.meters,
-                  closestReefTagAcrossCams?.value?.second?.translation?.y ?: 0.meters
+                  closestReefTagAcrossCams?.second?.second?.translation?.x ?: 0.meters,
+                  closestReefTagAcrossCams?.second?.second?.translation?.y ?: 0.meters
                 ),
-                closestReefTagAcrossCams?.value?.second?.rotation?.z ?: 0.degrees
+                closestReefTagAcrossCams?.second?.second?.rotation ?: 0.degrees
               )
             )
 

@@ -98,12 +98,14 @@ class TargetAngleCommand(
 
   override fun initialize() {
     thetaPID.reset() // maybe do first for x?
-    /*
+
     if (thetakP.hasChanged() || thetakI.hasChanged() || thetakD.hasChanged()) {
       thetaPID = PIDController(thetakP.get(), thetakI.get(), thetakD.get())
+
+      thetaPID.enableContinuousInput(-PI.radians, PI.radians)
     }
 
-     */
+
   }
 
   override fun execute() {

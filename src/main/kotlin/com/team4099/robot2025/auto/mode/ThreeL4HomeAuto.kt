@@ -44,7 +44,7 @@ class ThreeL4HomeAuto(
           elevator,
           superstructure,
           vision,
-          1
+          Constants.Universal.BranchSide.RIGHT
         ),
         superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L3)
       )
@@ -69,7 +69,7 @@ class ThreeL4HomeAuto(
           elevator,
           superstructure,
           vision,
-          1
+          Constants.Universal.BranchSide.RIGHT
         ),
         superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L3)
       )
@@ -92,7 +92,7 @@ class ThreeL4HomeAuto(
           elevator,
           superstructure,
           vision,
-          0
+          Constants.Universal.BranchSide.LEFT
         )
           .withTimeout(3.0),
         superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L3)

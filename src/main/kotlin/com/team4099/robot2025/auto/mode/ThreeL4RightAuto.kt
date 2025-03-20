@@ -43,7 +43,7 @@ class ThreeL4RightAuto(
           elevator,
           superstructure,
           vision,
-          1
+          Constants.Universal.BranchSide.RIGHT
         ),
         superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L4)
       ),
@@ -67,7 +67,7 @@ class ThreeL4RightAuto(
           elevator,
           superstructure,
           vision,
-          1
+          Constants.Universal.BranchSide.RIGHT
         ),
         superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L4)
       ),
@@ -91,7 +91,7 @@ class ThreeL4RightAuto(
           elevator,
           superstructure,
           vision,
-          0
+          Constants.Universal.BranchSide.LEFT
         ),
         superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L4)
       )

@@ -161,6 +161,29 @@ class DriveToPose(
     }
 
     override fun initialize() {
+        if (drivekP.hasChanged() || drivekI.hasChanged() || drivekD.hasChanged()) {
+            driveController =
+                ProfiledPIDController(
+                    drivekP.get(),
+                    drivekI.get(),
+                    drivekD.get(),
+                    driveConstraints
+                )
+        }
+
+        if (thetakP.hasChanged() || thetakI.hasChanged() || thetakD.hasChanged()) {
+            thetaController =
+                ProfiledPIDController(
+                    thetakP.get(),
+                    thetakI.get(),
+                    thetakD.get(),
+                    thetaConstraints
+                )
+
+            thetaController.enableContinuousInput(-PI.radians, PI.radians)
+        }
+
+
         currentPose = robotPoseSupplier()
         setpointPose = currentPose
         val fieldVelocity = drivetrain.fieldVelocity
@@ -186,27 +209,7 @@ class DriveToPose(
         )
         thetaController.setGoal(targetPose.rotation)
 
-        if (drivekP.hasChanged() || drivekI.hasChanged() || drivekD.hasChanged()) {
-            driveController =
-                ProfiledPIDController(
-                    drivekP.get(),
-                    drivekI.get(),
-                    drivekD.get(),
-                    driveConstraints
-                )
-        }
 
-        if (thetakP.hasChanged() || thetakI.hasChanged() || thetakD.hasChanged()) {
-            thetaController =
-                ProfiledPIDController(
-                    thetakP.get(),
-                    thetakI.get(),
-                    thetakD.get(),
-                    thetaConstraints
-                )
-
-            thetaController.enableContinuousInput(-PI.radians, PI.radians)
-        }
     }
 
     override fun execute() {

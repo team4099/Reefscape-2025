@@ -66,13 +66,14 @@ class FieldFrameEstimator(stateStdDevs: Matrix<N3?, N1?>) {
     update()
   }
 
+  //definitely doesn't work rn, don't use
   fun addReefVisionData(visionData: TimestampedTrigVisionUpdate) {
     val timestamp: Time = visionData.timestamp
     if (updates.containsKey(timestamp)) {
       // There was already an odometry update at this timestamp, add to it
       val odomTRobotAtVisionTimestamp = updates[timestamp]!!.odomTRobot
-      val robotTReef = visionData.robotTReefTag
-      odometryTReef = odomTRobotAtVisionTimestamp.transformBy(robotTReef).asTransform2d()
+      val robotTReef = visionData.fieldTRobot
+      odometryTReef = odomTRobotAtVisionTimestamp.transformBy(robotTReef.asTransform2d()).asTransform2d()
     } else {
       // Insert a new update
       val prevUpdate = updates.floorEntry(timestamp)
@@ -91,10 +92,12 @@ class FieldFrameEstimator(stateStdDevs: Matrix<N3?, N1?>) {
 
       // Add new pose updates
       val odomTRobotAtVisionTimestamp = prevUpdate.value.odomTRobot.exp(prevToVisionTwist)
-      val robotTSpeaker = visionData.robotTReefTag
-      odometryTReef = odomTRobotAtVisionTimestamp.transformBy(robotTSpeaker).asTransform2d()
+      val robotTReef = visionData.fieldTRobot
+      odometryTReef = odomTRobotAtVisionTimestamp.transformBy(robotTReef.asTransform2d()).asTransform2d()
     }
   }
+
+
 
   /** Records a new set of vision updates. */
   fun addVisionData(visionData: List<TimestampedVisionUpdate>) {
