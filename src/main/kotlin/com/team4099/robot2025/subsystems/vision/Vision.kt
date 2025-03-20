@@ -30,10 +30,12 @@ import org.team4099.lib.units.base.inInches
 import org.team4099.lib.units.base.inMeters
 import org.team4099.lib.units.base.inMilliseconds
 import org.team4099.lib.units.base.meters
+import org.team4099.lib.units.base.seconds
 import org.team4099.lib.units.derived.cos
 import org.team4099.lib.units.derived.degrees
 import org.team4099.lib.units.derived.inRadians
 import org.team4099.lib.units.derived.sin
+import java.lang.reflect.Field
 import java.util.function.Consumer
 import java.util.function.Supplier
 
@@ -102,6 +104,22 @@ class Vision(vararg cameras: CameraIO) : SubsystemBase() {
     }
 
     val visionUpdates = mutableListOf<TimestampedVisionUpdate>()
+
+
+    /*
+    Dummy test vision update
+    visionUpdates.add(
+      TimestampedVisionUpdate(
+        Clock.fpgaTime - 0.02.seconds,
+        Pose2d(
+          Translation2d(FieldConstants.fieldLength / 2, FieldConstants.fieldWidth / 2),
+          fieldFramePoseSupplier.get().rotation),
+        VecBuilder.fill(xyStdDev.get(), xyStdDev.get(), thetaStdDev.get()),
+        true
+      )
+    )
+
+     */
 
     val closestReefTags = mutableMapOf<Int, Pair<Int, Pose2d>?>()
     for (i in io.indices) {
@@ -288,6 +306,8 @@ class Vision(vararg cameras: CameraIO) : SubsystemBase() {
         }
       }
     }
+
+    visionConsumer.accept(visionUpdates)
 
     //visionConsumer.accept(visionUpdates)
     Logger.recordOutput(

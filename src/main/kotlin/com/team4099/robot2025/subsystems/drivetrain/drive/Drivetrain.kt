@@ -391,6 +391,7 @@ class Drivetrain(val gyroIO: GyroIO, swerveModuleIOs: DrivetrainIO) : SubsystemB
     }
 
     currentState = nextState
+
   }
 
   private fun updateOdometry() {
@@ -675,7 +676,7 @@ class Drivetrain(val gyroIO: GyroIO, swerveModuleIOs: DrivetrainIO) : SubsystemB
   /** Resets the field frame estimator given some current pose of the robot. */
   fun resetFieldFrameEstimator(fieldTRobot: Pose2d) {
     fieldFrameEstimator.resetFieldFrameFilter(
-      odomTRobot.asTransform2d() + fieldTRobot.asTransform2d().inverse()
+      fieldTRobot.asTransform2d().inverse() + odomTRobot.asTransform2d()
     )
   }
 
@@ -704,23 +705,37 @@ class Drivetrain(val gyroIO: GyroIO, swerveModuleIOs: DrivetrainIO) : SubsystemB
         swerveModules.map { it.modulePosition }.toTypedArray(),
         undriftedPose.pose2d
       )
+
+
     }
 
-    // TODO(parth): Update the field frame estimator's transform here too, otherwise it will need to
-    // re-converge
+
+
     swerveDriveOdometry.resetPosition(
       gyroInputs.gyroYaw.inRotation2ds,
       lastModulePositions,
       Pose2d(odomTRobot.x, odomTRobot.y, toAngle).pose2d
     )
 
-    fieldFrameEstimator.resetFieldFrameFilter(
-      Transform2d(odomTField.translation, gyroInputs.gyroYaw)
+    /*
+    resetFieldFrameEstimator(
+      Pose2d(
+        fieldTRobot.translation,
+        toAngle
+      )
     )
 
+     */
+
+
+
+    /*
     if (!(gyroInputs.gyroConnected)) {
       gyroYawOffset = toAngle - rawGyroAngle
     }
+     */
+
+
   }
 
   fun zeroGyroPitch(toAngle: Angle = 0.0.degrees) {
