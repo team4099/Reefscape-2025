@@ -68,7 +68,7 @@ object RobotContainer {
 
       drivetrain = Drivetrain(GyroIOPigeon2, DrivetrainIOReal)
       limelight = LimelightVision(object : LimelightVisionIO {})
-      arm = Arm(ArmIOTalonFX)
+      arm = Arm(object : ArmIO {})
       climber = Climber(object : ClimberIO {})
       elevator = Elevator(ElevatorIOTalon)
       rollers = Rollers(RollersIOTalonFX)
@@ -114,8 +114,6 @@ object RobotContainer {
   fun mapDefaultCommands() {
 
     drivetrain.defaultCommand =
-
-      /*
       TeleopDriveCommand(
         driver = Jessika(),
         { ControlBoard.forward.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
@@ -124,21 +122,6 @@ object RobotContainer {
         { ControlBoard.slowMode },
         drivetrain,
       )
-
-       */
-
-
-       ReefAimCommand(
-         driver = Jessika(),
-         { ControlBoard.forward.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
-         { ControlBoard.strafe.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
-         { ControlBoard.turn.smoothDeadband(Constants.Joysticks.TURN_DEADBAND) },
-         { ControlBoard.slowMode },
-         drivetrain,
-         superstructure
-       )
-
-
   }
 
   fun zeroSteering() {
@@ -199,12 +182,14 @@ object RobotContainer {
 
     ControlBoard.intakeCoral.whileTrue(superstructure.intakeCoralCommand())
 
-    ControlBoard.intakeAlgaeGround.onTrue(
-      superstructure.intakeAlgaeCommand(Constants.Universal.AlgaeLevel.GROUND)
-    )
-    ControlBoard.intakeAlgaeGround.onFalse(
-      superstructure.intakeAlgaeImmediatelyCommand()
-    )
+//    ControlBoard.intakeAlgaeGround.onTrue(
+//      superstructure.intakeAlgaeCommand(Constants.Universal.AlgaeLevel.GROUND)
+//    )
+
+//    ControlBoard.intakeAlgaeGround.onFalse(
+//      superstructure.intakeAlgaeImmediatelyCommand()
+//    )
+
     ControlBoard.intakeAlgaeL3.whileTrue(
       superstructure.intakeAlgaeCommand(Constants.Universal.AlgaeLevel.L3)
     )
@@ -223,11 +208,11 @@ object RobotContainer {
     ControlBoard.prepL3.whileTrue(
       superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L3)
     )
-    //
-    // No L4 scoring in the church
-//    ControlBoard.prepL4.whileTrue(
-//      superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L4)
-//    )
+
+     // No L4 scoring in the church
+    ControlBoard.prepL4.whileTrue(
+      superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L4)
+    )
 
     ControlBoard.score.whileTrue(superstructure.scoreCommand())
 
@@ -279,17 +264,9 @@ object RobotContainer {
       )
     )
 
-    ControlBoard.intakeCoral.whileTrue(
-        StationAlignCommand(
-            driver = Jessika(),
-            { ControlBoard.forward.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
-            { ControlBoard.strafe.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
-            { ControlBoard.turn.smoothDeadband(Constants.Joysticks.TURN_DEADBAND) },
-            { ControlBoard.slowMode },
-          drivetrain,
-            Constants.Universal.GamePiece.CORAL
-          )
-        )
+    ControlBoard.intakeCoral.whileTrue(superstructure.intakeCoralCommand())
+
+    ControlBoard.prepAlgaeBarge.whileTrue(superstructure.prepScoreAlgaeBargeCommand())
   }
 
   fun mapTestControls() {}

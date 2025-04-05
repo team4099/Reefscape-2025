@@ -97,6 +97,8 @@ class Superstructure(
 
   var visionScoringOffset = 0.0.inches
 
+  var isHomingSetWhenSkipped = false
+
   override fun periodic() {
     // led updates
     leds.hasCoral = theoreticalGamePiece == GamePiece.CORAL
@@ -255,21 +257,21 @@ class Superstructure(
       }
       SuperstructureStates.MANUAL_RESET -> {
         arm.currentRequest = Request.ArmRequest.ClosedLoop(0.0.degrees)
-        elevator.currentRequest = Request.ElevatorRequest.OpenLoop((-2.0).volts)
+        elevator.currentRequest = Request.ElevatorRequest.Home()
 
-        if (elevator.inputs.leaderStatorCurrent > ElevatorConstants.HOMING_STALL_CURRENT &&
-          elevator.inputs.elevatorVelocity.epsilonEquals(0.inches.perSecond) &&
-          elevator.inputs.leaderAppliedVoltage < 0.volts &&
-          (Clock.fpgaTime - lastTransitionTime) > 0.5.seconds
-        ) {
+        if (elevator.isHomed) {
+          currentRequest = Request.SuperstructureRequest.Idle()
           nextState = SuperstructureStates.IDLE
         }
-      }
+
+
+        }
       SuperstructureStates.HOME_PREP -> {
         nextState = SuperstructureStates.HOME
       }
       SuperstructureStates.HOME -> {
         elevator.currentRequest = Request.ElevatorRequest.Home()
+
         if (elevator.isHomed) {
           nextState = SuperstructureStates.IDLE
         }
@@ -288,8 +290,14 @@ class Superstructure(
           (Clock.fpgaTime - lastTransitionTime) >
           0.5.seconds
         ) { // add buffer so it won't home when still up
+          if (!isHomingSetWhenSkipped) {
+            //elevator.isHomed = false
+            isHomingSetWhenSkipped = true
+          }
+
           elevator.currentRequest = Request.ElevatorRequest.Home() // stop stalling
         } else {
+          isHomingSetWhenSkipped = false
           elevator.currentRequest = Request.ElevatorRequest.ClosedLoop(0.0.inches)
         }
 
@@ -324,6 +332,7 @@ class Superstructure(
             is Request.SuperstructureRequest.ClimbExtend -> SuperstructureStates.CLIMB_EXTEND
             is Request.SuperstructureRequest.ClimbRetract -> SuperstructureStates.CLIMB_RETRACT
             is Request.SuperstructureRequest.Tuning -> SuperstructureStates.TUNING
+            is Request.SuperstructureRequest.ManualReset -> SuperstructureStates.MANUAL_RESET
             is Request.SuperstructureRequest.Score -> {
               if (theoreticalGamePiece == GamePiece.ALGAE) {
                 SuperstructureStates.SCORE_ALGAE_PROCESSOR
@@ -334,17 +343,25 @@ class Superstructure(
             }
             else -> currentState
           }
+
+        if (currentRequest is Request.SuperstructureRequest.ManualReset || currentRequest is Request.SuperstructureRequest.IntakeCoral) {
+          elevator.isHomed = false
+        }
       }
 
       // Coral States
       SuperstructureStates.PREP_INTAKE_CORAL -> {
-        elevator.currentRequest =
-          Request.ElevatorRequest.ClosedLoop(
-            ElevatorTunableValues.ElevatorHeights.intakeCoralHeight.get()
-          )
 
-        if (elevator.isAtTargetedPosition) {
-          nextState = SuperstructureStates.INTAKE_CORAL
+        elevator.currentRequest = Request.ElevatorRequest.Home()
+
+        if (elevator.isHomed) {
+          elevator.currentRequest =
+            Request.ElevatorRequest.ClosedLoop(
+              ElevatorTunableValues.ElevatorHeights.intakeCoralHeight.get()
+            )
+          if (elevator.isAtTargetedPosition) {
+            nextState = SuperstructureStates.INTAKE_CORAL
+          }
         }
 
         if (currentRequest is Request.SuperstructureRequest.Idle) {
@@ -359,12 +376,13 @@ class Superstructure(
 
         if (rollers.hasCoral) {
           theoreticalGamePiece = GamePiece.CORAL
-          currentRequest = Request.SuperstructureRequest.Idle()
+          nextState = SuperstructureStates.IDLE
+          if (currentRequest is Request.SuperstructureRequest.IntakeCoral) {
+            currentRequest = Request.SuperstructureRequest.Idle()
+          }
         }
 
-        if (currentRequest is Request.SuperstructureRequest.Idle ||
-          currentRequest is Request.SuperstructureRequest.ScorePrepCoral
-        ) {
+        if (currentRequest is Request.SuperstructureRequest.Idle) {
           nextState = SuperstructureStates.IDLE
         }
       }
@@ -403,7 +421,7 @@ class Superstructure(
               )
             CoralLevel.L4 ->
               Request.ElevatorRequest.ClosedLoop(
-                ElevatorTunableValues.ElevatorHeights.PrepL4Height.get()
+                ElevatorTunableValues.ElevatorHeights.L4Height.get()
               )
             else ->
               Request.ElevatorRequest.ClosedLoop(
@@ -432,27 +450,14 @@ class Superstructure(
           CoralLevel.L1 -> ElevatorTunableValues.ElevatorHeights.L1Height.get()
           CoralLevel.L2 -> ElevatorTunableValues.ElevatorHeights.L2Height.get()
           CoralLevel.L3 -> ElevatorTunableValues.ElevatorHeights.L3Height.get()
-          CoralLevel.L4 -> ElevatorTunableValues.ElevatorHeights.PrepL4Height.get()
+          CoralLevel.L4 -> ElevatorTunableValues.ElevatorHeights.L4Height.get()
           else -> ElevatorTunableValues.ElevatorHeights.idleHeight.get()
         }
 
-        if ((!vision.isAligned && (vision.lastTrigVisionUpdate.robotTReefTag.translation.x.absoluteValue - 19.inches) < DrivetrainConstants.DRIVETRAIN_WIDTH)
-          && visionScoringOffset == 0.0.inches)
-        {
-          visionScoringOffset = vision.lastTrigVisionUpdate.robotTReefTag.translation.x.absoluteValue - 19.inches * 35.degrees.tan
-        }
-
-        Logger.recordOutput("Elevator/visionScoringOffsetInches", visionScoringOffset.inInches)
-
         if (theoreticalGamePiece == GamePiece.CORAL || theoreticalGamePiece == GamePiece.NONE) {
-          if (coralScoringLevel == CoralLevel.L4) {
-            elevator.currentRequest =
-              Request.ElevatorRequest.ClosedLoop(
-                ElevatorTunableValues.ElevatorHeights.L4Height.get() + visionScoringOffset
-              )
-          } else {
+          if (coralScoringLevel != CoralLevel.L4) {
             elevator.currentRequest = Request.ElevatorRequest.ClosedLoop(
-              currentElevatorPositionTarget + visionScoringOffset
+              currentElevatorPositionTarget
             )
           }
 
@@ -543,7 +548,7 @@ class Superstructure(
       }
 
       SuperstructureStates.INTAKE_ALGAE_CLEANUP -> {
-        if (vision.lastTrigVisionUpdate.robotTReefTag.translation.x.absoluteValue > 19.inches + VisionConstants.ALGAE_CLEAR_DISTANCE) {
+        if (vision.lastTrigVisionUpdate.robotTReefTag.translation.x.absoluteValue > 18.0.inches + VisionConstants.ALGAE_CLEAR_DISTANCE) {
           elevator.currentRequest = Request.ElevatorRequest.ClosedLoop(ElevatorTunableValues.ElevatorHeights.idleHeight.get())
 
           if (elevator.isAtTargetedPosition) {

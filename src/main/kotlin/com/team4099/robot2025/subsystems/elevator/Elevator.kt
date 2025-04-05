@@ -163,10 +163,11 @@ class Elevator(val io: ElevatorIO) : SubsystemBase() {
         if (!inputs.isSimulating &&
           (
             !isHomed &&
-              inputs.leaderStatorCurrent < ElevatorConstants.HOMING_STALL_CURRENT &&
+                    (inputs.leaderStatorCurrent < ElevatorConstants.HOMING_STALL_CURRENT ||
               (Clock.fpgaTime - lastHomingStatorCurrentTripTime) <
               ElevatorConstants.HOMING_STALL_TIME_THRESHOLD
-            )
+                    || inputs.elevatorVelocity.absoluteValue > 0.1.inches.perSecond
+            ))
         ) {
           setVoltage(ElevatorConstants.HOMING_APPLIED_VOLTAGE)
         } else {

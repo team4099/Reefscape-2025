@@ -9,6 +9,7 @@ import com.ctre.phoenix6.controls.PositionVoltage
 import com.ctre.phoenix6.controls.VoltageOut
 import com.ctre.phoenix6.hardware.TalonFX
 import com.ctre.phoenix6.signals.GravityTypeValue
+import com.ctre.phoenix6.signals.InvertedValue
 import com.team4099.robot2025.config.constants.Constants
 import com.team4099.robot2025.config.constants.ElevatorConstants
 import com.team4099.robot2025.config.constants.ElevatorConstants.MAX_ACCELERATION
@@ -98,6 +99,8 @@ object ElevatorIOTalon : ElevatorIO {
       ElevatorConstants.LEADER_SUPPLY_CURRENT_LIMIT.inAmperes
     configs.CurrentLimits.StatorCurrentLimitEnable = true
     configs.CurrentLimits.SupplyCurrentLimitEnable = true
+
+    configs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive
 
     // configs.SoftwareLimitSwitch.ForwardSoftLimitEnable = true
     // configs.SoftwareLimitSwitch.ReverseSoftLimitEnable = true

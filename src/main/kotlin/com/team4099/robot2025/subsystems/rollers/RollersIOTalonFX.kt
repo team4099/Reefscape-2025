@@ -15,7 +15,9 @@ import org.team4099.lib.units.base.inAmperes
 import org.team4099.lib.units.ctreAngularMechanismSensor
 import org.team4099.lib.units.derived.ElectricalPotential
 import org.team4099.lib.units.derived.inVolts
+import org.team4099.lib.units.derived.rotations
 import org.team4099.lib.units.derived.volts
+import org.team4099.lib.units.perMinute
 import edu.wpi.first.units.measure.Current as WPILibCurrent
 import edu.wpi.first.units.measure.Temperature as WPILibTemperature
 import edu.wpi.first.units.measure.Voltage as WPILibVoltage
@@ -34,6 +36,8 @@ object RollersIOTalonFX : RollersIO {
   var rollerStatorCurrentStatusSignal: StatusSignal<WPILibCurrent>
   var rollerSupplyCurrentStatusSignal: StatusSignal<WPILibCurrent>
   var rollerTempStatusSignal: StatusSignal<WPILibTemperature>
+  var rollerVelocityStatusSignal: StatusSignal<edu.wpi.first.units.measure.AngularVelocity>
+
   // var beamBreakStatusSignal: StatusSignal<Boolean>
 
   val voltageControl: VoltageOut = VoltageOut(0.volts.inVolts)
@@ -59,6 +63,7 @@ object RollersIOTalonFX : RollersIO {
     rollerStatorCurrentStatusSignal = rollersTalon.statorCurrent
     rollerSupplyCurrentStatusSignal = rollersTalon.supplyCurrent
     rollerTempStatusSignal = rollersTalon.deviceTemp
+    rollerVelocityStatusSignal = rollersTalon.velocity
     // beamBreakStatusSignal = beamBreak.s1Closed
   }
 
@@ -68,13 +73,14 @@ object RollersIOTalonFX : RollersIO {
       rollerStatorCurrentStatusSignal,
       rollerSupplyCurrentStatusSignal,
       rollerTempStatusSignal,
+      rollerVelocityStatusSignal
       // beamBreakStatusSignal
     )
   }
 
   override fun updateInputs(inputs: RollersIO.RollersIOInputs) {
     refreshStatusSignals()
-    inputs.rollerVelocity = rollerSensor.velocity
+    inputs.rollerVelocity = rollerVelocityStatusSignal.valueAsDouble.rotations.perMinute
     inputs.rollerAppliedVoltage = rollerAppliedVoltageStatusSignal.valueAsDouble.volts
     inputs.rollerStatorCurrent = rollerStatorCurrentStatusSignal.valueAsDouble.amps
     inputs.rollerSupplyCurrent = rollerSupplyCurrentStatusSignal.valueAsDouble.amps

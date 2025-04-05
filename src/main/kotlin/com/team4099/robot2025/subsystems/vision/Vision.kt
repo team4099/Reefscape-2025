@@ -169,12 +169,7 @@ class Vision(vararg cameras: CameraIO) : SubsystemBase() {
                   Rotation3d(0.degrees, 0.degrees, aprilTagAlignmentAngle ?: 0.degrees)
                 )
 
-
-
-              var fieldTRobot = Pose3d().transformBy(fieldTTag).transformBy(
-                Transform3d(robotTTag.translation,
-                  Rotation3d(0.degrees, 0.degrees, fieldTTag.rotation.z - fieldFramePoseSupplier.get().rotation)
-                ).inverse())
+              var fieldTRobot = Pose3d().transformBy(fieldTTag).transformBy(robotTTag.inverse())
 
               visionUpdates.add(
                 TimestampedVisionUpdate(
@@ -298,15 +293,11 @@ class Vision(vararg cameras: CameraIO) : SubsystemBase() {
             )
 
           // reefVisionConsumer.accept(lastTrigVisionUpdate)
-
         }
       }
     }
-
-
-
     if (DriverStation.isTeleop()) {
-      visionConsumer.accept(visionUpdates)
+      //visionConsumer.accept(visionUpdates)
     }
     Logger.recordOutput(
       "LoggedRobot/VisionLoopTimeMS", (Clock.realTimestamp - startTime).inMilliseconds

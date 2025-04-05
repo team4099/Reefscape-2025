@@ -17,7 +17,10 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import edu.wpi.first.wpilibj2.command.WaitCommand
 import org.team4099.lib.geometry.Pose2d
+import org.team4099.lib.geometry.Translation2d
 import org.team4099.lib.smoothDeadband
+import org.team4099.lib.units.derived.degrees
+import org.team4099.lib.units.derived.inRotation2ds
 
 class ThreeL4LeftAuto(
   val drivetrain: Drivetrain,
@@ -31,7 +34,7 @@ class ThreeL4LeftAuto(
     addCommands(
       DrivePathCommand.createPathInFieldFrame(
         drivetrain, TrajectoryTypes.Choreo(firstTrajectory), keepTrapping = false
-      ),
+      ).withTimeout(1.6),
       ParallelCommandGroup(
         ReefAlignCommand(
           driver = Jessika(),
@@ -45,13 +48,13 @@ class ThreeL4LeftAuto(
           vision,
           1
         ),
-        superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L3)
+        superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L4)
       ),
       ParallelCommandGroup(
         DrivePathCommand.createPathInFieldFrame(
           drivetrain, TrajectoryTypes.Choreo(secondTrajectory), keepTrapping = false
-        ),
-        WaitCommand(2.4).andThen(superstructure.intakeCoralCommand())
+        ).withTimeout(4.2),
+        WaitCommand(1.6).andThen(superstructure.intakeCoralCommand())
       ),
       ParallelCommandGroup(
         ReefAlignCommand(
@@ -66,13 +69,13 @@ class ThreeL4LeftAuto(
           vision,
           1
         ),
-        superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L3)
+        superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L4)
       ),
       ParallelCommandGroup(
         DrivePathCommand.createPathInFieldFrame(
           drivetrain, TrajectoryTypes.Choreo(thirdTrajectory), keepTrapping = false
-        ),
-        WaitCommand(1.9).andThen(superstructure.intakeCoralCommand())
+        ).withTimeout(4.0),
+        WaitCommand(1.6).andThen(superstructure.intakeCoralCommand())
       ),
       ParallelCommandGroup(
         ReefAlignCommand(
@@ -87,7 +90,7 @@ class ThreeL4LeftAuto(
           vision,
           0
         ),
-        superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L3)
+        superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L4)
       )
     )
   }
@@ -97,7 +100,7 @@ class ThreeL4LeftAuto(
     private val secondTrajectory = Choreo.loadTrajectory<SwerveSample>("ThreeL4Home/1to2Left").get()
     private val thirdTrajectory = Choreo.loadTrajectory<SwerveSample>("ThreeL4Home/2to3Left").get()
 
-    val startingPose = Pose2d(firstTrajectory.getInitialPose(false).get())
+    val startingPose = Pose2d(Translation2d(firstTrajectory.getInitialPose(false).get().translation), 180.degrees)
     val secondPose = Pose2d(secondTrajectory.getInitialPose(false).get())
     val thirdPose = Pose2d(thirdTrajectory.getInitialPose(false).get())
   }

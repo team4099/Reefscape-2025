@@ -46,15 +46,12 @@ class ThreeL4RightAuto(
         ),
         superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L4)
       ),
-      WaitCommand(0.3)
-        .andThen(
-          ParallelCommandGroup(
-            DrivePathCommand.createPathInFieldFrame(
-              drivetrain, TrajectoryTypes.Choreo(secondTrajectory), keepTrapping = false
-            ),
-            WaitCommand(1.4).andThen(superstructure.intakeCoralCommand())
-          )
+      ParallelCommandGroup(
+        DrivePathCommand.createPathInFieldFrame(
+          drivetrain, TrajectoryTypes.Choreo(secondTrajectory), keepTrapping = false
         ),
+        WaitCommand(1.6).andThen(superstructure.intakeCoralCommand())
+      ),
       ParallelCommandGroup(
         ReefAlignCommand(
           driver = Jessika(),
@@ -70,15 +67,12 @@ class ThreeL4RightAuto(
         ),
         superstructure.prepScoreCoralCommand(Constants.Universal.CoralLevel.L4)
       ),
-      WaitCommand(0.3)
-        .andThen(
-          ParallelCommandGroup(
-            DrivePathCommand.createPathInFieldFrame(
-              drivetrain, TrajectoryTypes.Choreo(thirdTrajectory), keepTrapping = false
-            ),
-            WaitCommand(1.3).andThen(superstructure.intakeCoralCommand())
-          )
+      ParallelCommandGroup(
+        DrivePathCommand.createPathInFieldFrame(
+          drivetrain, TrajectoryTypes.Choreo(thirdTrajectory), keepTrapping = false
         ),
+        WaitCommand(1.6).andThen(superstructure.intakeCoralCommand())
+      ),
       ParallelCommandGroup(
         ReefAlignCommand(
           driver = Jessika(),

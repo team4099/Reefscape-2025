@@ -285,12 +285,12 @@ private constructor(
       "Pathfollow/Desired Angle in Degrees", targetPose.pose2d.rotation.degrees
     )
 
-    CustomLogger.recordDebugOutput("Pathfollow/isAtReference", swerveDriveController.atReference())
+    CustomLogger.recordOutput("Pathfollow/isAtReference", swerveDriveController.atReference())
     CustomLogger.recordDebugOutput(
       "Pathfollow/trajectoryTimeSeconds", generatedTrajectory.totalTime.inSeconds
     )
 
-    CustomLogger.recordDebugOutput("ActiveCommands/DrivePathCommand", true)
+    CustomLogger.recordOutput("ActiveCommands/DrivePathCommand", true)
 
     if (thetakP.hasChanged()) thetaPID.proportionalGain = thetakP.get()
     if (thetakI.hasChanged()) thetaPID.integralGain = thetakI.get()
@@ -330,7 +330,7 @@ private constructor(
   }
 
   override fun end(interrupted: Boolean) {
-    CustomLogger.recordDebugOutput("ActiveCommands/DrivePathCommand", false)
+    CustomLogger.recordOutput("ActiveCommands/DrivePathCommand", false)
     if (interrupted) {
       DriverStation.reportError(errorString, true)
       // Stop where we are if interrupted

@@ -108,8 +108,8 @@ object Constants {
 
   // leader is right motor and follower is left
   object Elevator {
-    const val LEADER_MOTOR_ID = 42 // right
-    const val FOLLOWER_MOTOR_ID = 41 // left
+    const val LEADER_MOTOR_ID = 41 // right
+    const val FOLLOWER_MOTOR_ID = 42 // left
   }
 
   object Gyro {

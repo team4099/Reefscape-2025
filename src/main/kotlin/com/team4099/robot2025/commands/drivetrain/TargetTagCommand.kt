@@ -195,6 +195,12 @@ class TargetTagCommand(
   }
 
   fun isAtSepoint(keepTrapping: Boolean = false): Boolean {
+
+    CustomLogger.recordOutput("TagAlignment/thetaIsAligned", thetaPID.error < 3.degrees)
+    CustomLogger.recordOutput("TagAlignment/xIsAligned", (vision.lastTrigVisionUpdate.robotTReefTag.translation.x.absoluteValue -
+            18.0.inches) < 2.inches)
+    CustomLogger.recordOutput("TagAlignment/yIsAligned", yPID.error < 2.inches)
+
     val atSetPoint =
       if (!keepTrapping) {
         (
@@ -202,12 +208,9 @@ class TargetTagCommand(
             yPID.error < 2.inches &&
             (
             vision.lastTrigVisionUpdate.robotTReefTag.translation.x.absoluteValue -
-              19.0.inches
+              18.0.inches
             ) < 2.inches
-                  && (vision.lastTrigVisionUpdate.robotTReefTag.translation.y +
-                  yTargetOffset
-                  ).absoluteValue < 3.inches
-          )
+                )
 
       } else {
         (
@@ -215,11 +218,8 @@ class TargetTagCommand(
             yPID.error < 2.inches &&
             (
             vision.lastTrigVisionUpdate.robotTReefTag.translation.x.absoluteValue -
-              19.0.inches
+              18.0.inches
             ) < 2.inches
-                  && (vision.lastTrigVisionUpdate.robotTReefTag.translation.y +
-                  yTargetOffset).absoluteValue
-                  < 3.inches
           )
       }
 
@@ -307,7 +307,7 @@ class TargetTagCommand(
         var xFeedBack =
           xPID.calculate(
             -visionData.robotTReefTag.translation.x,
-            -(19.0).inches - (visionData.robotTReefTag.translation.x - 19.0.inches) / 1.75
+            -(18.0).inches - (visionData.robotTReefTag.translation.x - 18.0.inches) / 1.75
           )
         // 0.meters.perSecond
 

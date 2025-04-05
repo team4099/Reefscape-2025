@@ -43,7 +43,7 @@ object ControlBoard {
 
   val resetGyro = Trigger { driver.startButton && driver.selectButton }
   val forceIdle = Trigger { driver.dPadDown }
-  val manualReset = Trigger { driver.leftShoulderButton && driver.rightShoulderButton }
+  val manualReset = Trigger { driver.dPadRight }
 
   val stopRollersBind = Trigger { driver.dPadDown }
   // Tuning Binds
@@ -65,7 +65,8 @@ object ControlBoard {
   val intakeAlgaeGround = Trigger { driver.rightJoystickButton && driver.leftTriggerAxis > 0.5 }
   val intakeAlgaeL2 = Trigger { driver.rightJoystickButton && driver.aButton }
   val intakeAlgaeL3 = Trigger { driver.rightJoystickButton && driver.bButton }
-  val prepAlgaeProcessor = Trigger { driver.rightJoystickButton && driver.yButton }
+  val prepAlgaeProcessor = Trigger { driver.rightJoystickButton && driver.xButton }
+  val prepAlgaeBarge = Trigger { driver.rightJoystickButton && driver.yButton }
 
   val score = Trigger { driver.rightTriggerAxis > 0.5 }
   val intakeCoral = Trigger { driver.leftTriggerAxis > 0.5 && !driver.rightJoystickButton }

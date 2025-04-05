@@ -723,13 +723,9 @@ class Drivetrain(val gyroIO: GyroIO, swerveModuleIOs: DrivetrainIO) : SubsystemB
 
      */
 
-    /*
-
     if (!(gyroInputs.gyroConnected)) {
       gyroYawOffset = toAngle - rawGyroAngle
     }
-
-     */
   }
 
   fun zeroGyroPitch(toAngle: Angle = 0.0.degrees) {

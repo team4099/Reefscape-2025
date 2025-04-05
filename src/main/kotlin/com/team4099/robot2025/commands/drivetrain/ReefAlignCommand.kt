@@ -42,6 +42,7 @@ class ReefAlignCommand(
   }
 
   override fun initialize() {
+    CustomLogger.recordOutput("ActiveCommands/TargetReefCommand", true)
     tagID = vision.lastTrigVisionUpdate.targetTagID
     var horizontalOffset = 0.inches
     if (DriverStation.getAlliance().isPresent) {
@@ -98,6 +99,7 @@ class ReefAlignCommand(
       elevator.inputs.elevatorPosition <=
       ElevatorConstants
         .PREP_L4_HEIGHT && // just so it doesn't tip when driving and logic stays the same
+      elevator.inputs.elevatorVelocity.sign < 0 && // make sure it's going down
       DriverStation.isAutonomous()
   }
 
@@ -107,7 +109,7 @@ class ReefAlignCommand(
     vision.isAutoAligning = false
     command.end(interrupted)
 
-    CustomLogger.recordDebugOutput("ActiveCommands/TargetReefCommand", false)
+    CustomLogger.recordOutput("ActiveCommands/TargetReefCommand", false)
 
     if (!DriverStation.isAutonomous()) {
       drivetrain.currentRequest =
