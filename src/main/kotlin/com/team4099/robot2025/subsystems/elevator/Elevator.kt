@@ -1,6 +1,7 @@
 package com.team4099.robot2025.subsystems.elevator
 
 import com.team4099.lib.hal.Clock
+import com.team4099.robot2025.config.constants.Constants
 import com.team4099.robot2025.config.constants.ElevatorConstants
 import com.team4099.robot2025.util.CustomLogger
 import edu.wpi.first.wpilibj.RobotBase
@@ -14,16 +15,13 @@ import org.team4099.lib.units.inInchesPerSecond
 import org.team4099.lib.units.perSecond
 import com.team4099.robot2025.subsystems.superstructure.Request.ElevatorRequest as ElevatorRequest
 
+/**
+ * Logic file for the [Elevator] subsystem
+ *
+ * @property io
+ */
 class Elevator(val io: ElevatorIO) : SubsystemBase() {
   val inputs = ElevatorIO.ElevatorInputs()
-
-  val upperLimitReached: Boolean
-    get() = inputs.elevatorPosition >= ElevatorConstants.UPWARDS_EXTENSION_LIMIT
-
-  val lowerLimitReached: Boolean
-    get() = inputs.elevatorPosition <= ElevatorConstants.DOWNWARDS_EXTENSION_LIMIT
-
-  var isHomed = false
 
   var currentState: ElevatorState = ElevatorState.UNINITIALIZED
   var currentRequest: ElevatorRequest = ElevatorRequest.OpenLoop(0.0.volts)
@@ -45,8 +43,10 @@ class Elevator(val io: ElevatorIO) : SubsystemBase() {
   var elevatorVoltageTarget = 0.0.volts
     private set
 
-  private var lastHomingStatorCurrentTripTime = Clock.fpgaTime
-
+  /**
+   * Checks if elevator position is close enough to the target in closed loop within a threshold,
+   * checked if within threshold of [ElevatorConstants.ELEVATOR_TOLERANCE]
+   */
   val isAtTargetedPosition: Boolean
     get() =
       (
@@ -56,8 +56,25 @@ class Elevator(val io: ElevatorIO) : SubsystemBase() {
         ) ||
         (ElevatorTunableValues.enableElevator.get() != 1.0)
 
-  init {
+  val upperLimitReached: Boolean
+    get() = inputs.elevatorPosition >= ElevatorConstants.UPWARDS_EXTENSION_LIMIT
+  val lowerLimitReached: Boolean
+    get() = inputs.elevatorPosition <= ElevatorConstants.DOWNWARDS_EXTENSION_LIMIT
 
+  /**
+   * Homed gets set to true only at the beginning and doesn't get changed anytime else. This
+   * variable is not updated and shouldn't be used for up-to-date homing status.
+   */
+  var isHomed = false
+
+  /**
+   * Time of last current spike to check if current spike is new, checked if within threshold of
+   * [ElevatorConstants.HOMING_STALL_TIME_THRESHOLD]
+   */
+  var lastHomingStatorCurrentTripTime = Clock.fpgaTime
+
+  /* Static (before classes are loaded) initialization of PID and Feedforward constants into running code */
+  init {
     if (RobotBase.isReal()) {
       isHomed = false
 
@@ -96,9 +113,16 @@ class Elevator(val io: ElevatorIO) : SubsystemBase() {
     )
   }
 
+  /**
+   * Function that runs code based on [Constants.Universal.LOOP_PERIOD_TIME] (re-runs indefinitely
+   * with loop time as delay). Used in code for everything that should happen the entire duration of
+   * the match.
+   */
   override fun periodic() {
+    /* Updates the elevator interface and implementation with the correct values it needs (outlined in ElevatorInputs) */
     io.updateInputs(inputs)
 
+    // Updates PID values if they have changed to allow closed loop control to function
     if (ElevatorTunableValues.kP.hasChanged() ||
       ElevatorTunableValues.kI.hasChanged() ||
       ElevatorTunableValues.kD.hasChanged()
@@ -110,6 +134,7 @@ class Elevator(val io: ElevatorIO) : SubsystemBase() {
       )
     }
 
+    // Updates FF values if they have changed to allow feedforward control to function
     if (ElevatorTunableValues.kGDefault.hasChanged() ||
       ElevatorTunableValues.kS.hasChanged() ||
       ElevatorTunableValues.kV.hasChanged() ||
@@ -136,7 +161,6 @@ class Elevator(val io: ElevatorIO) : SubsystemBase() {
     CustomLogger.recordOutput("Elevator/currentRequest", currentRequest.javaClass.simpleName)
 
     CustomLogger.recordOutput("Elevator/isHomed", isHomed)
-
     CustomLogger.recordOutput("Elevator/isAtTargetPosition", isAtTargetedPosition)
 
     CustomLogger.recordOutput("Elevator/elevatorPositionTarget", elevatorPositionTarget.inInches)
@@ -148,8 +172,8 @@ class Elevator(val io: ElevatorIO) : SubsystemBase() {
     CustomLogger.recordDebugOutput("Elevator/upperLimitReached", upperLimitReached)
     CustomLogger.recordDebugOutput("Elevator/lowerLimitReached", lowerLimitReached)
 
+    /* Global currentState variable is used in when statement, and local variable nextState is updated with the global variable */
     var nextState = currentState
-
     when (currentState) {
       ElevatorState.UNINITIALIZED -> {
         nextState = fromElevatorRequestToState(currentRequest)
@@ -190,6 +214,12 @@ class Elevator(val io: ElevatorIO) : SubsystemBase() {
     currentState = nextState
   }
 
+  /**
+   * Voltage parameter value is applied to elevator motors through interface if elevator hasn't
+   * reached upper or lower limit.
+   *
+   * @param targetVoltage
+   */
   fun setVoltage(targetVoltage: ElectricalPotential) {
     if ((
       (upperLimitReached && targetVoltage > 0.0.volts) ||
@@ -202,6 +232,8 @@ class Elevator(val io: ElevatorIO) : SubsystemBase() {
     }
   }
 
+  /**
+   */
   companion object {
     enum class ElevatorState {
       UNINITIALIZED,
