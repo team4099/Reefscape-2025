@@ -4,6 +4,7 @@ import com.team4099.robot2023.subsystems.led.Leds
 import com.team4099.robot2023.subsystems.vision.camera.CameraIO
 import com.team4099.robot2023.subsystems.vision.camera.CameraIOPhotonvision
 import com.team4099.robot2025.auto.AutonomousSelector
+import com.team4099.robot2025.commands.TrackTagCommand
 import com.team4099.robot2025.commands.drivetrain.ReefAlignCommand
 import com.team4099.robot2025.commands.drivetrain.ResetGyroYawCommand
 import com.team4099.robot2025.commands.drivetrain.TargetTagCommand
@@ -22,8 +23,8 @@ import com.team4099.robot2025.subsystems.drivetrain.drive.DrivetrainIOSim
 import com.team4099.robot2025.subsystems.drivetrain.gyro.GyroIO
 import com.team4099.robot2025.subsystems.drivetrain.gyro.GyroIOPigeon2
 import com.team4099.robot2025.subsystems.elevator.Elevator
+import com.team4099.robot2025.subsystems.elevator.ElevatorIO
 import com.team4099.robot2025.subsystems.elevator.ElevatorIOSim
-import com.team4099.robot2025.subsystems.elevator.ElevatorIOTalon
 import com.team4099.robot2025.subsystems.led.LedIO
 import com.team4099.robot2025.subsystems.led.LedIOCandle
 import com.team4099.robot2025.subsystems.limelight.LimelightVision
@@ -66,7 +67,7 @@ object RobotContainer {
       limelight = LimelightVision(object : LimelightVisionIO {})
       arm = Arm(object : ArmIO {})
       climber = Climber(object : ClimberIO {})
-      elevator = Elevator(ElevatorIOTalon)
+      elevator = Elevator(object : ElevatorIO {})
       rollers = Rollers(RollersIOTalonFX)
       ramp = Ramp(RampIOTalonFX)
       leds = Leds(LedIOCandle)
@@ -175,6 +176,16 @@ object RobotContainer {
   }
 
   fun mapTeleopControls() {
+    ControlBoard.testBind.whileTrue(TrackTagCommand(
+      driver = Jessika(),
+      { ControlBoard.forward.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
+      { ControlBoard.strafe.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
+      { ControlBoard.turn.smoothDeadband(Constants.Joysticks.TURN_DEADBAND) },
+      { ControlBoard.slowMode },
+      drivetrain,
+      vision,
+      ramp
+    ))
 
     ControlBoard.resetGyro.whileTrue(ResetGyroYawCommand(drivetrain))
 

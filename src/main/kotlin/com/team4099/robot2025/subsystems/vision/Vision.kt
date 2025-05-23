@@ -8,6 +8,7 @@ import com.team4099.robot2023.subsystems.vision.camera.CameraIO
 import com.team4099.robot2025.config.constants.FieldConstants
 import com.team4099.robot2025.config.constants.VisionConstants
 import com.team4099.robot2025.subsystems.superstructure.Request
+import com.team4099.robot2025.util.CustomLogger
 import com.team4099.robot2025.util.FMSData
 import com.team4099.robot2025.util.toTransform3d
 import edu.wpi.first.math.VecBuilder
@@ -34,6 +35,7 @@ import org.team4099.lib.units.derived.inRadians
 import org.team4099.lib.units.derived.sin
 import java.util.function.Consumer
 import java.util.function.Supplier
+import kotlin.math.abs
 
 class Vision(vararg cameras: CameraIO) : SubsystemBase() {
   val io: List<CameraIO> = cameras.toList()
@@ -84,6 +86,10 @@ class Vision(vararg cameras: CameraIO) : SubsystemBase() {
   }
 
   override fun periodic() {
+    if (inputs.size >= 2) {
+      CustomLogger.recordDebugOutput("Vision/camera0TargetSize", inputs[0].cameraTargets.size)
+      CustomLogger.recordDebugOutput("Vision/camera1TargetSize", inputs[1].cameraTargets.size)
+    }
 
     Logger.recordOutput("Vision/currentTrigUpdateID", lastTrigVisionUpdate.targetTagID)
 
