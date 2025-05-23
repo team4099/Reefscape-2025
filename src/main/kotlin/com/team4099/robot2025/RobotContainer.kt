@@ -41,6 +41,7 @@ import com.team4099.robot2025.subsystems.vision.Vision
 import com.team4099.robot2025.util.driver.Jessika
 import edu.wpi.first.wpilibj.RobotBase
 import edu.wpi.first.wpilibj2.command.Command
+import edu.wpi.first.wpilibj2.command.Commands.runOnce
 import org.team4099.lib.smoothDeadband
 import org.team4099.lib.units.base.inches
 import org.team4099.lib.units.derived.Angle
@@ -176,16 +177,18 @@ object RobotContainer {
   }
 
   fun mapTeleopControls() {
-    ControlBoard.testBind.whileTrue(TrackTagCommand(
-      driver = Jessika(),
-      { ControlBoard.forward.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
-      { ControlBoard.strafe.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
-      { ControlBoard.turn.smoothDeadband(Constants.Joysticks.TURN_DEADBAND) },
-      { ControlBoard.slowMode },
-      drivetrain,
-      vision,
-      ramp
-    ))
+    ControlBoard.testBind.whileTrue(
+      TrackTagCommand(
+        driver = Jessika(),
+        { ControlBoard.forward.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
+        { ControlBoard.strafe.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
+        { ControlBoard.turn.smoothDeadband(Constants.Joysticks.TURN_DEADBAND) },
+        { ControlBoard.slowMode },
+        drivetrain,
+        vision,
+        ramp
+      )
+    )
 
     ControlBoard.resetGyro.whileTrue(ResetGyroYawCommand(drivetrain))
 

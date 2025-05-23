@@ -25,29 +25,7 @@ class TrackTagCommand(
     val vision: Vision,
     val ramp: Ramp
 ) : Command() {
-    var robotAngleFromTag = 0.0
-//
-//    val aimLeftCommand: TargetAngleCommand
-//        get() = TargetAngleCommand(
-//            driver,
-//            driveX,
-//            driveY,
-//            turn,
-//            slowMode,
-//            drivetrain,
-//            {drivetrain.odomTRobot.rotation + 0.03.radians}
-//        )
-//
-//    private val aimRightCommand: TargetAngleCommand
-//        get() = TargetAngleCommand(
-//            driver,
-//            driveX,
-//            driveY,
-//            turn,
-//            slowMode,
-//            drivetrain,
-//            { 1.0.radians * robotAngleFromTag.degrees.inRadians }
-//        )
+    private var robotAngleFromTag = 0.0
 
     private val aimCommand: TargetAngleCommand
         get() = TargetAngleCommand(
@@ -73,7 +51,7 @@ class TrackTagCommand(
             val raven1 = cams[0].cameraTargets[0]
             val raven2 = cams[1].cameraTargets[0]
             // TODO: Make constant threshold
-            aimedTowardsTag = abs(raven1.getYaw() + raven2.getYaw()) < 10 && raven1.fiducialId == raven2.fiducialId
+            aimedTowardsTag = abs(raven1.getYaw() + raven2.getYaw()) < 5 && raven1.fiducialId == raven2.fiducialId
         }
 
         CustomLogger.recordOutput("Vision/aimedTowardsTag", aimedTowardsTag)
@@ -84,40 +62,19 @@ class TrackTagCommand(
             CustomLogger.recordDebugOutput("Vision/cameras", cams.size)
 
             if (cams.size >= 2) {
-//                CustomLogger.recordDebugOutput("Vision/camera0TargetSize", cams[0].cameraTargets.size)
-//                CustomLogger.recordDebugOutput("Vision/camera1TargetSize", cams[1].cameraTargets.size)
-
                 if (cams[0].cameraTargets.size > 0 && cams[1].cameraTargets.size > 0) {
                     val raven1Angle = cams[0].cameraTargets[0].getYaw()
                     val raven2Angle = cams[1].cameraTargets[0].getYaw()
                     robotAngleFromTag = ((raven1Angle + raven2Angle) / 2)
-                    aimCommand.execute()
                 } else if (cams[0].cameraTargets.size > 0) {
-                    robotAngleFromTag = -cams[0].cameraTargets[0].getYaw()
-                    aimCommand.execute()
+                    robotAngleFromTag = -abs(cams[0].cameraTargets[0].getYaw())
                 } else if (cams[1].cameraTargets.size > 0) {
-                    robotAngleFromTag = cams[1].cameraTargets[0].getYaw()
-                    aimCommand.execute()
+                    robotAngleFromTag = abs(cams[1].cameraTargets[0].getYaw())
                 }
-
-                /*
-                if (cams[0].cameraTargets.size > 0 && cams[1].cameraTargets.size > 0) {
-                    val raven1 = cams[0].cameraTargets[0]
-                    val raven2 = cams[1].cameraTargets[0]
-
-                    if (abs(raven1.getYaw()) > abs(raven2.getYaw())) {
-                        aimLeftCommand.execute()
-                    } else {
-                        aimRightCommand.execute()
-                    }
-                } else if (cams[1].cameraTargets.size > 0) {
-                    aimLeftCommand.execute()
-                } else if (cams[0].cameraTargets.size > 0) {
-                    aimRightCommand.execute()
-                }
-                 */
+                aimCommand.execute()
             }
         }
+        CustomLogger.recordOutput("Vision/loggedRobotAngleFromTag", robotAngleFromTag)
     }
 
     override fun isFinished(): Boolean {
