@@ -4,7 +4,10 @@ import org.team4099.lib.geometry.Rotation3d
 import org.team4099.lib.geometry.Transform3d
 import org.team4099.lib.geometry.Translation3d
 import org.team4099.lib.units.base.inches
+import org.team4099.lib.units.base.seconds
 import org.team4099.lib.units.derived.degrees
+import org.team4099.lib.units.derived.radiansPerSecondPerRadiansPerSecond
+import org.team4099.lib.units.perSecond
 
 object VisionConstants {
   const val SIM_POSE_TOPIC_NAME = "Odometry/groundTruthPose"
@@ -76,6 +79,13 @@ object VisionConstants {
     )
 
   val CAMERA_NAMES = listOf("raven_1", "raven_2")
+
+  object PID {
+    val TELEOP_THETA_PID_KP = 8.4.degrees.perSecond / 1.degrees
+    val TELEOP_THETA_PID_KI = 0.0.degrees.perSecond / (1.degrees * 1.seconds)
+    val TELEOP_THETA_PID_KD = (0.95.degrees.perSecond / (1.degrees / 1.seconds)).radiansPerSecondPerRadiansPerSecond
+
+  }
 
   object Limelight {
     val LIMELIGHT_NAME = "limelight-owl"

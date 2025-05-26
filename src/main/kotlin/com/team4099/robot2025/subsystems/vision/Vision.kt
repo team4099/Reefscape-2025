@@ -35,7 +35,6 @@ import org.team4099.lib.units.derived.inRadians
 import org.team4099.lib.units.derived.sin
 import java.util.function.Consumer
 import java.util.function.Supplier
-import kotlin.math.abs
 
 class Vision(vararg cameras: CameraIO) : SubsystemBase() {
   val io: List<CameraIO> = cameras.toList()
