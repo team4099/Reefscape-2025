@@ -81,9 +81,9 @@ object VisionConstants {
   val CAMERA_NAMES = listOf("raven_1", "raven_2")
 
   object PID {
-    val TELEOP_THETA_PID_KP = 8.4.degrees.perSecond / 1.degrees
+    val TELEOP_THETA_PID_KP = 8.2.degrees.perSecond / 1.degrees
     val TELEOP_THETA_PID_KI = 0.0.degrees.perSecond / (1.degrees * 1.seconds)
-    val TELEOP_THETA_PID_KD = (0.95.degrees.perSecond / (1.degrees / 1.seconds)).radiansPerSecondPerRadiansPerSecond
+    val TELEOP_THETA_PID_KD = (1.degrees.perSecond / (1.degrees / 1.seconds)).radiansPerSecondPerRadiansPerSecond
 
   }
 

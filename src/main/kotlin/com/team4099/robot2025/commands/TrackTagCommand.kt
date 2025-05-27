@@ -18,6 +18,7 @@ import org.team4099.lib.units.inDegreesPerSecond
 import org.team4099.lib.units.perSecond
 import kotlin.math.PI
 import kotlin.math.abs
+import kotlin.math.sign
 
 class TrackTagCommand(
   val driver: DriverProfile,
@@ -102,7 +103,7 @@ class TrackTagCommand(
       val raven2 = cams[1].cameraTargets[0]
       // TODO: Make constant threshold
       aimedTowardsTag =
-        abs(raven1.getYaw() + raven2.getYaw()) < 10 && raven1.fiducialId == raven2.fiducialId
+        abs(raven1.getYaw() + raven2.getYaw()) < 3 && raven1.fiducialId == raven2.fiducialId
     }
 
     CustomLogger.recordOutput("Vision/aimedTowardsTag", aimedTowardsTag)
@@ -129,11 +130,12 @@ class TrackTagCommand(
             robotAngleFromTag = ((raven1Angle + raven2Angle) / 2)
           } else if (raven1HasTargets) {
             val raven1Angle = cams[0].cameraTargets[0].getYaw()
-            robotAngleFromTag = -abs(raven1Angle)
+            robotAngleFromTag = -abs(raven1Angle) + sign(raven1Angle) * 15
           } else if (raven2HasTargets) {
             val raven2Angle = cams[1].cameraTargets[0].getYaw()
-            robotAngleFromTag = abs(raven2Angle)
+            robotAngleFromTag = abs(raven2Angle) + sign(raven2Angle) * 15
           }
+
           val thetaFeedback =
             thetaPID.calculate(drivetrain.odomTRobot.rotation, drivetrain.odomTRobot.rotation + robotAngleFromTag.degrees.inRadians.radians)
 
