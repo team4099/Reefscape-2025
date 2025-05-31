@@ -9,6 +9,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration
 import com.ctre.phoenix6.controls.DutyCycleOut
 import com.ctre.phoenix6.controls.PositionDutyCycle
 import com.ctre.phoenix6.controls.VelocityVoltage
+import com.ctre.phoenix6.hardware.CANcoder
 import com.ctre.phoenix6.hardware.TalonFX
 import com.ctre.phoenix6.signals.InvertedValue
 import com.ctre.phoenix6.signals.NeutralModeValue
@@ -17,7 +18,6 @@ import com.team4099.robot2025.config.constants.DrivetrainConstants
 import com.team4099.utils.threads.PhoenixOdometryThread
 import edu.wpi.first.units.measure.Current
 import edu.wpi.first.units.measure.Temperature
-import edu.wpi.first.wpilibj.AnalogInput
 import edu.wpi.first.wpilibj.RobotController
 import org.littletonrobotics.junction.Logger
 import org.team4099.lib.units.AngularAcceleration
@@ -55,7 +55,7 @@ import java.util.Queue
 class SwerveModuleIOTalon(
   private val steeringFalcon: TalonFX,
   private val driveFalcon: TalonFX,
-  private val potentiometer: AnalogInput,
+  private val potentiometer: CANcoder,
   private val zeroOffset: Angle,
   private val steeringRatio: Double,
   override val label: String,
@@ -79,7 +79,8 @@ class SwerveModuleIOTalon(
 
   private val potentiometerOutput: Double
     get() {
-      return 2 * PI - potentiometer.voltage / RobotController.getVoltage5V() * 2.0 * Math.PI
+      return 2 * PI -
+        potentiometer.supplyVoltage.valueAsDouble / RobotController.getVoltage5V() * 2.0 * Math.PI
     }
 
   val driveStatorCurrentSignal: StatusSignal<Current>
@@ -242,7 +243,7 @@ class SwerveModuleIOTalon(
     steeringPositionQueue.clear()
 
     inputs.potentiometerOutputRaw =
-      potentiometer.voltage / RobotController.getVoltage5V() * 2.0 * Math.PI
+      potentiometer.supplyVoltage.valueAsDouble / RobotController.getVoltage5V() * 2.0 * Math.PI
     inputs.potentiometerOutputRadians = potentiometerOutput.radians
 
     Logger.recordOutput(
