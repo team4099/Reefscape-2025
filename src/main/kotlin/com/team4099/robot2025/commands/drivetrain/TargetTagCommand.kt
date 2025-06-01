@@ -62,6 +62,7 @@ class TargetTagCommand(
   private var xPID: PIDController<Meter, Velocity<Meter>>
 
   var timeStarted = Clock.fpgaTime
+  var hasThetaAligned = false
 
   var visionData = vision.lastTrigVisionUpdate
 
@@ -257,17 +258,8 @@ class TargetTagCommand(
       visionData.robotTReefTag != Transform2d(Translation2d(0.meters, 0.meters), 0.degrees)
     ) {
 
-      var robotRotation = drivetrain.odomTRobot.rotation
-      var flippedRotation = -robotRotation
-      var appliedRotation =
-        if ((tagTargetID == 21 || tagTargetID == 7) && robotRotation < 0.degrees) flippedRotation
-        else robotRotation
-
-      var thetaFeedback = thetaPID.calculate(appliedRotation, visionData.robotTReefTag.rotation)
-
-      if ((tagTargetID == 21 || tagTargetID == 7) && robotRotation < 0.degrees) {
-        thetaFeedback = -thetaFeedback
-      }
+      val offsetFromDeadOn = (180.degrees - visionData.robotTReefTag.rotation.absoluteValue) * visionData.robotTReefTag.rotation.sign
+      val thetaFeedback = thetaPID.calculate(offsetFromDeadOn, 0.0.degrees)
 
       Logger.recordOutput("TagAlign/tagID", tagTargetID)
 
@@ -281,7 +273,7 @@ class TargetTagCommand(
       CustomLogger.recordOutput("TagAlignment/thetaError", thetaPID.error.inDegrees)
       CustomLogger.recordOutput("TagAlignment/thetaFeedback", thetaFeedback.inDegreesPerSecond)
 
-      if (thetaPID.error.absoluteValue > 5.degrees) {
+      if (thetaPID.error.absoluteValue > 5.degrees && !hasThetaAligned) {
         drivetrain.currentRequest =
           Request.DrivetrainRequest.OpenLoop(
             thetaFeedback,
@@ -289,6 +281,7 @@ class TargetTagCommand(
             fieldOriented = true
           )
       } else {
+        hasThetaAligned = true
 
         var yFeedback =
           yPID.calculate(

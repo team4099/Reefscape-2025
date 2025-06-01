@@ -38,6 +38,7 @@ import java.util.function.Supplier
 import kotlin.math.absoluteValue
 import org.team4099.lib.units.derived.inDegrees
 import org.team4099.lib.units.derived.radians
+import kotlin.math.atan2
 
 class Vision(vararg cameras: CameraIO) : SubsystemBase() {
   val io: List<CameraIO> = cameras.toList()
@@ -95,19 +96,12 @@ class Vision(vararg cameras: CameraIO) : SubsystemBase() {
       if (inputs[0].cameraTargets.size > 0) {
         val transformTTag = inputs[0].cameraTargets[0].bestCameraToTarget
         CustomLogger.recordOutput("Vision/raven1TransformTTag", transformTTag);
+        CustomLogger.recordOutput("Vision/raven1Yaw", inputs[0].cameraTargets[0].getYaw())
       }
       if (inputs[1].cameraTargets.size > 0) {
         val transformTTag = inputs[1].cameraTargets[0].bestCameraToTarget
         CustomLogger.recordOutput("Vision/raven2TransformTTag", transformTTag);
-      }
-      if (inputs[0].cameraTargets.size > 0 && inputs[1].cameraTargets.size > 0) {
-        CustomLogger.recordOutput(
-          "Vision/diffBetweenCameras",
-          (
-                  inputs[1].cameraTargets[0].bestCameraToTarget.rotation.z.radians.absoluteValue
-                          - inputs[0].cameraTargets[0].bestCameraToTarget.rotation.z.radians.absoluteValue
-                  ).inDegrees
-        )
+        CustomLogger.recordOutput("Vision/raven2Yaw", inputs[1].cameraTargets[0].getYaw())
       }
     }
 
@@ -192,7 +186,13 @@ class Vision(vararg cameras: CameraIO) : SubsystemBase() {
                       )
                     )
                     .translation,
-                  Rotation3d(0.degrees, 0.degrees, aprilTagAlignmentAngle ?: 0.degrees)
+                  Rotation3d(
+                    0.degrees,
+                    0.degrees,
+                    tag.bestCameraToTarget.rotation.rotateBy(
+                      VisionConstants.CAMERA_TRANSFORMS[instance].rotation.rotation3d
+                    ).z.radians
+                  )
                 )
 
               var fieldTRobot = Pose3d().transformBy(fieldTTag).transformBy(robotTTag.inverse())
@@ -207,6 +207,13 @@ class Vision(vararg cameras: CameraIO) : SubsystemBase() {
               )
 
               val distanceToTarget = robotTTag.translation.norm
+
+              Logger.recordOutput(
+                "Vision/${VisionConstants.CAMERA_NAMES[instance]}/yaw",
+                robotTTag.rotation.rotateBy(
+                  VisionConstants.CAMERA_TRANSFORMS[instance].rotation
+                ).z.inRadians
+              )
 
               Logger.recordOutput(
                 "Vision/${VisionConstants.CAMERA_NAMES[instance]}/${tag.fiducialId}/cameraDistanceToTarget3D",
