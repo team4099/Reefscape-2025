@@ -31,6 +31,8 @@ class TrackTagCommand(
   val ramp: Ramp
 ) : Command() {
   private var thetaPID: PIDController<Radian, Velocity<Radian>>
+  private var isTargeting = false
+
   val kP =
     LoggedTunableValue(
       "Vision/thetakP",
@@ -63,15 +65,15 @@ class TrackTagCommand(
       )
 
     if (!(RobotBase.isSimulation())) {
-      kP.initDefault(VisionConstants.PID.TELEOP_THETA_PID_KP)
-      kI.initDefault(VisionConstants.PID.TELEOP_THETA_PID_KI)
-      kD.initDefault(VisionConstants.PID.TELEOP_THETA_PID_KD)
+      kP.initDefault(DrivetrainConstants.PID.TELEOP_THETA_PID_KP)
+      kI.initDefault(DrivetrainConstants.PID.TELEOP_THETA_PID_KI)
+      kD.initDefault(DrivetrainConstants.PID.TELEOP_THETA_PID_KD)
 
       thetaPID =
         PIDController(
-          VisionConstants.PID.TELEOP_THETA_PID_KP,
-          VisionConstants.PID.TELEOP_THETA_PID_KI,
-          VisionConstants.PID.TELEOP_THETA_PID_KD
+          kP.get(),
+          kI.get(),
+          kD.get()
         )
     } else {
       kP.initDefault(DrivetrainConstants.PID.SIM_AUTO_THETA_PID_KP)
@@ -102,8 +104,7 @@ class TrackTagCommand(
       val raven1 = cams[0].cameraTargets[0]
       val raven2 = cams[1].cameraTargets[0]
       // TODO: Make constant threshold
-      aimedTowardsTag =
-        abs(raven1.getYaw() + raven2.getYaw()) < 3 && raven1.fiducialId == raven2.fiducialId
+      aimedTowardsTag = (raven2.bestCameraToTarget.rotation.z.radians.absoluteValue - raven1.bestCameraToTarget.rotation.z.radians.absoluteValue).inDegrees < 3 && raven1.fiducialId == raven2.fiducialId
     }
 
     CustomLogger.recordOutput("Vision/aimedTowardsTag", aimedTowardsTag)
@@ -118,26 +119,31 @@ class TrackTagCommand(
       CustomLogger.recordDebugOutput("Vision/cameras", cams.size)
 
       if (cams.size >= 2) {
-        var robotAngleFromTag = 0.0
-
         val raven1HasTargets = cams[0].cameraTargets.size > 0
         val raven2HasTargets = cams[1].cameraTargets.size > 0
 
         if (raven1HasTargets || raven2HasTargets) {
-          if (raven1HasTargets && raven2HasTargets) {
-            val raven1Angle = cams[0].cameraTargets[0].getYaw()
-            val raven2Angle = cams[1].cameraTargets[0].getYaw()
-            robotAngleFromTag = ((raven1Angle + raven2Angle) / 2)
-          } else if (raven1HasTargets) {
-            val raven1Angle = cams[0].cameraTargets[0].getYaw()
-            robotAngleFromTag = -abs(raven1Angle) + sign(raven1Angle) * 15
-          } else if (raven2HasTargets) {
-            val raven2Angle = cams[1].cameraTargets[0].getYaw()
-            robotAngleFromTag = abs(raven2Angle) + sign(raven2Angle) * 15
-          }
+          val robotAngleFromTag =
+            if (raven1HasTargets && raven2HasTargets) {
+              val raven1Angle = cams[0].cameraTargets[0].bestCameraToTarget.rotation.z.radians
+              val raven2Angle = cams[1].cameraTargets[0].bestCameraToTarget.rotation.z.radians
+
+              raven2Angle.absoluteValue - raven1Angle.absoluteValue
+            }
+            else if (raven1HasTargets) {
+              val raven1Angle = cams[0].cameraTargets[0].bestCameraToTarget.rotation.z.radians
+              - (raven1Angle.absoluteValue - 50.degrees)
+            } else if (raven2HasTargets) {
+              val raven2Angle = cams[1].cameraTargets[0].bestCameraToTarget.rotation.z.radians
+              raven2Angle.absoluteValue - 50.degrees
+            }
+            else {
+              0.0.degrees
+            }
 
           val thetaFeedback =
-            thetaPID.calculate(drivetrain.odomTRobot.rotation, drivetrain.odomTRobot.rotation + robotAngleFromTag.degrees.inRadians.radians)
+            thetaPID.calculate(-robotAngleFromTag, 0.0.degrees)
+          isTargeting = true
 
           CustomLogger.recordDebugOutput("Testing/error", thetaPID.error.inDegrees)
           CustomLogger.recordDebugOutput("Testing/thetaFeedback", thetaFeedback.inDegreesPerSecond)
@@ -148,6 +154,13 @@ class TrackTagCommand(
               fieldOriented = true
             )
 
+        } else {
+          drivetrain.currentRequest =
+            Request.DrivetrainRequest.OpenLoop(
+              0.0.radians.perSecond,
+              driver.driveSpeedClampedSupplier(driveX, driveY, slowMode),
+              fieldOriented = true
+            )
         }
       }
     }
@@ -156,7 +169,7 @@ class TrackTagCommand(
   }
 
   override fun isFinished(): Boolean {
-    return false
+    return thetaPID.error.absoluteValue < 2.degrees && isTargeting
   }
 
   override fun end(interrupted: Boolean) {

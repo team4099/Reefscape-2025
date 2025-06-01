@@ -88,10 +88,10 @@ object DrivetrainConstants {
   val DRIVE_STATOR_THRESHOLD_CURRENT_LIMIT = 80.0.amps
   val DRIVE_STATOR_TRIGGER_THRESHOLD_TIME = 1.0.seconds
 
-  val FRONT_LEFT_MODULE_ZERO = 5.617.radians - Math.PI.radians // good
-  val FRONT_RIGHT_MODULE_ZERO = 6.251.radians // good
-  val BACK_LEFT_MODULE_ZERO = 4.361.radians // good
-  val BACK_RIGHT_MODULE_ZERO = 2.245.radians // good
+  val FRONT_LEFT_MODULE_ZERO = 2.498.radians // good
+  val FRONT_RIGHT_MODULE_ZERO = 5.908.radians // good
+  val BACK_LEFT_MODULE_ZERO = 3.32.radians // good
+  val BACK_RIGHT_MODULE_ZERO = 2.22.radians // good
 
   val STEERING_COMPENSATION_VOLTAGE = 10.volts
   val DRIVE_COMPENSATION_VOLTAGE = 12.volts
@@ -148,10 +148,10 @@ object DrivetrainConstants {
     val AUTO_REEF_PID_KD =
       (0.4.degrees.perSecond / (1.degrees / 1.seconds)).radiansPerSecondPerRadiansPerSecond
 
-    val TELEOP_THETA_PID_KP = 2.9.degrees.perSecond / 1.degrees
+    val TELEOP_THETA_PID_KP = 0.7.degrees.perSecond / 1.degrees
     val TELEOP_THETA_PID_KI = 0.0.degrees.perSecond / (1.degrees * 1.seconds)
     val TELEOP_THETA_PID_KD =
-      (0.4.degrees.perSecond / (1.degrees / 1.seconds)).radiansPerSecondPerRadiansPerSecond
+      (1.0.degrees.perSecond / (1.degrees / 1.seconds)).radiansPerSecondPerRadiansPerSecond
 
     val TELEOP_Y_PID_KP = 3.5.meters.perSecond / 1.meters
     val TELEOP_Y_PID_KI = 0.0.meters.perSecond / (1.meters * 1.seconds)

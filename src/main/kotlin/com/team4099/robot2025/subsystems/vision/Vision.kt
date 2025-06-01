@@ -35,6 +35,9 @@ import org.team4099.lib.units.derived.inRadians
 import org.team4099.lib.units.derived.sin
 import java.util.function.Consumer
 import java.util.function.Supplier
+import kotlin.math.absoluteValue
+import org.team4099.lib.units.derived.inDegrees
+import org.team4099.lib.units.derived.radians
 
 class Vision(vararg cameras: CameraIO) : SubsystemBase() {
   val io: List<CameraIO> = cameras.toList()
@@ -88,6 +91,24 @@ class Vision(vararg cameras: CameraIO) : SubsystemBase() {
     if (inputs.size >= 2) {
       CustomLogger.recordDebugOutput("Vision/camera0TargetSize", inputs[0].cameraTargets.size)
       CustomLogger.recordDebugOutput("Vision/camera1TargetSize", inputs[1].cameraTargets.size)
+
+      if (inputs[0].cameraTargets.size > 0) {
+        val transformTTag = inputs[0].cameraTargets[0].bestCameraToTarget
+        CustomLogger.recordOutput("Vision/raven1TransformTTag", transformTTag);
+      }
+      if (inputs[1].cameraTargets.size > 0) {
+        val transformTTag = inputs[1].cameraTargets[0].bestCameraToTarget
+        CustomLogger.recordOutput("Vision/raven2TransformTTag", transformTTag);
+      }
+      if (inputs[0].cameraTargets.size > 0 && inputs[1].cameraTargets.size > 0) {
+        CustomLogger.recordOutput(
+          "Vision/diffBetweenCameras",
+          (
+                  inputs[1].cameraTargets[0].bestCameraToTarget.rotation.z.radians.absoluteValue
+                          - inputs[0].cameraTargets[0].bestCameraToTarget.rotation.z.radians.absoluteValue
+                  ).inDegrees
+        )
+      }
     }
 
     Logger.recordOutput("Vision/currentTrigUpdateID", lastTrigVisionUpdate.targetTagID)
