@@ -8,6 +8,7 @@ import com.team4099.robot2025.subsystems.superstructure.Request
 import com.team4099.robot2025.subsystems.vision.Vision
 import com.team4099.robot2025.util.CustomLogger
 import com.team4099.robot2025.util.driver.DriverProfile
+import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.RobotBase
 import edu.wpi.first.wpilibj2.command.Command
@@ -22,6 +23,7 @@ import org.team4099.lib.units.base.inMeters
 import org.team4099.lib.units.base.inches
 import org.team4099.lib.units.base.meters
 import org.team4099.lib.units.base.seconds
+import org.team4099.lib.units.derived.Angle
 import org.team4099.lib.units.derived.Radian
 import org.team4099.lib.units.derived.degrees
 import org.team4099.lib.units.derived.inDegrees
@@ -31,6 +33,7 @@ import org.team4099.lib.units.derived.inDegreesPerSecondPerDegreeSeconds
 import org.team4099.lib.units.derived.inMetersPerSecondPerMeter
 import org.team4099.lib.units.derived.inMetersPerSecondPerMeterPerSecond
 import org.team4099.lib.units.derived.inMetersPerSecondPerMeterSeconds
+import org.team4099.lib.units.derived.inRotation2ds
 import org.team4099.lib.units.derived.perDegree
 import org.team4099.lib.units.derived.perDegreePerSecond
 import org.team4099.lib.units.derived.perDegreeSeconds
@@ -63,6 +66,9 @@ class TargetTagCommand(
 
   var timeStarted = Clock.fpgaTime
   var hasThetaAligned = false
+
+  var rotationAtStartOfCommand: Angle? = null
+  var offsetAtStartOfCommand = 0.0.degrees
 
   var visionData = vision.lastTrigVisionUpdate
 
@@ -257,9 +263,13 @@ class TargetTagCommand(
     if (visionData.targetTagID != -1 &&
       visionData.robotTReefTag != Transform2d(Translation2d(0.meters, 0.meters), 0.degrees)
     ) {
-
       val offsetFromDeadOn = (180.degrees - visionData.robotTReefTag.rotation.absoluteValue) * visionData.robotTReefTag.rotation.sign
       val thetaFeedback = thetaPID.calculate(offsetFromDeadOn, 0.0.degrees)
+
+      if (rotationAtStartOfCommand == null) {
+        rotationAtStartOfCommand = drivetrain.odomTRobot.rotation
+        offsetAtStartOfCommand = offsetFromDeadOn
+      }
 
       Logger.recordOutput("TagAlign/tagID", tagTargetID)
 
@@ -319,6 +329,35 @@ class TargetTagCommand(
             thetaFeedback, Pair(xFeedBack, yFeedback), fieldOriented = false
           )
       }
+    }
+    // Still aligning but lost sight of tag
+    else if (rotationAtStartOfCommand != null && !hasThetaAligned) {
+      val thetaFeedback = thetaPID.calculate(
+        (
+            offsetAtStartOfCommand.absoluteValue
+            - (drivetrain.odomTRobot.rotation - rotationAtStartOfCommand!!).absoluteValue
+        ) * offsetAtStartOfCommand.sign,
+        0.0.degrees
+      )
+
+      Logger.recordOutput("TagAlign/tagID", tagTargetID)
+
+      CustomLogger.recordOutput(
+        "TagAlignment/CurrentDrivetrainRotation", drivetrain.odomTRobot.rotation.inDegrees
+      )
+      CustomLogger.recordOutput(
+        "TagAlignment/targetAlignmentAngle", visionData.robotTReefTag.rotation.inDegrees
+      )
+
+      CustomLogger.recordOutput("TagAlignment/thetaError", thetaPID.error.inDegrees)
+      CustomLogger.recordOutput("TagAlignment/thetaFeedback", thetaFeedback.inDegreesPerSecond)
+
+      drivetrain.currentRequest =
+        Request.DrivetrainRequest.OpenLoop(
+          thetaFeedback,
+          driver.driveSpeedClampedSupplier(driveX, driveY, slowMode),
+          fieldOriented = true
+        )
     }
   }
 
