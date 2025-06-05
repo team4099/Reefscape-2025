@@ -4,6 +4,7 @@ import com.team4099.robot2023.subsystems.led.Leds
 import com.team4099.robot2023.subsystems.vision.camera.CameraIO
 import com.team4099.robot2023.subsystems.vision.camera.CameraIOPhotonvision
 import com.team4099.robot2025.auto.AutonomousSelector
+import com.team4099.robot2025.commands.AlignTowardsTagCommand
 import com.team4099.robot2025.commands.TrackTagCommand
 import com.team4099.robot2025.commands.drivetrain.ReefAlignCommand
 import com.team4099.robot2025.commands.drivetrain.ResetGyroYawCommand
@@ -177,7 +178,7 @@ object RobotContainer {
 
   fun mapTeleopControls() {
     ControlBoard.testBind.whileTrue(
-      TrackTagCommand(
+      AlignTowardsTagCommand(
         driver = Jessika(),
         { ControlBoard.forward.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
         { ControlBoard.strafe.smoothDeadband(Constants.Joysticks.THROTTLE_DEADBAND) },
