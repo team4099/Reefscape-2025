@@ -2,7 +2,9 @@ package com.team4099.robot2025.commands.drivetrain
 
 import com.team4099.lib.hal.Clock
 import com.team4099.lib.logging.LoggedTunableValue
+import com.team4099.lib.trajectory.CustomHolonomicDriveController
 import com.team4099.robot2025.config.constants.DrivetrainConstants
+import com.team4099.robot2025.config.constants.FieldConstants
 import com.team4099.robot2025.subsystems.drivetrain.drive.Drivetrain
 import com.team4099.robot2025.subsystems.superstructure.Request
 import com.team4099.robot2025.subsystems.vision.Vision
@@ -59,10 +61,11 @@ class TargetTagCommand(
   val yTargetOffset: Length = 0.meters,
   val tagTargetID: Int = -1
 ) : Command() {
-
   private var thetaPID: PIDController<Radian, Velocity<Radian>>
   private var yPID: PIDController<Meter, Velocity<Meter>>
   private var xPID: PIDController<Meter, Velocity<Meter>>
+
+  private var swerveDriveController: CustomHolonomicDriveController
 
   var timeStarted = Clock.fpgaTime
   var hasThetaAligned = false
@@ -199,6 +202,11 @@ class TargetTagCommand(
     }
 
     thetaPID.enableContinuousInput(-PI.radians, PI.radians)
+
+    swerveDriveController =
+      CustomHolonomicDriveController(
+        xPID.wpiPidController, yPID.wpiPidController, thetaPID.wpiPidController
+      )
   }
 
   fun isAtSepoint(keepTrapping: Boolean = false): Boolean {
@@ -259,10 +267,23 @@ class TargetTagCommand(
     CustomLogger.recordOutput("ActiveCommands/TargetTagCommand", true)
 
     val visionData = vision.lastTrigVisionUpdate
+    val currentPoseFromVision = vision.lastFieldRelativeVisionUpdate.fieldTRobot
 
     if (visionData.targetTagID != -1 &&
       visionData.robotTReefTag != Transform2d(Translation2d(0.meters, 0.meters), 0.degrees)
     ) {
+//      val targetPose = FieldConstants.aprilTags[visionData.targetTagID]
+//        .pose
+//        .toPose2d()
+//        .transformBy(
+//          Transform2d(
+//            Translation2d(
+//              DrivetrainConstants.DRIVETRAIN_WIDTH,
+//              yTargetOffset
+//            ), 180.degrees
+//          )
+//        )
+
       val offsetFromDeadOn = (180.degrees - visionData.robotTReefTag.rotation.absoluteValue) * visionData.robotTReefTag.rotation.sign
       val thetaFeedback = thetaPID.calculate(offsetFromDeadOn, 0.0.degrees)
 
@@ -272,6 +293,8 @@ class TargetTagCommand(
       }
 
       Logger.recordOutput("TagAlign/tagID", tagTargetID)
+
+      CustomLogger.recordOutput("TagAlignment/estimatedFieldPose", vision.lastFieldRelativeVisionUpdate.fieldTRobot.pose2d)
 
       CustomLogger.recordOutput(
         "TagAlignment/CurrentDrivetrainRotation", drivetrain.odomTRobot.rotation.inDegrees
@@ -319,6 +342,8 @@ class TargetTagCommand(
           xFeedBack.inMetersPerSecond,
         )
 
+        CustomLogger.recordOutput("TagAlignment/lostSightOfTag", false)
+
         val driveVector = driver.driveSpeedClampedSupplier(driveX, driveY, slowMode)
 
         var autoDriveVector =
@@ -348,6 +373,8 @@ class TargetTagCommand(
       CustomLogger.recordOutput(
         "TagAlignment/targetAlignmentAngle", visionData.robotTReefTag.rotation.inDegrees
       )
+
+      CustomLogger.recordOutput("TagAlignment/lostSightOfTag", true)
 
       CustomLogger.recordOutput("TagAlignment/thetaError", thetaPID.error.inDegrees)
       CustomLogger.recordOutput("TagAlignment/thetaFeedback", thetaFeedback.inDegreesPerSecond)

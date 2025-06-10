@@ -2,6 +2,7 @@ package com.team4099.robot2025.subsystems.vision
 
 import com.team4099.lib.hal.Clock
 import com.team4099.lib.logging.TunableNumber
+import com.team4099.lib.math.asPose2d
 import com.team4099.lib.vision.TimestampedTrigVisionUpdate
 import com.team4099.lib.vision.TimestampedVisionUpdate
 import com.team4099.robot2023.subsystems.vision.camera.CameraIO
@@ -10,6 +11,7 @@ import com.team4099.robot2025.config.constants.VisionConstants
 import com.team4099.robot2025.subsystems.superstructure.Request
 import com.team4099.robot2025.util.CustomLogger
 import com.team4099.robot2025.util.FMSData
+import com.team4099.robot2025.util.toPose3d
 import com.team4099.robot2025.util.toTransform3d
 import edu.wpi.first.math.VecBuilder
 import edu.wpi.first.math.geometry.Rotation2d
@@ -73,6 +75,13 @@ class Vision(vararg cameras: CameraIO) : SubsystemBase() {
 
   var lastTrigVisionUpdate =
     TimestampedTrigVisionUpdate(Clock.fpgaTime, -1, Transform2d(Translation2d(), 0.degrees))
+
+  var lastFieldRelativeVisionUpdate =
+    TimestampedVisionUpdate(
+      Clock.fpgaTime,
+      Pose2d(),
+      VecBuilder.fill(xyStdDev.get(), xyStdDev.get(), thetaStdDev.get())
+    )
 
   private var fieldFramePoseSupplier = Supplier<Pose2d> { Pose2d() }
   private var visionConsumer: Consumer<List<TimestampedVisionUpdate>> = Consumer {}
@@ -160,7 +169,7 @@ class Vision(vararg cameras: CameraIO) : SubsystemBase() {
               val cameraDistanceToTarget3D = tag.bestCameraToTarget.translation.norm.meters
               val cameraDistanceToTarget2D = cameraDistanceToTarget3D * (tag.pitch.degrees).cos
 
-              var cameraTTagTranslation2d =
+              val cameraTTagTranslation2d =
                 Translation2d(
                   PhotonUtils.estimateCameraToTargetTranslation(
                     cameraDistanceToTarget2D.inMeters,
@@ -168,14 +177,14 @@ class Vision(vararg cameras: CameraIO) : SubsystemBase() {
                   )
                 )
 
-              var cameraTTagTranslation3d =
+              val cameraTTagTranslation3d =
                 Translation3d(
                   cameraTTagTranslation2d.x,
                   cameraTTagTranslation2d.y,
                   cameraDistanceToTarget3D * tag.pitch.degrees.sin
                 )
 
-              var robotTTag =
+              val robotTTag =
                 Transform3d(
                   Pose3d()
                     .transformBy(VisionConstants.CAMERA_TRANSFORMS[instance])
@@ -195,7 +204,7 @@ class Vision(vararg cameras: CameraIO) : SubsystemBase() {
                   )
                 )
 
-              var fieldTRobot = Pose3d().transformBy(fieldTTag).transformBy(robotTTag.inverse())
+              val fieldTRobot = Pose3d().transformBy(fieldTTag).transformBy(robotTTag.inverse())
 
               visionUpdates.add(
                 TimestampedVisionUpdate(
@@ -311,7 +320,6 @@ class Vision(vararg cameras: CameraIO) : SubsystemBase() {
         )
 
         if (closestReefTagAcrossCams?.key != null && closestReefTagAcrossCams?.value != null) {
-
           lastTrigVisionUpdate =
             TimestampedTrigVisionUpdate(
               inputs[closestReefTagAcrossCams?.key ?: 0].timestamp,
@@ -325,10 +333,34 @@ class Vision(vararg cameras: CameraIO) : SubsystemBase() {
               )
             )
 
+          // pose of the tag that was in the update
+          val fieldTReefTag =
+            FieldConstants.AprilTagLayoutType.OFFICIAL
+              .layout
+              .getTagPose(closestReefTagAcrossCams?.value?.first ?: -1)
+              .toTransform3d()
+
+          Logger.recordOutput("Vision/aprilTagPose", fieldTReefTag.toPose3d().pose3d)
+
+          lastFieldRelativeVisionUpdate = TimestampedVisionUpdate(
+            inputs[closestReefTagAcrossCams?.key ?: 0].timestamp,
+            Pose2d(
+              fieldTReefTag.x,
+              fieldTReefTag.y,
+              fieldTReefTag.rotation.z
+            ).transformBy(lastTrigVisionUpdate.robotTReefTag.inverse()),
+            VecBuilder.fill(xyStdDev.get(), xyStdDev.get(), thetaStdDev.get()),
+            fromVision = true
+          )
+
           // reefVisionConsumer.accept(lastTrigVisionUpdate)
         }
       }
     }
+
+    Logger.recordOutput(
+      "Vision/estimatedPose", lastFieldRelativeVisionUpdate.fieldTRobot.pose2d
+    )
 
     // visionConsumer.accept(visionUpdates)
     Logger.recordOutput(

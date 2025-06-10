@@ -26,6 +26,7 @@ import com.team4099.robot2025.subsystems.drivetrain.gyro.GyroIOPigeon2
 import com.team4099.robot2025.subsystems.elevator.Elevator
 import com.team4099.robot2025.subsystems.elevator.ElevatorIO
 import com.team4099.robot2025.subsystems.elevator.ElevatorIOSim
+import com.team4099.robot2025.subsystems.elevator.ElevatorIOTalon
 import com.team4099.robot2025.subsystems.led.LedIO
 import com.team4099.robot2025.subsystems.led.LedIOCandle
 import com.team4099.robot2025.subsystems.limelight.LimelightVision
@@ -68,7 +69,7 @@ object RobotContainer {
       limelight = LimelightVision(object : LimelightVisionIO {})
       arm = Arm(object : ArmIO {})
       climber = Climber(object : ClimberIO {})
-      elevator = Elevator(object : ElevatorIO {})
+      elevator = Elevator(ElevatorIOTalon)
       rollers = Rollers(RollersIOTalonFX)
       ramp = Ramp(RampIOTalonFX)
       leds = Leds(LedIOCandle)

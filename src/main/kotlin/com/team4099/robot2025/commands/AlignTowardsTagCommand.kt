@@ -132,7 +132,7 @@ class AlignTowardsTagCommand(
                         val raven2Angle = raven2.cameraTargets[0].yaw
 
                         val thetaFeedback =
-                            thetaPID.calculate(raven2Angle - raven1Angle.degrees, 0.0.degrees)
+                            thetaPID.calculate(raven2Angle.degrees - raven1Angle.degrees, 0.0.degrees)
 
                         drivetrain.currentRequest =
                             Request.DrivetrainRequest.OpenLoop(
@@ -142,7 +142,7 @@ class AlignTowardsTagCommand(
                             )
                     } else if (raven1HasTargets) {
                         val thetaFeedback =
-                            thetaPID.calculate(raven1.cameraTargets[0].yaw.degrees, -15.0.degrees)
+                            thetaPID.calculate(raven1.cameraTargets[0].yaw.degrees, -30.0.degrees)
 
                         drivetrain.currentRequest =
                             Request.DrivetrainRequest.OpenLoop(
@@ -152,7 +152,7 @@ class AlignTowardsTagCommand(
                             )
                     } else {
                         val thetaFeedback =
-                            thetaPID.calculate(raven2.cameraTargets[0].yaw.degrees, 15.0.degrees)
+                            thetaPID.calculate(raven2.cameraTargets[0].yaw.degrees, 30.0.degrees)
 
                         drivetrain.currentRequest =
                             Request.DrivetrainRequest.OpenLoop(
