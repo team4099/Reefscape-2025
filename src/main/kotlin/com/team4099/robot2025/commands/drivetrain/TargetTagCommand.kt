@@ -9,6 +9,7 @@ import com.team4099.robot2025.subsystems.drivetrain.drive.Drivetrain
 import com.team4099.robot2025.subsystems.superstructure.Request
 import com.team4099.robot2025.subsystems.vision.Vision
 import com.team4099.robot2025.util.CustomLogger
+import com.team4099.robot2025.util.Velocity2d
 import com.team4099.robot2025.util.driver.DriverProfile
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.wpilibj.DriverStation
@@ -35,6 +36,7 @@ import org.team4099.lib.units.derived.inDegreesPerSecondPerDegreeSeconds
 import org.team4099.lib.units.derived.inMetersPerSecondPerMeter
 import org.team4099.lib.units.derived.inMetersPerSecondPerMeterPerSecond
 import org.team4099.lib.units.derived.inMetersPerSecondPerMeterSeconds
+import org.team4099.lib.units.derived.inRadians
 import org.team4099.lib.units.derived.inRotation2ds
 import org.team4099.lib.units.derived.perDegree
 import org.team4099.lib.units.derived.perDegreePerSecond
@@ -48,6 +50,7 @@ import org.team4099.lib.units.inMetersPerSecond
 import org.team4099.lib.units.milli
 import org.team4099.lib.units.perSecond
 import kotlin.math.PI
+import kotlin.math.cos
 import kotlin.math.hypot
 
 class TargetTagCommand(
@@ -254,7 +257,7 @@ class TargetTagCommand(
       vision.currentRequest = Request.VisionRequest.TargetTag(arrayOf(tagTargetID))
     }
 
-    vision.isAligned = true
+    vision.isAligned = false
 
     timeStarted = Clock.fpgaTime
   }
@@ -306,54 +309,50 @@ class TargetTagCommand(
       CustomLogger.recordOutput("TagAlignment/thetaError", thetaPID.error.inDegrees)
       CustomLogger.recordOutput("TagAlignment/thetaFeedback", thetaFeedback.inDegreesPerSecond)
 
-      if (thetaPID.error.absoluteValue > 5.degrees && !hasThetaAligned) {
-        drivetrain.currentRequest =
-          Request.DrivetrainRequest.OpenLoop(
-            thetaFeedback,
-            driver.driveSpeedClampedSupplier(driveX, driveY, slowMode),
-            fieldOriented = true
-          )
-      } else {
-        hasThetaAligned = true
+      hasThetaAligned = true
 
-        var yFeedback =
-          yPID.calculate(
-            -visionData.robotTReefTag.translation.y,
-            yTargetOffset - (visionData.robotTReefTag.translation.y + yTargetOffset) / 2.0
-          )
-        // 0.meters.perSecond
-
-        var xFeedBack =
-          xPID.calculate(
-            -visionData.robotTReefTag.translation.x,
-            -(18.0).inches - (visionData.robotTReefTag.translation.x - 18.0.inches) / 1.75
-          )
-        // 0.meters.perSecond
-
-        CustomLogger.recordOutput("TagAlignment/yError", yPID.error.inMeters)
-        CustomLogger.recordOutput(
-          "TagAlignment/yFeedback",
-          yFeedback.inMetersPerSecond,
+      var yFeedback =
+        yPID.calculate(
+          -visionData.robotTReefTag.translation.y,
+          yTargetOffset - (visionData.robotTReefTag.translation.y + yTargetOffset) / 2.0
         )
+      // 0.meters.perSecond
 
-        CustomLogger.recordOutput("TagAlignment/xError", xPID.error.inMeters)
-        CustomLogger.recordOutput(
-          "TagAlignment/xFeedback",
-          xFeedBack.inMetersPerSecond,
+      var xFeedBack =
+        xPID.calculate(
+          -visionData.robotTReefTag.translation.x,
+          -(18.0).inches - (visionData.robotTReefTag.translation.x - 18.0.inches) / 1.75
         )
+      // 0.meters.perSecond
 
-        CustomLogger.recordOutput("TagAlignment/lostSightOfTag", false)
+      CustomLogger.recordOutput("TagAlignment/yError", yPID.error.inMeters)
+      CustomLogger.recordOutput(
+        "TagAlignment/yFeedback",
+        yFeedback.inMetersPerSecond,
+      )
 
-        val driveVector = driver.driveSpeedClampedSupplier(driveX, driveY, slowMode)
+      CustomLogger.recordOutput("TagAlignment/xError", xPID.error.inMeters)
+      CustomLogger.recordOutput(
+        "TagAlignment/xFeedback",
+        xFeedBack.inMetersPerSecond,
+      )
 
-        var autoDriveVector =
-          hypot(driveVector.first.inMetersPerSecond, driveVector.second.inMetersPerSecond)
+      CustomLogger.recordOutput("TagAlignment/lostSightOfTag", false)
 
-        drivetrain.currentRequest =
-          Request.DrivetrainRequest.OpenLoop(
-            thetaFeedback, Pair(xFeedBack, yFeedback), fieldOriented = false
-          )
-      }
+      val driveVector = driver.driveSpeedClampedSupplier(driveX, driveY, slowMode)
+
+      var autoDriveVector =
+        hypot(driveVector.first.inMetersPerSecond, driveVector.second.inMetersPerSecond)
+
+      val driveAccoutingForTurnVector = Velocity2d(
+        xFeedBack,
+        yFeedback
+      ).rotateBy(drivetrain.odomTRobot.rotation)
+
+      drivetrain.currentRequest =
+        Request.DrivetrainRequest.OpenLoop(
+          thetaFeedback, Pair(driveAccoutingForTurnVector.x, driveAccoutingForTurnVector.y), fieldOriented = true
+        )
     }
     // Still aligning but lost sight of tag
     else if (rotationAtStartOfCommand != null && !hasThetaAligned) {
@@ -395,6 +394,7 @@ class TargetTagCommand(
   override fun end(interrupted: Boolean) {
     CustomLogger.recordOutput("ActiveCommands/TargetTagCommand", false)
 
+    vision.isAligned = true
     vision.currentRequest = Request.VisionRequest.TargetReef()
 
     drivetrain.currentRequest =
