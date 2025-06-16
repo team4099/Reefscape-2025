@@ -365,7 +365,7 @@ class Superstructure(
               )
             CoralLevel.L4 ->
               Request.ElevatorRequest.ClosedLoop(
-                ElevatorTunableValues.ElevatorHeights.PrepL4Height.get()
+                ElevatorTunableValues.ElevatorHeights.L4Height.get()
               )
             else ->
               Request.ElevatorRequest.ClosedLoop(

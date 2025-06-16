@@ -67,7 +67,6 @@ object ElevatorConstants {
   val L1_HEIGHT = 24.inches
   val L2_HEIGHT = 28.789.inches - 2.inches + 0.5.inches + 5.5.inches
   val L3_HEIGHT = 28.789.inches - 2.inches + 0.5.inches + 20.5.inches
-  val PREP_L4_HEIGHT = 53.5.inches
   val L4_HEIGHT = 73.inches
 
   val EJECT_HEIGHT = 9.0.inches
