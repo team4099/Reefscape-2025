@@ -83,8 +83,8 @@ object VisionConstants {
   object PID {
     val TELEOP_THETA_PID_KP = 2.degrees.perSecond / 1.degrees
     val TELEOP_THETA_PID_KI = 0.0.degrees.perSecond / (1.degrees * 1.seconds)
-    val TELEOP_THETA_PID_KD = (1.degrees.perSecond / (1.degrees / 1.seconds)).radiansPerSecondPerRadiansPerSecond
-
+    val TELEOP_THETA_PID_KD =
+      (1.degrees.perSecond / (1.degrees / 1.seconds)).radiansPerSecondPerRadiansPerSecond
   }
 
   object Limelight {

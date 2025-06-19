@@ -97,7 +97,7 @@ class ReefAlignCommand(
       Clock.fpgaTime - timeScored > RollersConstants.CORAL_SPIT_TIME &&
       elevator.inputs.elevatorPosition <=
       ElevatorConstants
-        .PREP_L4_HEIGHT && // just so it doesn't tip when driving and logic stays the same
+        .L3_HEIGHT && // just so it doesn't tip when driving and logic stays the same
       DriverStation.isAutonomous()
   }
 

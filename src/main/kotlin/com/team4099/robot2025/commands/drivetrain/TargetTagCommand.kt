@@ -4,14 +4,12 @@ import com.team4099.lib.hal.Clock
 import com.team4099.lib.logging.LoggedTunableValue
 import com.team4099.lib.trajectory.CustomHolonomicDriveController
 import com.team4099.robot2025.config.constants.DrivetrainConstants
-import com.team4099.robot2025.config.constants.FieldConstants
 import com.team4099.robot2025.subsystems.drivetrain.drive.Drivetrain
 import com.team4099.robot2025.subsystems.superstructure.Request
 import com.team4099.robot2025.subsystems.vision.Vision
 import com.team4099.robot2025.util.CustomLogger
 import com.team4099.robot2025.util.Velocity2d
 import com.team4099.robot2025.util.driver.DriverProfile
-import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.RobotBase
 import edu.wpi.first.wpilibj2.command.Command
@@ -36,8 +34,6 @@ import org.team4099.lib.units.derived.inDegreesPerSecondPerDegreeSeconds
 import org.team4099.lib.units.derived.inMetersPerSecondPerMeter
 import org.team4099.lib.units.derived.inMetersPerSecondPerMeterPerSecond
 import org.team4099.lib.units.derived.inMetersPerSecondPerMeterSeconds
-import org.team4099.lib.units.derived.inRadians
-import org.team4099.lib.units.derived.inRotation2ds
 import org.team4099.lib.units.derived.perDegree
 import org.team4099.lib.units.derived.perDegreePerSecond
 import org.team4099.lib.units.derived.perDegreeSeconds
@@ -50,7 +46,6 @@ import org.team4099.lib.units.inMetersPerSecond
 import org.team4099.lib.units.milli
 import org.team4099.lib.units.perSecond
 import kotlin.math.PI
-import kotlin.math.cos
 import kotlin.math.hypot
 
 class TargetTagCommand(
@@ -275,19 +270,21 @@ class TargetTagCommand(
     if (visionData.targetTagID != -1 &&
       visionData.robotTReefTag != Transform2d(Translation2d(0.meters, 0.meters), 0.degrees)
     ) {
-//      val targetPose = FieldConstants.aprilTags[visionData.targetTagID]
-//        .pose
-//        .toPose2d()
-//        .transformBy(
-//          Transform2d(
-//            Translation2d(
-//              DrivetrainConstants.DRIVETRAIN_WIDTH,
-//              yTargetOffset
-//            ), 180.degrees
-//          )
-//        )
+      //      val targetPose = FieldConstants.aprilTags[visionData.targetTagID]
+      //        .pose
+      //        .toPose2d()
+      //        .transformBy(
+      //          Transform2d(
+      //            Translation2d(
+      //              DrivetrainConstants.DRIVETRAIN_WIDTH,
+      //              yTargetOffset
+      //            ), 180.degrees
+      //          )
+      //        )
 
-      val offsetFromDeadOn = (180.degrees - visionData.robotTReefTag.rotation.absoluteValue) * visionData.robotTReefTag.rotation.sign
+      val offsetFromDeadOn =
+        (180.degrees - visionData.robotTReefTag.rotation.absoluteValue) *
+          visionData.robotTReefTag.rotation.sign
       val thetaFeedback = thetaPID.calculate(offsetFromDeadOn, 0.0.degrees)
 
       if (rotationAtStartOfCommand == null) {
@@ -297,7 +294,10 @@ class TargetTagCommand(
 
       Logger.recordOutput("TagAlign/tagID", tagTargetID)
 
-      CustomLogger.recordOutput("TagAlignment/estimatedFieldPose", vision.lastFieldRelativeVisionUpdate.fieldTRobot.pose2d)
+      CustomLogger.recordOutput(
+        "TagAlignment/estimatedFieldPose",
+        vision.lastFieldRelativeVisionUpdate.fieldTRobot.pose2d
+      )
 
       CustomLogger.recordOutput(
         "TagAlignment/CurrentDrivetrainRotation", drivetrain.odomTRobot.rotation.inDegrees
@@ -344,25 +344,27 @@ class TargetTagCommand(
       var autoDriveVector =
         hypot(driveVector.first.inMetersPerSecond, driveVector.second.inMetersPerSecond)
 
-      val driveAccoutingForTurnVector = Velocity2d(
-        xFeedBack,
-        yFeedback
-      ).rotateBy(drivetrain.odomTRobot.rotation)
+      val driveAccoutingForTurnVector =
+        Velocity2d(xFeedBack, yFeedback).rotateBy(drivetrain.odomTRobot.rotation)
 
       drivetrain.currentRequest =
         Request.DrivetrainRequest.OpenLoop(
-          thetaFeedback, Pair(driveAccoutingForTurnVector.x, driveAccoutingForTurnVector.y), fieldOriented = true
+          thetaFeedback,
+          Pair(driveAccoutingForTurnVector.x, driveAccoutingForTurnVector.y),
+          fieldOriented = true
         )
     }
     // Still aligning but lost sight of tag
     else if (rotationAtStartOfCommand != null && !hasThetaAligned) {
-      val thetaFeedback = thetaPID.calculate(
-        (
-            offsetAtStartOfCommand.absoluteValue
-            - (drivetrain.odomTRobot.rotation - rotationAtStartOfCommand!!).absoluteValue
-        ) * offsetAtStartOfCommand.sign,
-        0.0.degrees
-      )
+      val thetaFeedback =
+        thetaPID.calculate(
+          (
+            offsetAtStartOfCommand.absoluteValue -
+              (drivetrain.odomTRobot.rotation - rotationAtStartOfCommand!!).absoluteValue
+            ) *
+            offsetAtStartOfCommand.sign,
+          0.0.degrees
+        )
 
       Logger.recordOutput("TagAlign/tagID", tagTargetID)
 

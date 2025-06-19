@@ -5,7 +5,6 @@ import com.team4099.robot2023.subsystems.vision.camera.CameraIO
 import com.team4099.robot2023.subsystems.vision.camera.CameraIOPhotonvision
 import com.team4099.robot2025.auto.AutonomousSelector
 import com.team4099.robot2025.commands.AlignTowardsTagCommand
-import com.team4099.robot2025.commands.TrackTagCommand
 import com.team4099.robot2025.commands.drivetrain.ReefAlignCommand
 import com.team4099.robot2025.commands.drivetrain.ResetGyroYawCommand
 import com.team4099.robot2025.commands.drivetrain.TargetTagCommand
@@ -24,7 +23,6 @@ import com.team4099.robot2025.subsystems.drivetrain.drive.DrivetrainIOSim
 import com.team4099.robot2025.subsystems.drivetrain.gyro.GyroIO
 import com.team4099.robot2025.subsystems.drivetrain.gyro.GyroIOPigeon2
 import com.team4099.robot2025.subsystems.elevator.Elevator
-import com.team4099.robot2025.subsystems.elevator.ElevatorIO
 import com.team4099.robot2025.subsystems.elevator.ElevatorIOSim
 import com.team4099.robot2025.subsystems.elevator.ElevatorIOTalon
 import com.team4099.robot2025.subsystems.led.LedIO

@@ -301,6 +301,7 @@ class Superstructure(
           when (currentRequest) {
             is Request.SuperstructureRequest.Home -> SuperstructureStates.HOME_PREP
             is Request.SuperstructureRequest.Eject -> SuperstructureStates.EJECT
+            is Request.SuperstructureRequest.ManualReset -> SuperstructureStates.MANUAL_RESET
             is Request.SuperstructureRequest.IntakeAlgae -> SuperstructureStates.PREP_INTAKE_ALGAE
             is Request.SuperstructureRequest.IntakeCoral -> SuperstructureStates.PREP_INTAKE_CORAL
             is Request.SuperstructureRequest.ScorePrepCoral ->
@@ -589,7 +590,9 @@ class Superstructure(
   }
 
   fun manualResetCommand(): Command {
-    val returnCommand = run { currentRequest = Request.SuperstructureRequest.ManualReset() }
+    val returnCommand = run { currentRequest = Request.SuperstructureRequest.ManualReset() }.until {
+      isAtRequestedState && currentState == SuperstructureStates.MANUAL_RESET
+    }
     returnCommand.name = "ManualResetCommand"
     return returnCommand
   }

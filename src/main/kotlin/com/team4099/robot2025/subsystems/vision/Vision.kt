@@ -2,7 +2,6 @@ package com.team4099.robot2025.subsystems.vision
 
 import com.team4099.lib.hal.Clock
 import com.team4099.lib.logging.TunableNumber
-import com.team4099.lib.math.asPose2d
 import com.team4099.lib.vision.TimestampedTrigVisionUpdate
 import com.team4099.lib.vision.TimestampedVisionUpdate
 import com.team4099.robot2023.subsystems.vision.camera.CameraIO
@@ -34,13 +33,10 @@ import org.team4099.lib.units.base.meters
 import org.team4099.lib.units.derived.cos
 import org.team4099.lib.units.derived.degrees
 import org.team4099.lib.units.derived.inRadians
+import org.team4099.lib.units.derived.radians
 import org.team4099.lib.units.derived.sin
 import java.util.function.Consumer
 import java.util.function.Supplier
-import kotlin.math.absoluteValue
-import org.team4099.lib.units.derived.inDegrees
-import org.team4099.lib.units.derived.radians
-import kotlin.math.atan2
 
 class Vision(vararg cameras: CameraIO) : SubsystemBase() {
   val io: List<CameraIO> = cameras.toList()
@@ -104,12 +100,12 @@ class Vision(vararg cameras: CameraIO) : SubsystemBase() {
 
       if (inputs[0].cameraTargets.size > 0) {
         val transformTTag = inputs[0].cameraTargets[0].bestCameraToTarget
-        CustomLogger.recordOutput("Vision/raven1TransformTTag", transformTTag);
+        CustomLogger.recordOutput("Vision/raven1TransformTTag", transformTTag)
         CustomLogger.recordOutput("Vision/raven1Yaw", inputs[0].cameraTargets[0].getYaw())
       }
       if (inputs[1].cameraTargets.size > 0) {
         val transformTTag = inputs[1].cameraTargets[0].bestCameraToTarget
-        CustomLogger.recordOutput("Vision/raven2TransformTTag", transformTTag);
+        CustomLogger.recordOutput("Vision/raven2TransformTTag", transformTTag)
         CustomLogger.recordOutput("Vision/raven2Yaw", inputs[1].cameraTargets[0].getYaw())
       }
     }
@@ -200,7 +196,9 @@ class Vision(vararg cameras: CameraIO) : SubsystemBase() {
                     0.degrees,
                     tag.bestCameraToTarget.rotation.rotateBy(
                       VisionConstants.CAMERA_TRANSFORMS[instance].rotation.rotation3d
-                    ).z.radians
+                    )
+                      .z
+                      .radians
                   )
                 )
 
@@ -219,9 +217,9 @@ class Vision(vararg cameras: CameraIO) : SubsystemBase() {
 
               Logger.recordOutput(
                 "Vision/${VisionConstants.CAMERA_NAMES[instance]}/yaw",
-                robotTTag.rotation.rotateBy(
-                  VisionConstants.CAMERA_TRANSFORMS[instance].rotation
-                ).z.inRadians
+                robotTTag.rotation.rotateBy(VisionConstants.CAMERA_TRANSFORMS[instance].rotation)
+                  .z
+                  .inRadians
               )
 
               Logger.recordOutput(
@@ -342,25 +340,21 @@ class Vision(vararg cameras: CameraIO) : SubsystemBase() {
 
           Logger.recordOutput("Vision/aprilTagPose", fieldTReefTag.toPose3d().pose3d)
 
-          lastFieldRelativeVisionUpdate = TimestampedVisionUpdate(
-            inputs[closestReefTagAcrossCams?.key ?: 0].timestamp,
-            Pose2d(
-              fieldTReefTag.x,
-              fieldTReefTag.y,
-              fieldTReefTag.rotation.z
-            ).transformBy(lastTrigVisionUpdate.robotTReefTag.inverse()),
-            VecBuilder.fill(xyStdDev.get(), xyStdDev.get(), thetaStdDev.get()),
-            fromVision = true
-          )
+          lastFieldRelativeVisionUpdate =
+            TimestampedVisionUpdate(
+              inputs[closestReefTagAcrossCams?.key ?: 0].timestamp,
+              Pose2d(fieldTReefTag.x, fieldTReefTag.y, fieldTReefTag.rotation.z)
+                .transformBy(lastTrigVisionUpdate.robotTReefTag.inverse()),
+              VecBuilder.fill(xyStdDev.get(), xyStdDev.get(), thetaStdDev.get()),
+              fromVision = true
+            )
 
           // reefVisionConsumer.accept(lastTrigVisionUpdate)
         }
       }
     }
 
-    Logger.recordOutput(
-      "Vision/estimatedPose", lastFieldRelativeVisionUpdate.fieldTRobot.pose2d
-    )
+    Logger.recordOutput("Vision/estimatedPose", lastFieldRelativeVisionUpdate.fieldTRobot.pose2d)
 
     // visionConsumer.accept(visionUpdates)
     Logger.recordOutput(
