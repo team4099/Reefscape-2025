@@ -200,7 +200,7 @@ class Superstructure(
     when (currentState) {
       // General States
       SuperstructureStates.UNINITIALIZED -> {
-        nextState = SuperstructureStates.HOME_PREP
+        nextState = SuperstructureStates.IDLE
       }
       SuperstructureStates.TUNING -> {
         if (currentRequest is Request.SuperstructureRequest.Idle) {
@@ -250,7 +250,7 @@ class Superstructure(
           elevator.inputs.leaderAppliedVoltage < 0.volts &&
           (Clock.fpgaTime - lastTransitionTime) > 0.5.seconds
         ) {
-          nextState = SuperstructureStates.IDLE
+          nextState = SuperstructureStates.HOME
         }
       }
       SuperstructureStates.HOME_PREP -> {
@@ -274,7 +274,7 @@ class Superstructure(
           ElevatorConstants.ELEVATOR_FORCE_HOME_TOLERANCE &&
           elevator.inputs.leaderAppliedVoltage < 0.volts &&
           (Clock.fpgaTime - lastTransitionTime) >
-          0.5.seconds
+          0.5.seconds // second part is homing logic at beginning
         ) { // add buffer so it won't home when still up
           elevator.currentRequest = Request.ElevatorRequest.Home() // stop stalling
         } else {
