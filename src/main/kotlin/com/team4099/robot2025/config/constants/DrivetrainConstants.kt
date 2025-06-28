@@ -61,8 +61,8 @@ object DrivetrainConstants {
   val SLOW_AUTO_VEL = 2.meters.perSecond
   val SLOW_AUTO_ACCEL = 2.0.meters.perSecond.perSecond
 
-  val MAX_AUTO_VEL = 3.meters.perSecond // 4
-  val MAX_AUTO_ACCEL = 4.meters.perSecond.perSecond // 3
+  val MAX_AUTO_VEL = 1.meters.perSecond // 4
+  val MAX_AUTO_ACCEL = 3.meters.perSecond.perSecond // 3
 
   val MAX_REEF_VEL = 1.meters.perSecond
   val MAX_REEF_ACCEL = 2.meters.perSecond.perSecond

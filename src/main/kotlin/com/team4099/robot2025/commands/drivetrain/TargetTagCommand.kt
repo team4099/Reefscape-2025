@@ -344,14 +344,11 @@ class TargetTagCommand(
       var autoDriveVector =
         hypot(driveVector.first.inMetersPerSecond, driveVector.second.inMetersPerSecond)
 
-      val driveAccoutingForTurnVector =
-        Velocity2d(xFeedBack, yFeedback).rotateBy(drivetrain.odomTRobot.rotation)
-
       drivetrain.currentRequest =
         Request.DrivetrainRequest.OpenLoop(
           thetaFeedback,
-          Pair(driveAccoutingForTurnVector.x, driveAccoutingForTurnVector.y),
-          fieldOriented = true
+          Pair(xFeedBack, yFeedback),
+          fieldOriented = false
         )
     }
     // Still aligning but lost sight of tag

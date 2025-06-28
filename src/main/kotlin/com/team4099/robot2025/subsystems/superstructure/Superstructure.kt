@@ -200,7 +200,7 @@ class Superstructure(
     when (currentState) {
       // General States
       SuperstructureStates.UNINITIALIZED -> {
-        nextState = SuperstructureStates.HOME_PREP
+        nextState = SuperstructureStates.IDLE // SuperstructureStates.HOME_PREP
       }
       SuperstructureStates.TUNING -> {
         if (currentRequest is Request.SuperstructureRequest.Idle) {
@@ -245,11 +245,16 @@ class Superstructure(
         arm.currentRequest = Request.ArmRequest.Retract()
         elevator.currentRequest = Request.ElevatorRequest.OpenLoop((-2.0).volts)
 
-        if (elevator.inputs.leaderStatorCurrent > ElevatorConstants.HOMING_STALL_CURRENT &&
-          elevator.inputs.elevatorVelocity.epsilonEquals(0.inches.perSecond) &&
-          elevator.inputs.leaderAppliedVoltage < 0.volts &&
-          (Clock.fpgaTime - lastTransitionTime) > 0.5.seconds
-        ) {
+//        if (elevator.inputs.leaderStatorCurrent > ElevatorConstants.HOMING_STALL_CURRENT &&
+//          elevator.inputs.elevatorVelocity.epsilonEquals(0.inches.perSecond) &&
+//          elevator.inputs.leaderAppliedVoltage < 0.volts &&
+//          (Clock.fpgaTime - lastTransitionTime) > 0.5.seconds
+//        ) {
+//          elevator.currentRequest = Request.ElevatorRequest.Home()
+//        }
+
+        if (elevator.isHomed || currentRequest is Request.SuperstructureRequest.Idle) {
+          elevator.currentRequest = Request.ElevatorRequest.Home()
           nextState = SuperstructureStates.IDLE
         }
       }
@@ -590,9 +595,10 @@ class Superstructure(
   }
 
   fun manualResetCommand(): Command {
-    val returnCommand = run { currentRequest = Request.SuperstructureRequest.ManualReset() }.until {
-      isAtRequestedState && currentState == SuperstructureStates.MANUAL_RESET
-    }
+    val returnCommand =
+      run { currentRequest = Request.SuperstructureRequest.ManualReset() }.until {
+        isAtRequestedState && currentState == SuperstructureStates.MANUAL_RESET
+      }
     returnCommand.name = "ManualResetCommand"
     return returnCommand
   }

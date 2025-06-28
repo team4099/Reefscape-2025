@@ -13,6 +13,7 @@ import com.team4099.robot2025.config.constants.Constants
 import com.team4099.robot2025.config.constants.ElevatorConstants
 import com.team4099.robot2025.config.constants.ElevatorConstants.MAX_ACCELERATION
 import com.team4099.robot2025.config.constants.ElevatorConstants.MAX_VELOCITY
+import com.team4099.robot2025.config.constants.ElevatorConstants.MAX_VELOCITY_DOWN
 import edu.wpi.first.units.measure.AngularVelocity
 import org.littletonrobotics.junction.Logger
 import org.team4099.lib.units.base.Length
@@ -22,6 +23,7 @@ import org.team4099.lib.units.base.celsius
 import org.team4099.lib.units.base.inAmperes
 import org.team4099.lib.units.base.inInches
 import org.team4099.lib.units.base.inches
+import org.team4099.lib.units.base.meters
 import org.team4099.lib.units.ctreLinearMechanismSensor
 import org.team4099.lib.units.derived.AccelerationFeedforward
 import org.team4099.lib.units.derived.Angle

@@ -3,6 +3,9 @@ package com.team4099.robot2025
 import com.team4099.lib.hal.Clock
 import com.team4099.robot2025.auto.AutonomousSelector
 import com.team4099.robot2025.auto.PathStore
+import com.team4099.robot2025.auto.mode.ThreeL3LeftAuto
+import com.team4099.robot2025.auto.mode.ThreeL4LeftAuto
+import com.team4099.robot2025.auto.mode.ThreeL4RightAuto
 import com.team4099.robot2025.config.constants.Constants
 import com.team4099.robot2025.util.Alert
 import com.team4099.robot2025.util.Alert.AlertType
@@ -125,6 +128,17 @@ object Robot : LoggedRobot() {
     // init robot container too
     RobotContainer
     AutonomousSelector
+
+    ThreeL4LeftAuto.firstTrajectory
+    ThreeL4LeftAuto.secondTrajectory
+    ThreeL4LeftAuto.thirdTrajectory
+    ThreeL4LeftAuto.fourthTrajectory
+    ThreeL4LeftAuto.fifthTrajectory // load choreo trajs so we're not spending time doing that
+
+    ThreeL4RightAuto.firstTrajectory
+    ThreeL4RightAuto.secondTrajectory
+    ThreeL4RightAuto.thirdTrajectory
+
     PathStore
     RobotContainer.mapDefaultCommands()
 

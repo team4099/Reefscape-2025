@@ -75,6 +75,7 @@ object ElevatorConstants {
 
   // TODO: make real maxes
   val MAX_VELOCITY = 400.0.inches.perSecond
+  val MAX_VELOCITY_DOWN = 340.inches.perSecond
   val MAX_ACCELERATION = 200.0.inches.perSecond.perSecond
 
   object PID {

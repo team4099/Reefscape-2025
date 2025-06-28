@@ -1,6 +1,8 @@
 package com.team4099.robot2025.auto
 
 import com.team4099.robot2025.auto.mode.ExamplePathAuto
+import com.team4099.robot2025.auto.mode.OneL4CenterAuto
+import com.team4099.robot2025.auto.mode.ThreeL3LeftAuto
 import com.team4099.robot2025.auto.mode.ThreeL4HomeAuto
 import com.team4099.robot2025.auto.mode.ThreeL4LeftAuto
 import com.team4099.robot2025.auto.mode.ThreeL4RightAuto
@@ -41,6 +43,10 @@ object AutonomousSelector {
 
     autonomousModeChooser.addOption(
       "Three L4 Auto from Far Side", AutonomousMode.THREE_L4_RIGHT_AUTO
+    )
+
+    autonomousModeChooser.addOption(
+      "One L4 Auto from Center", AutonomousMode.ONE_L4_CENTER
     )
 
     autoTab.add("Mode", autonomousModeChooser.sendableChooser).withSize(4, 2).withPosition(2, 0)
@@ -110,6 +116,17 @@ object AutonomousSelector {
             )
           })
           .andThen(ThreeL4RightAuto(drivetrain, elevator, superstructure, vision))
+      AutonomousMode.ONE_L4_CENTER ->
+        return WaitCommand(waitTime.inSeconds)
+          .andThen({
+            drivetrain.tempZeroGyroYaw(
+              AllianceFlipUtil.apply(OneL4CenterAuto.startingPose).rotation
+            )
+            drivetrain.resetFieldFrameEstimator(
+              AllianceFlipUtil.apply(OneL4CenterAuto.startingPose)
+            )
+          })
+          .andThen(ThreeL4RightAuto(drivetrain, elevator, superstructure, vision))
       else -> return InstantCommand()
     }
   }
@@ -122,6 +139,7 @@ object AutonomousSelector {
     // Delete this when real autos are made
     THREE_L4_HOME_AUTO,
     THREE_L4_LEFT_AUTO,
-    THREE_L4_RIGHT_AUTO
+    THREE_L4_RIGHT_AUTO,
+    ONE_L4_CENTER
   }
 }

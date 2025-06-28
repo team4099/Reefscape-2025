@@ -28,7 +28,6 @@ class ThreeL4RightAuto(
     addRequirements(drivetrain)
 
     addCommands(
-      WaitCommand(0.25),
       DrivePathCommand.createPathInFieldFrame(
         drivetrain, TrajectoryTypes.Choreo(firstTrajectory), keepTrapping = false
       ),
@@ -98,11 +97,12 @@ class ThreeL4RightAuto(
     )
   }
   companion object {
-    private val firstTrajectory =
+    // public so we can load beforehand
+    val firstTrajectory =
       Choreo.loadTrajectory<SwerveSample>("ThreeL4Home/startingLineTo1Right").get()
-    private val secondTrajectory =
+    val secondTrajectory =
       Choreo.loadTrajectory<SwerveSample>("ThreeL4Home/1to2Right").get()
-    private val thirdTrajectory = Choreo.loadTrajectory<SwerveSample>("ThreeL4Home/2to3Right").get()
+    val thirdTrajectory = Choreo.loadTrajectory<SwerveSample>("ThreeL4Home/2to3Right").get()
 
     val startingPose = Pose2d(firstTrajectory.getInitialPose(false).get())
     val secondPose = Pose2d(secondTrajectory.getInitialPose(false).get())
