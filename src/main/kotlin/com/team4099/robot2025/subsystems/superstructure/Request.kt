@@ -60,12 +60,23 @@ sealed interface Request {
     class Extend() : ArmRequest
   }
 
+  sealed interface IntakeRequest : Request {
+    class OpenLoop(val voltage: ElectricalPotential) : IntakeRequest
+
+    class ClosedLoop(val position: Angle) : IntakeRequest
+
+    class Uninitialized(): IntakeRequest
+
+    class Home() : IntakeRequest
+  }
+
   sealed interface ClimberRequest : Request {
     class OpenLoop(val voltage: ElectricalPotential) : ClimberRequest
 
     class ClosedLoop(val position: Angle) : ClimberRequest
 
     class Home() : ClimberRequest
+
   }
 
   sealed interface RollersRequest : Request {

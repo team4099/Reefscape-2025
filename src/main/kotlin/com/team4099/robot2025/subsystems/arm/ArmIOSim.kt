@@ -71,5 +71,5 @@ object ArmIOSim : ArmIO {
    }
 
    override fun setArmBrakeMode(brake: Boolean) {}
-  */
+
 }
