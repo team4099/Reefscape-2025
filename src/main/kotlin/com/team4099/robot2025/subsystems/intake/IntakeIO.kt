@@ -91,5 +91,5 @@ interface IntakeIO { //blueprint for talon, and used within your logic class
     fun setIntakeBrakeMode (brake: Boolean) //sets the motor's to have a brakemode
     fun setIntakeVoltage (volts: ElectricalPotential) //needed for voltage control, where you supply n volts continously to do smth
     fun setIntakePosition(position: Angle)
-
+    fun zeroEncoder() {}
 }

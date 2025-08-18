@@ -20,14 +20,14 @@ class Intake(private val io: IntakeIO): SubsystemBase() { //Class Intake, and ev
     private var lastIntakePosition = -1337.0.degrees //has to be an unrealistic number, just sets up PID
     private var intakePositionTarget = 0.0.degrees // :000
 //
-//    val isAtTargetedPosition: Boolean //checks if the current request is PID, and it is legal, and returns a boolean w the get()
-//        get() =
-//            (
-//                currentRequest is Request.IntakeRequest.ClosedLoop &&
-//                    (inputs.intakePosition - intakePositionTarget).absoluteValue <= IntakeConstants.INTAKE_TOLERANCE
-//                )
+    val isAtTargetedPosition: Boolean //checks if the current request is PID, and it is legal, and returns a boolean w the get()
+        get() =
+            (
+                currentRequest is Request.IntakeRequest.ClosedLoop &&
+                    (inputs.intakePosition - intakePositionTarget).absoluteValue <= IntakeConstants.INTAKE_TOLERANCE
+                )
 
-    var currentRequest: Request.IntakeRequest = Request.IntakeRequest.Home() //this asks whether the currentRequest is an OpenLoop or ClosedLoop
+    var currentRequest: Request.IntakeRequest = Request.IntakeRequest.Uninitialized() //this asks whether the currentRequest is an OpenLoop or ClosedLoop
         set(value) {
             when (value) {
                 is Request.IntakeRequest.OpenLoop -> {
@@ -53,10 +53,10 @@ class Intake(private val io: IntakeIO): SubsystemBase() { //Class Intake, and ev
             IntakeTunableValues.kI.initDefault(IntakeConstants.PID.SIM_PIVOT_KI)
             IntakeTunableValues.kD.initDefault(IntakeConstants.PID.SIM_PIVOT_KD)
         }
-        IntakeTunableValues.kS.initDefault(IntakeConstants.INTAKE_KS)
-        IntakeTunableValues.kA.initDefault(IntakeConstants.INTAKE_KA)
-        IntakeTunableValues.kV.initDefault(IntakeConstants.INTAKE_KV)
-        IntakeTunableValues.kGDefault.initDefault(IntakeConstants.INTAKE_KG) //Default cs gravity
+        IntakeTunableValues.kS.initDefault(IntakeConstants.PID.INTAKE_KS)
+        IntakeTunableValues.kA.initDefault(IntakeConstants.PID.INTAKE_KA)
+        IntakeTunableValues.kV.initDefault(IntakeConstants.PID.INTAKE_KV)
+        IntakeTunableValues.kGDefault.initDefault(IntakeConstants.PID.INTAKE_KG) //Default cs gravity
     } //sets up PID
 
     override fun periodic() {
@@ -95,26 +95,27 @@ class Intake(private val io: IntakeIO): SubsystemBase() { //Class Intake, and ev
             IntakeState.UNINITIALIZED -> {
                 nextState = fromRequestToState(currentRequest)
             }
+            IntakeState.ZERO -> {
+                io.zeroEncoder()
+                nextState = fromRequestToState(currentRequest)
+            }
             IntakeState.OPEN_LOOP -> {
                 io.setIntakeVoltage(intakeTargetVoltage)
                 nextState = fromRequestToState(currentRequest)
             }
             IntakeState.CLOSED_LOOP -> {
-                io.setIntakeVoltage(intakeTargetVoltage)
+                io.setIntakePosition(intakePositionTarget)
                 nextState = fromRequestToState(currentRequest)
             }
 
-        }
-
-        fun setIntakeVoltage(voltage: ElectricalPotential) {
-            io.setIntakeVoltage(voltage)
         }
     }
     companion object { //creates an object within a class
         enum class IntakeState { //These are all the states of Intake, and it's like a drop-down menu
             UNINITIALIZED,
             OPEN_LOOP,
-            CLOSED_LOOP
+            CLOSED_LOOP,
+            ZERO
         }
 
         fun fromRequestToState(request: Request.IntakeRequest): IntakeState { //Superstructures State machine will dictate what state the intake should be at in order to achieve the actionable
@@ -123,7 +124,7 @@ class Intake(private val io: IntakeIO): SubsystemBase() { //Class Intake, and ev
                 is Request.IntakeRequest.OpenLoop -> IntakeState.OPEN_LOOP
                 is Request.IntakeRequest.ClosedLoop -> IntakeState.CLOSED_LOOP
                 is Request.IntakeRequest.Uninitialized -> IntakeState.UNINITIALIZED
-                is Request.IntakeRequest.Home -> IntakeState.UNINITIALIZED
+                is Request.IntakeRequest.Zero -> IntakeState.ZERO
             }
         }
     }
@@ -133,3 +134,4 @@ class Intake(private val io: IntakeIO): SubsystemBase() { //Class Intake, and ev
 //State Machine does 2 things. 1. Keeps track of the current state. (Uninitialized, preheating, staying at it's temp) 2. Handling requests, and switching between states accordingly.
 //Actionable states are within Superstructure's State machine
 //Basic States are within logic files
+//test

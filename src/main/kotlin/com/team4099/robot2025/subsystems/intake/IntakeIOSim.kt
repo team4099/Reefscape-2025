@@ -8,6 +8,8 @@ import com.team4099.robot2025.config.constants.Constants
 import com.team4099.robot2025.config.constants.IntakeConstants
 import com.team4099.robot2025.subsystems.climber.ClimberIOSim.setVoltage
 import edu.wpi.first.math.system.plant.DCMotor
+import edu.wpi.first.wpilibj.simulation.BatterySim
+import edu.wpi.first.wpilibj.simulation.RoboRioSim
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim
 import org.team4099.lib.controller.ArmFeedforward
 import org.team4099.lib.controller.PIDController
@@ -41,8 +43,8 @@ object IntakeIOSim: IntakeIO { //You're creating an object for your intake, and 
             1 / IntakeConstants.GEAR_RATIO,
             IntakeConstants.INERTIA.inKilogramsMeterSquared,
             IntakeConstants.LENGTH.inMeters,
-            0.degrees.inRadians,
-            180.degrees.inRadians,
+            IntakeConstants.MIN_ROTATION.inRadians,
+            IntakeConstants.MAX_ROTATION.inRadians,
             true,
             0.0
         )
@@ -59,7 +61,7 @@ object IntakeIOSim: IntakeIO { //You're creating an object for your intake, and 
         )
     private var intakeFeedforward =
         ArmFeedforward(
-            IntakeConstants.INTAKE_KS, IntakeConstants.INTAKE_KG, IntakeConstants.INTAKE_KV, IntakeConstants.INTAKE_KA
+            IntakeConstants.PID.INTAKE_KS, IntakeConstants.PID.INTAKE_KG, IntakeConstants.PID.INTAKE_KV, IntakeConstants.PID.INTAKE_KA
         )
 
     init { //setting position of our intake
@@ -74,6 +76,12 @@ object IntakeIOSim: IntakeIO { //You're creating an object for your intake, and 
         inputs.intakeStatorCurrent = intakeSim.currentDrawAmps.amps
         inputs.intakeSupplyCurrent = 0.0.amps
         inputs.intakeTemp = 0.0.celsius
+
+    RoboRioSim.setVInVoltage(
+        BatterySim.calculateDefaultBatteryLoadedVoltage(intakeSim.currentDrawAmps)
+
+        //simulates roboRIO and battery during match
+    )
     }
 
     override fun setIntakeBrakeMode(brake: Boolean) {}

@@ -20,18 +20,17 @@ object IntakeConstants {
     val SUPPLY_CURRENT_LIMIT = 40.0.amps
     val THRESHOLD_CURRENT_LIMIT = 40.0.amps
 
+    val MIN_ROTATION = 0.0.degrees
+    val MAX_ROTATION = 132.0.degrees
+
 
     val LENGTH = 13.408.inches
     val INERTIA = 16.767866.pounds * 1.0.inches.squared
-    val GEAR_RATIO = 240.0 / 1.0
+    val GEAR_RATIO = 1.0 / 40.0
     val INTAKE_TOLERANCE = 1.0.degrees
 
 
-    // Feedforward Constants
-    val INTAKE_KA = 0.0.volts / 1.0.radians.perSecond.perSecond
-    val INTAKE_KV = 0.0.volts / 1.0.radians.perSecond
-    val INTAKE_KG = 0.15.volts
-    val INTAKE_KS = 0.0.volts
+
 
     object PID {
         // PID Constants
@@ -42,5 +41,11 @@ object IntakeConstants {
         val REAL_INTAKE_KP: ProportionalGain<Radian, Volt> = 7.volts / 1.0.degrees
         val REAL_INTAKE_KI: IntegralGain<Radian, Volt> = 0.0.volts / (1.0.degrees * 1.0.seconds)
         val REAL_INTAKE_KD: DerivativeGain<Radian, Volt> = 0.3.volts / 1.0.degrees.perSecond
+
+        // Feedforward Constants
+        val INTAKE_KA = 0.0.volts / 1.0.radians.perSecond.perSecond
+        val INTAKE_KV = 0.0.volts / 1.0.radians.perSecond
+        val INTAKE_KG = 0.15.volts
+        val INTAKE_KS = 0.0.volts
     }
 }

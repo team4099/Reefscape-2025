@@ -67,7 +67,8 @@ sealed interface Request {
 
     class Uninitialized(): IntakeRequest
 
-    class Home() : IntakeRequest
+    class  Zero(): IntakeRequest
+
   }
 
   sealed interface ClimberRequest : Request {

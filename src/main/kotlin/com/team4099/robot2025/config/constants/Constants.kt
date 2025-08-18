@@ -106,6 +106,10 @@ object Constants {
     const val CLIMBER_MOTOR_ID = 31
   }
 
+  object Intake {
+    const val INTAKE_MOTOR_ID = 33
+  }
+
   // leader is right motor and follower is left
   object Elevator {
     const val LEADER_MOTOR_ID = 42 // right
