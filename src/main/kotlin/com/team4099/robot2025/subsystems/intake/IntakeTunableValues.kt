@@ -15,41 +15,36 @@ import org.team4099.lib.units.derived.volts
 
 object IntakeTunableValues {
   val kS =
-    LoggedTunableValue("Intake/kS", IntakeConstants.PID.INTAKE_KS, Pair({ it.inVolts }, { it.volts }))
+    LoggedTunableValue("Intake/kS", Pair({ it.inVolts }, { it.volts }))
   val kV =
     LoggedTunableValue(
       "Intake/kV",
-      IntakeConstants.PID.INTAKE_KV,
       Pair({ it.inVoltsPerDegreePerSecond }, { it.volts.perDegreePerSecond })
     )
   val kA =
     LoggedTunableValue(
       "Intake/kA",
-      IntakeConstants.PID.INTAKE_KA,
       Pair({ it.inVoltsPerDegreePerSecondPerSecond }, { it.volts.perDegreePerSecondPerSecond })
     )
 
   val kGDefault =
     LoggedTunableValue(
-      "Intake/kGDefault", IntakeConstants.PID.INTAKE_KG, Pair({ it.inVolts }, { it.volts })
+      "Intake/kGDefault",  Pair({ it.inVolts }, { it.volts })
     )
 
   val kP =
     LoggedTunableValue(
       "Intake/kP",
-      IntakeConstants.PID.REAL_INTAKE_KP,
       Pair({ it.inVoltsPerDegree }, { it.volts.perDegree })
     )
   val kI =
     LoggedTunableValue(
       "Intake/kI",
-      IntakeConstants.PID.REAL_INTAKE_KI,
       Pair({ it.inVoltsPerDegreeSeconds }, { it.volts.perDegreeSeconds })
     )
   val kD =
     LoggedTunableValue(
       "Intake/kD",
-      IntakeConstants.PID.REAL_INTAKE_KD,
       Pair({ it.inVoltsPerDegreePerSecond }, { it.volts.perDegreePerSecond })
     )
 }
