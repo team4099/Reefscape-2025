@@ -5,6 +5,7 @@ import com.team4099.lib.math.clamp
 import com.team4099.robot2025.config.constants.ArmConstants
 import com.team4099.robot2025.config.constants.ClimberConstants
 import com.team4099.robot2025.config.constants.Constants
+import com.team4099.robot2025.config.constants.ElevatorConstants
 import com.team4099.robot2025.config.constants.IntakeConstants
 import com.team4099.robot2025.subsystems.climber.ClimberIOSim.setVoltage
 import edu.wpi.first.math.system.plant.DCMotor
@@ -13,6 +14,8 @@ import edu.wpi.first.wpilibj.simulation.RoboRioSim
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim
 import org.team4099.lib.controller.ArmFeedforward
 import org.team4099.lib.controller.PIDController
+import org.team4099.lib.controller.ProfiledPIDController
+import org.team4099.lib.controller.TrapezoidProfile
 import org.team4099.lib.units.base.Current
 import org.team4099.lib.units.base.amps
 import org.team4099.lib.units.base.celsius
@@ -54,10 +57,23 @@ object IntakeIOSim: IntakeIO { //You're creating an object for your intake, and 
     var intakeTargetPos = -1337.degrees
 
     private val intakeController =
-        PIDController(
+        ProfiledPIDController(
             IntakeConstants.PID.SIM_PIVOT_KP,
             IntakeConstants.PID.SIM_PIVOT_KI,
             IntakeConstants.PID.SIM_PIVOT_KD,
+            TrapezoidProfile.Constraints(
+                IntakeConstants.MAX_VELOCITY, IntakeConstants.MAX_ACCELERATION
+            )
+        )
+
+    private val intakePIDController =
+        ProfiledPIDController(
+            IntakeConstants.PID.SIM_PIVOT_KP,
+            IntakeConstants.PID.SIM_PIVOT_KI,
+            IntakeConstants.PID.SIM_PIVOT_KD,
+            TrapezoidProfile.Constraints(
+                IntakeConstants.MAX_VELOCITY, IntakeConstants.MAX_ACCELERATION
+            )
         )
     private var intakeFeedforward =
         ArmFeedforward(

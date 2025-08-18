@@ -27,7 +27,7 @@ class Intake(private val io: IntakeIO): SubsystemBase() { //Class Intake, and ev
                     (inputs.intakePosition - intakePositionTarget).absoluteValue <= IntakeConstants.INTAKE_TOLERANCE
                 )
 
-    var currentRequest: Request.IntakeRequest = Request.IntakeRequest.Uninitialized() //this asks whether the currentRequest is an OpenLoop or ClosedLoop
+    var currentRequest: Request.IntakeRequest = Request.IntakeRequest.Zero() //this asks whether the currentRequest is an OpenLoop or ClosedLoop
         set(value) {
             when (value) {
                 is Request.IntakeRequest.OpenLoop -> {
@@ -56,7 +56,7 @@ class Intake(private val io: IntakeIO): SubsystemBase() { //Class Intake, and ev
         IntakeTunableValues.kS.initDefault(IntakeConstants.PID.INTAKE_KS)
         IntakeTunableValues.kA.initDefault(IntakeConstants.PID.INTAKE_KA)
         IntakeTunableValues.kV.initDefault(IntakeConstants.PID.INTAKE_KV)
-        IntakeTunableValues.kGDefault.initDefault(IntakeConstants.PID.INTAKE_KG) //Default cs gravity
+        IntakeTunableValues.kG.initDefault(IntakeConstants.PID.INTAKE_KG) //Default cs gravity
     } //sets up PID
 
     override fun periodic() {
@@ -71,7 +71,7 @@ class Intake(private val io: IntakeIO): SubsystemBase() { //Class Intake, and ev
             IntakeTunableValues.kS.hasChanged() ||
                 IntakeTunableValues.kA.hasChanged() ||
                 IntakeTunableValues.kV.hasChanged() ||
-                IntakeTunableValues.kGDefault.hasChanged()
+                IntakeTunableValues.kG.hasChanged()
 
         if (hasPIDChanged) {
             io.configPID(
@@ -82,7 +82,7 @@ class Intake(private val io: IntakeIO): SubsystemBase() { //Class Intake, and ev
         }
         if (hasFFChanged) {
             io.configFF(
-                IntakeTunableValues.kGDefault.get(),
+                IntakeTunableValues.kG.get(),
                 IntakeTunableValues.kS.get(),
                 IntakeTunableValues.kV.get(),
                 IntakeTunableValues.kA.get()
@@ -134,4 +134,3 @@ class Intake(private val io: IntakeIO): SubsystemBase() { //Class Intake, and ev
 //State Machine does 2 things. 1. Keeps track of the current state. (Uninitialized, preheating, staying at it's temp) 2. Handling requests, and switching between states accordingly.
 //Actionable states are within Superstructure's State machine
 //Basic States are within logic files
-//test

@@ -2,6 +2,7 @@ package com.team4099.robot2025.config.constants
 
 import org.team4099.lib.units.base.amps
 import org.team4099.lib.units.base.inches
+import org.team4099.lib.units.base.meters
 import org.team4099.lib.units.base.pounds
 import org.team4099.lib.units.base.seconds
 import org.team4099.lib.units.derived.DerivativeGain
@@ -19,6 +20,9 @@ object IntakeConstants {
     val STATOR_CURRENT_LIMIT = 30.0.amps
     val SUPPLY_CURRENT_LIMIT = 40.0.amps
     val THRESHOLD_CURRENT_LIMIT = 40.0.amps
+
+    val MAX_VELOCITY = 400.0.degrees.perSecond
+    val MAX_ACCELERATION = 200.0.degrees.perSecond.perSecond
 
     val MIN_ROTATION = 0.0.degrees
     val MAX_ROTATION = 132.0.degrees

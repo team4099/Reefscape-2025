@@ -27,9 +27,9 @@ object IntakeTunableValues {
       Pair({ it.inVoltsPerDegreePerSecondPerSecond }, { it.volts.perDegreePerSecondPerSecond })
     )
 
-  val kGDefault =
+  val kG =
     LoggedTunableValue(
-      "Intake/kGDefault",  Pair({ it.inVolts }, { it.volts })
+      "Intake/kG",  Pair({ it.inVolts }, { it.volts })
     )
 
   val kP =
